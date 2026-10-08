@@ -771,8 +771,10 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a GitHub Release URL */
           : '<span class="dl-btn off">Not published</span>');
       dlg.appendChild(c);
     });
-    dlnote.textContent = live
-      ? 'SHA-256 values are of the files exactly as served. Verify with:  sha256sum -c SHA256SUMS.txt'
+    dlnote.innerHTML = live
+      ? 'SHA-256 values are those of the files exactly as served. Verify each download against '+
+        '<a href="files/SHA256SUMS.txt">files/SHA256SUMS.txt</a> '+
+        '<span class="mono">(sha256sum -c SHA256SUMS.txt)</span>.'
       : 'No artifacts are published yet. Run FEILIAN_deploy/make_downloads.py to assemble and enable them.';
   }
 

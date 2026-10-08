@@ -1,3 +1,11 @@
-# Keep the shipped artifacts byte-exact across checkouts.
+# Shipped artifacts must stay byte-exact across checkouts and platforms.
 *.zip  binary
 *.pdf  binary
+
+# Served text: always LF, so the deployed bytes do not depend on the platform
+# that happened to clone the repository.
+*.html text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.js   text eol=lf
+*.css  text eol=lf
