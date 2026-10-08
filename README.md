@@ -28,37 +28,41 @@ python -m http.server 8000
 
 ## Deploy to GitHub Pages
 
-### Option A — project site (recommended)
+Target: **`pennybenny/crypto-lab-feilian`** → <https://pennybenny.github.io/crypto-lab-feilian/>
 
-1. Create an empty repository on GitHub, e.g. `feilian-spec-compendium` (public).
+### One-liner (recommended)
+
+A ready-made script lives in the sibling folder `FEILIAN_deploy/`:
+
+```bash
+bash ../FEILIAN_deploy/deploy_github_pages.sh                                          # Git Bash / WSL
+powershell -ExecutionPolicy Bypass -File ..\FEILIAN_deploy\deploy_github_pages.ps1     # PowerShell
+```
+
+It reuses the repository already initialised in this folder, sets the remote and pushes. If the GitHub CLI is installed and authenticated it also creates the repo and enables Pages automatically.
+
+### By hand
+
+1. Create an empty **public** repo named `crypto-lab-feilian`.
 2. From this folder:
 
    ```bash
-   git init
-   git add -A
-   git commit -m "FEILIAN specification compendium"
-   git branch -M main
-   git remote add origin https://github.com/<your-user>/feilian-spec-compendium.git
+   git remote add origin https://github.com/pennybenny/crypto-lab-feilian.git
    git push -u origin main
    ```
 
-3. On GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch `main`, folder `/ (root)`, Save.
-4. Wait ~1 minute. The site is live at `https://<your-user>.github.io/feilian-spec-compendium/`.
+3. **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch `main`, folder `/ (root)`, Save.
+4. Live in ~1 minute at <https://pennybenny.github.io/crypto-lab-feilian/>.
 
-### Option B — user site
-
-If the repository is named `<your-user>.github.io`, the site is served at `https://<your-user>.github.io/`.
-
-### Option C — command line with the GitHub CLI
-
-If you install [`gh`](https://cli.github.com/) and run `gh auth login`:
+### With the GitHub CLI
 
 ```bash
-git init && git add -A && git commit -m "FEILIAN specification compendium"
-gh repo create feilian-spec-compendium --public --source=. --push
-gh api -X POST repos/:owner/feilian-spec-compendium/pages \
+gh repo create pennybenny/crypto-lab-feilian --public --source=. --push
+gh api -X POST repos/pennybenny/crypto-lab-feilian/pages \
   -f 'source[branch]=main' -f 'source[path]=/'
 ```
+
+> The repo name is free — whatever you pick, the URL becomes `https://pennybenny.github.io/<repo>/`.
 
 ## Alternative hosts (drag-and-drop, no git)
 
@@ -71,7 +75,13 @@ gh api -X POST repos/:owner/feilian-spec-compendium/pages \
 
 ## Custom domain
 
-Add a file named `CNAME` in this folder containing the bare domain (e.g. `feilian.example.org`), commit it, then point a `CNAME` DNS record at `<your-user>.github.io`. Enable "Enforce HTTPS" in Pages settings.
+Optional — the site works fine on the `pennybenny.github.io` URL.
+
+1. Add a file named `CNAME` in this folder containing the bare domain, e.g. `crypto-lab.pennybenny.dev`, and commit it.
+2. At your DNS provider add a `CNAME` record: `crypto-lab` → `pennybenny.github.io`.
+3. In **Settings → Pages → Custom domain** confirm the domain and tick **Enforce HTTPS**.
+
+This mirrors the pattern used by the Ascon lab site (`crypto-lab.systemslibrarian.dev` → `systemslibrarian.github.io/crypto-lab-ascon`).
 
 ## Provenance and caveats
 
