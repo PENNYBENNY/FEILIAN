@@ -1,0 +1,17 @@
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors
+*.swp
+*~
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Scratch
+*.tmp
