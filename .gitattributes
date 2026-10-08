@@ -1,12 +1,8 @@
-# Shipped artifacts must stay byte-exact across checkouts and platforms.
+# Served and shipped bytes must not depend on the platform that cloned the repo.
+# Text files are stored and checked out with LF everywhere; git still detects and
+# leaves genuine binaries alone.
+* text=auto eol=lf
+
+# Shipped artifacts stay byte-exact, whatever the platform.
 *.zip  binary
 *.pdf  binary
-
-# Served text: always LF, so the deployed bytes do not depend on the platform
-# that happened to clone the repository.
-*.html text eol=lf
-*.md   text eol=lf
-*.txt  text eol=lf
-*.js   text eol=lf
-*.css  text eol=lf
-.gitattributes text eol=lf
