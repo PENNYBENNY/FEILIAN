@@ -83,6 +83,55 @@ Optional — the site works fine on the `pennybenny.github.io` URL.
 
 This mirrors the pattern used by the Ascon lab site (`crypto-lab.systemslibrarian.dev` → `systemslibrarian.github.io/crypto-lab-ascon`).
 
+## Downloadable artifacts
+
+`index.html` renders a **Downloads** section from a manifest embedded between
+`/* DOWNLOADS:BEGIN */` and `/* DOWNLOADS:END */`. Nothing is published until you
+build it, so the section shows *Not published* rather than a dead link.
+
+```bash
+python ../FEILIAN_deploy/make_downloads.py             # dry run — shows what would be built
+python ../FEILIAN_deploy/make_downloads.py --publish   # build files/ and patch the manifest
+```
+
+Output lands in `FEILIAN_site/files/`:
+
+| File | Built from | Size |
+|---|---|---|
+| `specification.pdf` | the specification, as filed | 649 KB |
+| `feilian-code.zip` | `Implementations/` — C (reference + AVX2/SIMD) + SystemVerilog | 107 KB |
+| `feilian-archive.zip` | code + `KAT_current/` + Appendix B work + docs | 9.94 MB |
+| `SHA256SUMS.txt` | `sha256sum -c` compatible manifest | — |
+
+> ⚠️ **Disclosure.** Copying `specification.pdf`, the implementations or the KAT
+> vectors into a public repository publishes submission material. Confirm with the
+> authors and the NGCC programme that release is permitted before running
+> `--publish` on a public repo. Both the specification PDF and the code are
+> covered by this; only the compendium page itself is analysis.
+
+Zips are written deterministically (sorted entries, fixed timestamps) so the same
+inputs always yield byte-identical archives and identical SHA-256. Flags
+`--with-bench` and `--with-reference` additionally bundle `FEILIAN_bench/` and
+`ZC-DM/`; `--out DIR` and `--no-patch` let you stage the build elsewhere first.
+
+### Where to host the artifacts
+
+| Route | URL shape | Needs git | Loads in mainland China |
+|---|---|---|---|
+| **In the repo, served by Pages** (default) | `/FEILIAN/files/x.zip` | yes | ✅ `github.io` is reachable |
+| GitHub Releases | `.../FEILIAN/releases/download/v1/x.zip` | upload via UI or `gh` | ❌ the URL *starts* at `github.com`, which is blocked |
+| jsDelivr over the repo | `cdn.jsdelivr.net/gh/pennybenny/FEILIAN@<tag>/files/x.zip` | yes | ✅ good China CDN, but **20 MB per file** |
+| Cloudflare R2 / Pages | your own domain | no | ✅ |
+
+Because the Release download URL begins at `github.com`, it is the one route that
+does **not** work behind the usual block — the in-repo Pages route is both the
+simplest and the one that survives it. Note also that the HTML `download`
+attribute only forces a save dialog for **same-origin** links; a cross-origin
+mirror just navigates to the file.
+
+Site budget: GitHub Pages allows ~1 GB per published site, and no single git file
+may exceed 100 MB. Git LFS is **not** supported by Pages — commit the real bytes.
+
 ## Troubleshooting: `Connection was reset` when pushing
 
 On mainland-China networks the TLS connection to `github.com:443` is frequently reset. Git for Windows **ignores the Windows system proxy**, so a browser that reaches GitHub fine does not mean git will.
