@@ -1,0 +1,3 @@
+# Keep the shipped artifacts byte-exact across checkouts.
+*.zip  binary
+*.pdf  binary
