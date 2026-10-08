@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FEILIAN — Specification Compendium (hash-10)</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --bg2:#eef1f8; --card:#ffffff; --ink:#161c28; --ink-soft:#5a6478;
+    --line:#e4e8f0; --line2:#d6dcea;
+    --p1:#4338ca; --p2:#0ea5e9; --accent:#4338ca; --accent-soft:#eef1fe;
+    --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c;
+    --grad:linear-gradient(120deg,#4338ca 0%,#5b53e0 42%,#0ea5e9 100%);
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang SC",sans-serif;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);
+    --shadow-lg:0 24px 60px -24px rgba(30,27,110,.42);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:70px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+       line-height:1.62;font-size:15px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  h2,h3,h4{line-height:1.25}
+
+  #prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad);z-index:100;transition:width .12s linear}
+
+  .rv{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+  .rv.in{opacity:1;transform:none}
+  .rv.d1{transition-delay:.06s}.rv.d2{transition-delay:.12s}.rv.d3{transition-delay:.18s}.rv.d4{transition-delay:.24s}
+
+  header.hero{position:relative;overflow:hidden;color:#fff;
+              background:radial-gradient(1200px 500px at 15% -10%,#6d5ff0 0%,transparent 55%),
+                         radial-gradient(900px 500px at 100% 0%,#19b6e8 0%,transparent 50%),
+                         linear-gradient(150deg,#1b1f4b 0%,#2a2e6e 55%,#123a63 100%);
+              padding:70px 0 60px}
+  header.hero::after{content:"";position:absolute;inset:0;
+     background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+                      linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+     background-size:44px 44px;mask-image:radial-gradient(700px 400px at 30% 20%,#000,transparent 75%)}
+  header.hero .wrap{position:relative;z-index:2}
+  .herogrid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+  @media(max-width:860px){.herogrid{grid-template-columns:1fr;gap:26px}}
+  .kicker{display:inline-flex;align-items:center;gap:8px;letter-spacing:.16em;text-transform:uppercase;
+          font-size:11px;font-weight:600;color:#c7d2fe;
+          border:1px solid rgba(199,210,254,.3);background:rgba(199,210,254,.08);
+          padding:6px 12px;border-radius:20px;margin:0 0 18px}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 0 rgba(94,234,212,.7);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(94,234,212,.6)}70%{box-shadow:0 0 0 10px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}
+  header.hero h1{margin:0 0 14px;font-size:60px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  header.hero h1 span{background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  header.hero p.sub{margin:0;font-size:17px;color:#dfe5f7;max-width:620px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
+       padding:11px 20px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:.2s}
+  .btn.p{background:#fff;color:#232a54;box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+  .btn.p:hover{transform:translateY(-2px);text-decoration:none}
+  .btn.g{background:rgba(255,255,255,.08);color:#e8ecfb;border-color:rgba(255,255,255,.28)}
+  .btn.g:hover{background:rgba(255,255,255,.16);text-decoration:none}
+
+  .panel{background:rgba(10,14,40,.5);border:1px solid rgba(160,180,255,.25);border-radius:16px;
+         padding:16px 16px 14px;backdrop-filter:blur(8px);box-shadow:0 20px 50px -20px rgba(0,0,0,.6)}
+  .panel .bar{display:flex;gap:6px;margin-bottom:12px}
+  .panel .bar i{width:10px;height:10px;border-radius:50%;background:#3b4a7a;display:block}
+  .panel .bar i:nth-child(1){background:#ff5f57}.panel .bar i:nth-child(2){background:#febc2e}.panel .bar i:nth-child(3){background:#28c840}
+  .panel .ttl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#93a3d6;margin:0 0 8px}
+  .panel .hex{font-family:var(--mono);font-size:12.5px;color:#9ff0e0;word-break:break-all;min-height:52px;line-height:1.8}
+  .panel .hex b{color:#67e8f9;font-weight:600}
+  .panel .caret{display:inline-block;width:8px;height:15px;background:#9ff0e0;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .panel .foot{margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,180,255,.2);
+               font-size:11.5px;color:#93a3d6;display:flex;justify-content:space-between;font-family:var(--mono)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:8px;
+        padding:6px 11px;font-size:12px;font-family:var(--mono);color:#e6ebfa}
+  .chip b{color:#a5b4fc;font-weight:600}
+
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(247,248,251,.86);backdrop-filter:blur(10px);
+          border-bottom:1px solid var(--line)}
+  nav.toc .wrap{display:flex;gap:2px;padding:9px 24px;overflow-x:auto}
+  nav.toc a{font-size:13px;color:var(--ink-soft);padding:7px 12px;border-radius:8px;white-space:nowrap;font-weight:500}
+  nav.toc a:hover{background:var(--accent-soft);color:var(--accent);text-decoration:none}
+  nav.toc a.on{background:var(--accent);color:#fff}
+
+  section{padding:56px 0 8px}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--p2);margin:0 0 8px}
+  section h2{font-size:30px;margin:0 0 10px;letter-spacing:-.015em}
+  .lead{color:var(--ink-soft);margin:8px 0 22px;max-width:840px;font-size:15.5px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+        box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+  .lift:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+  .stat{text-align:left}
+  .stat .v{font-size:30px;font-weight:800;letter-spacing:-.02em;
+           background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .stat .l{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#f2f5fb;font-weight:600}
+  tbody tr{transition:background .2s}
+  tbody tr:nth-child(even){background:#fafbfe}
+  tbody tr:hover{background:var(--accent-soft)}
+  tbody tr.hl{background:#e7f6ff!important;box-shadow:inset 3px 0 0 var(--p2)}
+  td.k{font-weight:600;white-space:nowrap}
+  td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
+  .tblcap{font-size:12.5px;color:var(--ink-soft);margin:4px 0 0}
+
+  code,.mono{font-family:var(--mono);font-size:13px}
+  pre{background:#0d1424;color:#e6edf6;border-radius:10px;padding:16px 18px;overflow:auto;
+      font-family:var(--mono);font-size:12.5px;line-height:1.6;margin:8px 0}
+  pre .lbl{color:#7fd1c4}
+  .vecbox{position:relative}
+  .copy{position:absolute;top:12px;right:12px;background:#22384f;color:#cfe3f5;border:0;border-radius:6px;
+        font-size:11px;padding:5px 10px;cursor:pointer;font-family:var(--sans);font-weight:600;transition:.2s}
+  .copy:hover{background:var(--p2)}
+
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
+  .b-high{background:#fdecea;color:var(--high)}
+  .b-med{background:#fdf3e2;color:var(--med)}
+  .b-info{background:#e7f2fb;color:var(--info)}
+  .b-ok{background:#e5f5ee;color:var(--ok)}
+
+  .note{background:#fff9ea;border:1px solid #f1dcae;border-left:4px solid var(--med);border-radius:10px;
+        padding:13px 17px;font-size:13.5px;margin:16px 0}
+  .note b{color:var(--med)}
+  .callout{background:var(--accent-soft);border:1px solid #ccd7fb;border-radius:10px;padding:15px 18px;margin:16px 0;font-size:14px}
+  .callout.warn{background:#fdeeec;border-color:#f3bab4}
+  .callout.ok{background:#e8f6f0;border-color:#b7e2d0}
+
+  figure{margin:18px 0}
+  figure svg{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:14px}
+  figcaption{font-size:12.5px;color:var(--ink-soft);margin-top:9px;text-align:center}
+
+  ul.tight{margin:8px 0;padding-left:19px}
+  ul.tight li{margin:5px 0}
+  .ref{font-size:13px;color:var(--ink-soft);padding:7px 0;border-bottom:1px dashed var(--line)}
+  .ref:last-child{border-bottom:0}
+
+  .seg{display:inline-flex;background:#eef1f8;border:1px solid var(--line2);border-radius:10px;padding:4px;gap:4px}
+  .seg button{border:0;background:transparent;font-family:var(--sans);font-weight:600;font-size:13.5px;
+              color:var(--ink-soft);padding:8px 18px;border-radius:7px;cursor:pointer;transition:.2s}
+  .seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(20,30,60,.14)}
+
+  .vec-panel{display:none}
+  .vec-panel.on{display:block;animation:fade .45s cubic-bezier(.2,.7,.3,1)}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .steps{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+  .stepbtn{border:1px solid var(--line2);background:#fff;border-radius:9px;width:38px;height:38px;
+           font-size:16px;cursor:pointer;color:var(--ink);transition:.2s}
+  .stepbtn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .stepbtn.play{width:auto;padding:0 18px;font-weight:600;font-size:13.5px;background:var(--grad);color:#fff;border:0}
+  .stepcap{font-size:13.5px;color:var(--ink-soft)}
+  .stepcap b{color:var(--ink)}
+  .ph-box{transition:.35s}
+  .ph-box rect.frame{fill:#f7f9fd;stroke:#dbe3f2;stroke-width:1.5;transition:.35s}
+  .ph-box.active rect.frame{fill:#eaf0ff;stroke:var(--accent);stroke-width:2.4;filter:drop-shadow(0 6px 14px rgba(67,56,202,.22))}
+  .ph-cell{fill:#dfe6f5;transition:.35s}
+  .ph-cell.msg{fill:#c3cef7}
+  .ph-box.active .ph-cell{fill:#9fb0ea}
+  .ph-box.active .ph-cell.msg{fill:var(--p1)}
+
+  .bar-row{display:grid;grid-template-columns:132px 1fr 100px;align-items:center;gap:12px;margin:8px 0;font-size:13px}
+  .bar-track{background:#eef1f8;border-radius:6px;height:22px;overflow:hidden}
+  .bar-fill{height:100%;width:0;background:var(--grad);border-radius:6px;transition:width 1s cubic-bezier(.2,.7,.3,1)}
+  .bar-fill.keep{background:linear-gradient(90deg,#c0271b,#e0603f)}
+  .bar-fill.alt{background:linear-gradient(90deg,#0e6ba8,#38bdf8)}
+  .bar-val{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-align:right}
+
+  .chk{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}
+  .chk:last-child{border-bottom:0}
+  .chk .n{flex:0 0 62px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
+          display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--mono);font-size:12px}
+  .chk .t{font-size:14px}
+
+  footer{border-top:1px solid var(--line);margin-top:48px;padding:32px 0 56px;color:var(--ink-soft);font-size:12.5px;background:var(--bg2)}
+  .disclaimer{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 19px;margin:16px 0}
+  .toplink{position:fixed;right:22px;bottom:22px;z-index:60;background:var(--accent);color:#fff;width:44px;height:44px;
+           border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;
+           box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s}
+  .toplink.show{opacity:1;pointer-events:auto}
+  .toplink:hover{transform:translateY(-3px);text-decoration:none}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="herogrid">
+      <div>
+        <p class="kicker"><span class="dot"></span> NGCC-CH Submission · Technical Compendium</p>
+        <h1><span>FEILIAN</span></h1>
+        <p class="sub">A 1024-bit ARX hash function on a single narrow-pipe compression function. Parameters, canonical test vectors, security analysis, reported performance and applications — assembled from the submitted specification into one interactive walkthrough.</p>
+        <div class="cta">
+          <a href="#spec" class="btn p">Explore the specification →</a>
+          <a href="#vectors" class="btn g">Jump to test vectors</a>
+        </div>
+        <div class="chips">
+          <span class="chip"><b>Revision</b> 2026-09-29</span>
+          <span class="chip"><b>Designation</b> hash-10</span>
+          <span class="chip"><b>Digest</b> 512 / 768 / 1024</span>
+          <span class="chip"><b>State</b> 1024-bit</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <p class="ttl">live · initial vector (π-derived)</p>
+        <div class="hex" id="ticker"></div>
+        <div class="foot"><span>IV[0..15]</span><span id="tickmeta">1024-bit</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav class="toc" id="toc">
+  <div class="wrap">
+    <a href="#overview">Overview</a>
+    <a href="#spec">Specification</a>
+    <a href="#arch">Pipeline</a>
+    <a href="#iv">IV &amp; Constants</a>
+    <a href="#vectors">Test Vectors</a>
+    <a href="#security">Security</a>
+    <a href="#perf">Performance</a>
+    <a href="#apps">Applications</a>
+    <a href="#component">Components</a>
+    <a href="#refs">References</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================= OVERVIEW ================= -->
+<section id="overview">
+  <p class="eyebrow rv">01 — Overview</p>
+  <h2 class="rv">What FEILIAN is</h2>
+  <p class="lead rv">FEILIAN is a candidate submitted to the Next-generation Commercial Cryptographic Algorithms programme (NGCC-CH). It runs a 1024-bit chaining state with a 1024-bit message block; the compression function is a tweakable ARX permutation under a Davies–Meyer feed-forward. All three digest lengths reuse the same 1024-bit internal state — only the output is truncated, so one core implementation serves the whole family.</p>
+
+  <div class="grid4">
+    <div class="card stat lift rv d1"><div class="v" data-count="1024" data-suffix="-bit">0</div><div class="l">Chaining state &amp; message block</div></div>
+    <div class="card stat lift rv d2"><div class="v" data-count="20">0</div><div class="l">Rounds across 5 phases</div></div>
+    <div class="card stat lift rv d3"><div class="v" data-count="40">0</div><div class="l">SubColumn · ShiftRow layers</div></div>
+    <div class="card stat lift rv d4"><div class="v" data-count="3">0</div><div class="l">Digest sizes · 512 / 768 / 1024</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="card lift rv">
+      <h3 style="margin-top:0">Design highlights</h3>
+      <ul class="tight">
+        <li>HAIFA-style iteration with a public tweak (§3.1, §4.3)</li>
+        <li>Davies–Meyer: <span class="mono">h′ = v₀ ⊕ v₅ = E(h) ⊕ h</span> (§2.2.4)</li>
+        <li>Permutation <span class="mono">E</span>: 20 rounds / 5 phases, 2 SubColumn layers per round</li>
+        <li>Strictly ARX — no message-word re-ordering, no linear expansion (§3.1)</li>
+        <li>Six rotation constants in total: 5, 48, 8 and 11, 40, 63 (§3.1)</li>
+      </ul>
+    </div>
+    <div class="card lift rv d1">
+      <h3 style="margin-top:0">Public tweak <span class="mono" style="font-weight:400">tw=(ver,flag,t₀,t₁)</span></h3>
+      <ul class="tight">
+        <li>Version <span class="mono">ver</span> — 64-bit: <span class="mono">0x200/0x300/0x400</span> for 512/768/1024</li>
+        <li>Final-call flag <span class="mono">flag</span> — 64-bit, <span class="mono">0</span> or all-ones</li>
+        <li>Counter <span class="mono">t</span> — 128-bit message-bit count, split <span class="mono">t₀‖t₁</span></li>
+        <li>Loaded into state row 3 by <span class="mono">AC</span> (§2.2.2)</li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= SPEC ================= -->
+<section id="spec">
+  <p class="eyebrow rv">02 — Specification</p>
+  <h2 class="rv">Official parameters</h2>
+  <p class="lead rv">Parameters below are taken verbatim from the specification text; chapter and section references are given for each.</p>
+  <div class="card rv">
+    <table>
+      <tbody>
+        <tr><td class="k">Chaining state</td><td>1024 bit — the only internal state width; the 512/768 digests reuse it and truncate the output (§2.2.1, §2.3)</td></tr>
+        <tr><td class="k">Message block</td><td>1024 bit (128 bytes) (§2.2.1)</td></tr>
+        <tr><td class="k">Digest lengths</td><td>512 / 768 / 1024 bit; the digest is the state prefix <span class="mono">h₀…h₇</span> / <span class="mono">h₀…h₁₁</span> / <span class="mono">h₀…h₁₅</span> (§2.3)</td></tr>
+        <tr><td class="k">Version word</td><td><span class="mono">ver = 0x200</span> (512) · <span class="mono">0x300</span> (768) · <span class="mono">0x400</span> (1024) (§2.3)</td></tr>
+        <tr><td class="k">Total rounds</td><td>20 rounds, organised into 5 phases; a phase is one message-bearing round <span class="mono">R⊕</span> followed by three <span class="mono">R</span> (§2.2.3, §2.2.4)</td></tr>
+        <tr><td class="k">Message injection</td><td>Once per phase — rounds 1, 5, 9, 13, 17 — each injection absorbing the block <em>half by half</em> (§2.2.3)</td></tr>
+        <tr><td class="k">SubColumn / ShiftRow</td><td>2 layers per full round; 8 per phase; 40 layers in the whole permutation (§2.2.3)</td></tr>
+        <tr><td class="k">ShiftRow</td><td>Row <span class="mono">i</span> is rotated left by <span class="mono">i</span> positions, <span class="mono">i∈{0,1,2,3}</span> (§2.2.2)</td></tr>
+        <tr><td class="k">AddConstant</td><td>Row 1 ← XOR with the cyclically shifted constants <span class="mono">(C′₀…C′₃)</span>; row 3 ← XOR with <span class="mono">(ver,flag,t₀,t₁)</span> (§2.2.2)</td></tr>
+        <tr><td class="k">Phase constants</td><td>At phase <span class="mono">i</span>: <span class="mono">(C′₀,C′₁,C′₂,C′₃)=(C_{i%4},C_{(i+1)%4},C_{(i+2)%4},C_{(i+3)%4})</span> (§2.2.3)</td></tr>
+        <tr><td class="k">Compression mode</td><td>Davies–Meyer feed-forward: <span class="mono">h′ ← v₀ ⊕ v₅</span> (§2.2.4, discussed §4.4)</td></tr>
+        <tr><td class="k">Padding</td><td>Zero bits appended <em>only if</em> the last block is short; if the message length is a multiple of 1024 no padding is added — the final-call flag carries that role (§2.3, §4.3)</td></tr>
+        <tr><td class="k">Iteration counter</td><td><span class="mono">t</span> accumulates 1024 per non-final block; the final call carries <span class="mono">t</span> = true message bit length (§2.3)</td></tr>
+        <tr><td class="k">SubColumn (ARX)</td><td><span class="mono">Σ₀(z)=z⊕(z≫5)⊕(z≫48)</span>, <span class="mono">Σ₁(z)=z⊕(z≫11)⊕(z≫40)</span>; inner rotations <span class="mono">≫8</span> and <span class="mono">≫63</span> (§2.2.2)</td></tr>
+        <tr><td class="k">Initial vector</td><td>First 256 hexadecimal fractional digits of π (§2.1)</td></tr>
+        <tr><td class="k">Round constants</td><td>First 64 bits of the fractional parts of √2, √3, √5, √7 (§2.1)</td></tr>
+        <tr><td class="k">Byte order</td><td>Little-endian (§3.2)</td></tr>
+        <tr><td class="k">Message space</td><td>Bit length &lt; 2¹²⁸ (§2.3)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= ARCH ================= -->
+<section id="arch">
+  <p class="eyebrow rv">03 — Pipeline</p>
+  <h2 class="rv">Compression, step by step</h2>
+  <p class="lead rv">Step through the five phases of the permutation <span class="mono">E</span>. Each phase holds four rounds: one message-bearing round (dark) and three message-free rounds (light). Message blocks are injected at the first round of every phase, so the last injection is round 17.</p>
+
+  <div class="card rv">
+    <div class="steps">
+      <button class="stepbtn" id="prev" aria-label="previous phase">‹</button>
+      <button class="stepbtn play" id="play">▶ Play</button>
+      <button class="stepbtn" id="next" aria-label="next phase">›</button>
+      <span class="stepcap" id="cap">Press <b>Play</b> to walk the 20 rounds</span>
+    </div>
+    <figure style="margin:6px 0 0">
+      <svg viewBox="0 0 700 210" id="phasesvg" role="img" aria-label="Five-phase permutation pipeline">
+        <defs>
+          <style>
+            .plab{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12.5px;fill:#5a6478;font-weight:600}
+            .pnum{font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;fill:#8a94a8}
+            .ptag{font-family:'Inter',Arial,sans-serif;font-size:10.5px;font-weight:700;fill:#4338ca}
+          </style>
+        </defs>
+        <g id="phg"></g>
+        <line x1="30" y1="186" x2="670" y2="186" stroke="#dbe3f2" stroke-width="2"/>
+        <text class="pnum" x="30" y="203">round 1</text>
+        <text class="pnum" x="636" y="203">round 20</text>
+      </svg>
+      <figcaption>Figure 1 · Permutation E — 5 phases × 4 rounds; the message-bearing round of each phase is shown dark (§2.2.3–§2.2.4).</figcaption>
+    </figure>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="card rv">
+      <h3 style="margin-top:0">Compression wrapper</h3>
+      <p style="color:var(--ink-soft);margin:6px 0 0">The chain value <span class="mono">h</span> and message block <span class="mono">m</span> drive five phase calls <span class="mono">v₁=P₀(v₀,m) … v₅=P₄(v₄,m)</span>; the output is <span class="mono">h′ ← v₀ ⊕ v₅</span>. The tweak binds version, final-block flag and the 128-bit counter into every compression, so the same block processed at a different position is a different computation (§2.2.4, §4.3.2).</p>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Why the counter matters</h3>
+      <p style="color:var(--ink-soft);margin:6px 0 0">Under zero-only padding there is no in-block length delimiter, so the processed-bit count carried in the tweak <span class="mono">t</span> is what makes the message-to-transcript encoding injective. Encoding the number of processed bits invalidates the expandable-message structures behind Kelsey–Schneier second-preimage attacks (§4.3.2).</p>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-top:18px">
+    <div class="card rv">
+      <h3 style="margin-top:0">Round <span class="mono">R⊕</span></h3>
+      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">v ← v ⊕̂ m₀…m₇<br>v ← SC(v); v ← SR(v)<br>v ← v ⊕̂ m₈…m₁₅<br>v ← SC(v); v ← SR(v)<br>v ← AC(v)</p>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Round <span class="mono">R</span></h3>
+      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">v ← SC(v); v ← SR(v)<br>v ← SC(v); v ← SR(v)<br>v ← AC(v)</p>
+      <p style="color:var(--ink-soft);font-size:13px;margin:8px 0 0">Same layer sequence without absorbing a message half.</p>
+    </div>
+    <div class="card rv d2">
+      <h3 style="margin-top:0">SubColumn <span class="mono">SC</span></h3>
+      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">a₁ ← a₁+b₁; s₀ ← a₁<br>a₀ ← a₀+b₀; b₀ ← b₀⊕s₀<br>b₀′ ← b₀≫8; a₀′ ← a₀+Σ₀(b₀′)<br>s₁ ← a₀′; b₁ ← b₁⊕s₁<br>b₁′ ← b₁≫63; a₁′ ← a₁+Σ₁(b₁′)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= IV ================= -->
+<section id="iv">
+  <p class="eyebrow rv">04 — IV &amp; Constants</p>
+  <h2 class="rv">Initial vector and round constants</h2>
+  <p class="lead rv">The 1024-bit initial chaining value, shared by all three digest variants, is the first 256 hexadecimal fractional digits of π. The four round constants are the first 64 bits of the fractional parts of √2, √3, √5 and √7.</p>
+  <div class="grid2">
+    <div class="card vecbox rv">
+      <button class="copy" data-target="ivblock">Copy</button>
+      <h3 style="margin-top:0">IV (4×4, row-major — as printed)</h3>
+<pre id="ivblock"><span class="lbl">row0  </span>243f6a8885a308d3 13198a2e03707344 a4093822299f31d0 082efa98ec4e6c89
+<span class="lbl">row1  </span>452821e638d01377 be5466cf34e90c6c c0ac29b7c97c50dd 3f84d5b5b5470917
+<span class="lbl">row2  </span>9216d5d98979fb1b d1310ba698dfb5ac 2ffd72dbd01adfb7 b8e1afed6a267e96
+<span class="lbl">row3  </span>ba7c9045f12c7f99 24a19947b3916cf7 0801f2e2858efc16 636920d871574e69</pre>
+    </div>
+    <div class="card vecbox rv d1">
+      <button class="copy" data-target="rcblock">Copy</button>
+      <h3 style="margin-top:0">Round constants (4 words)</h3>
+<pre id="rcblock">6a09e667f3bcc908   C0  =  frac(√2)
+bb67ae8584caa73b   C1  =  frac(√3)
+3c6ef372fe94f82b   C2  =  frac(√5)
+a54ff53a5f1d36f1   C3  =  frac(√7)</pre>
+      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">One <span class="mono">Σ₀</span> + one <span class="mono">Σ₁</span> per SubColumn; the three inner rotations plus the three Σ rotations make the six constants the only dedicated parameters to memorise (§3.1).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VECTORS ================= -->
+<section id="vectors">
+  <p class="eyebrow rv">05 — Test Vectors</p>
+  <h2 class="rv">Appendix B vectors</h2>
+  <p class="lead rv">Appendix B of the specification gives, for each digest size, the intermediate states after rounds 1, 2, 5, 10 and 20 of every compression call plus the final digest. Appendix B states that values are printed left to right, top to bottom, so the first four words of a state are <span class="mono">m₀ m₁ m₂ m₃</span> and <span class="mono">h₀ h₁ h₂ h₃</span>. Under §2.3 the counter reaches the true message bit length at the final call — 24 for <span class="mono">"abc"</span>, 1032 for <span class="mono">"aaa…a"</span> — with <span class="mono">flag = 0xFFFF…FF</span>.</p>
+
+  <div class="rv" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+    <div class="seg" id="vecseg">
+      <button data-v="1024" class="on">FEILIAN-1024</button>
+      <button data-v="768">FEILIAN-768</button>
+      <button data-v="512">FEILIAN-512</button>
+    </div>
+    <span class="stepcap" id="vechint">Output width: <b>1024 bit</b> · 16 words</span>
+  </div>
+
+  <div class="card vecbox rv">
+    <button class="copy" data-target="vpanel-cur">Copy</button>
+    <div class="vec-panel on" data-v="1024">
+      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
+<pre>0507e4b1ef75d025 dfa303ea0a8e2c47 f9c7c5503dc12be4 d38615f0b1e1ed2b
+0ec6527ec29778a4 36be43cd599500fd fe2718a07ba9ca85 c94271df47351109
+dc73a8ec672ba113 296b155e56052dd6 39a0e0a636afea48 88db3739e2f282cc
+da0d93dfbeefde73 902c89d42803b6cb 7944717688ebc3b2 ad2955c31ee6c681</pre>
+      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
+<pre>e3383d3260ea32ed 8fe316f8b27cd6be a25969c43aacdc01 360c94861cd190ff
+95a82f04ebf95e95 19eef7c969bb0f0b ee439de8851ce6bf be21ba160f55884d
+af4263785f6b6d1e 7713350145ba5fcd eb63e5e2e376161b 5dfa8ef11f09e285
+ab8ebb5cb6de1b60 517922e7d3ffabf2 537a269f70f25f5a 117484183bc76ee5</pre>
+    </div>
+    <div class="vec-panel" data-v="768">
+      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
+<pre>ea0a78e8fd68db09 af5ad1d5755311e6 073e2742f9c9f79f cb9966dc869e1454
+bac2495ca9bfe8ea 2f331638ccd98a3f 6ecdb42b952889b0 ec054a26e934fe94
+f46b8b5fd6c4bb34 b5bfb869028e76f7 8bbc0c99f1c276be cb1adc2739a5abe1</pre>
+      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
+<pre>5fc94695955a87e9 defaaf83a7460733 ded961a12b7c5507 3af1611c8f524339
+af4000edb802c443 32b24a4187525040 e12f4e530c633797 c2283313a832445c
+b62f926c28f0e45f 7ccb8b9c22780964 46141c07e46f78a0 14ab284f37e6d4fd</pre>
+    </div>
+    <div class="vec-panel" data-v="512">
+      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
+<pre>fc7320c565f60ec6 a6ea26585f7c7d1f 50931119a1d1fb6c a06a71bed9bce094
+7e22171373e48e0c 9bb1ef36808ef3e5 fa56c50ff5838213 b54a0750c6ae1270</pre>
+      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
+<pre>a2189955d155788c e69ab2a6db9b5a94 3eff5d5924876f96 ba46d3944947238e
+3f0f29ea4c15bddd a8dd238876b0d693 3d6f17a7eb6e166b 5e4afb38519b803a</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECURITY ================= -->
+<section id="security">
+  <p class="eyebrow rv">06 — Security</p>
+  <h2 class="rv">Claims and analyses</h2>
+  <p class="lead rv">Table 4.1 states the security claims of the family in the classical setting; §4.2 reports NIST SP 800-22 statistical results and §4.5.3 an avalanche table. The mode and component arguments follow in §4.3–§4.6.</p>
+
+  <div class="card rv">
+    <table>
+      <thead><tr><th>Instance</th><th class="num">Collision</th><th class="num">Second-preimage</th><th class="num">Preimage</th></tr></thead>
+      <tbody>
+        <tr data-size="1024"><td class="k">FEILIAN-1024</td><td class="num">512</td><td class="num">1024</td><td class="num">1024</td></tr>
+        <tr data-size="768"><td class="k">FEILIAN-768</td><td class="num">384</td><td class="num">768</td><td class="num">768</td></tr>
+        <tr data-size="512"><td class="k">FEILIAN-512</td><td class="num">256</td><td class="num">512</td><td class="num">512</td></tr>
+      </tbody>
+    </table>
+    <p class="tblcap">Specification Table 4.1 — security claims in bits, classical setting. §4.1 additionally claims <em>no dedicated quantum attack</em> on collision, second-preimage or preimage resistance with complexity below the corresponding generic quantum attack; no separate quantum exponents are tabulated in the specification.</p>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="card rv">
+      <h3 style="margin-top:0">NIST SP 800-22 (§4.2)</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Messages from an 8-byte big-endian counter, digests concatenated in counter order and truncated to exactly 100,000,000 bits, split into 100 sequences of 1,000,000 bits, tested with all 15 tests at default parameters. Selected rows, reporting proportion of passing sequences:</p>
+      <table style="font-size:13px">
+        <thead><tr><th>Statistical test</th><th class="num">P-value</th><th class="num">Proportion</th></tr></thead>
+        <tbody>
+          <tr><td>Frequency</td><td class="num">0.574903</td><td class="num">98/100</td></tr>
+          <tr><td>BlockFrequency</td><td class="num">0.719747</td><td class="num">97/100</td></tr>
+          <tr><td>Runs</td><td class="num">0.678686</td><td class="num">99/100</td></tr>
+          <tr><td>FFT</td><td class="num">0.122325</td><td class="num">99/100</td></tr>
+          <tr><td>ApproximateEntropy</td><td class="num">0.383827</td><td class="num">100/100</td></tr>
+          <tr><td>RandomExcursions</td><td class="num">0.534146</td><td class="num">58/58</td></tr>
+          <tr><td>LinearComplexity</td><td class="num">0.437274</td><td class="num">99/100</td></tr>
+        </tbody>
+      </table>
+      <p class="tblcap">Seven of the rows printed in Table 4.2 (the specification elides the remainder). Pass proportions sit at or near 100% of the eligible sequences.</p>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Structure and diffusion (§4.3–§4.6)</h3>
+      <ul class="tight">
+        <li><b>Mode.</b> A HAIFA variant using a counter but no salt; the final-block flag replaces traditional padding's role, giving resistance to length extension and long-message second preimages (§4.3.2).</li>
+        <li><b>Indifferentiability.</b> §4.3.1 gives a simulator proof with distinguishing advantage <span class="mono">O(q²/2ⁿ)</span>, arguing that <span class="mono">flag</span> makes message processing prefix-free.</li>
+        <li><b>Davies–Meyer.</b> Collision and preimage resistance from the ideal-cipher assumption; a fixed-point property exists but the designers judge it without real impact (§4.4).</li>
+        <li><b>Diffusion.</b> Best one-round differential trail <span class="mono">2⁻³</span>; average flipped bits per word after three rounds <span class="mono">31.7–32.4</span> out of 64 (§4.5.3, Table 4.3).</li>
+        <li><b>Dedicated attacks.</b> Rotational, slide, rotational-slide, meet-in-the-middle and boomerang analysis (§4.6); four phases are argued sufficient against sliding, because aligning <span class="mono">P₀</span> with <span class="mono">P₄</span> requires sliding over four phases.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PERFORMANCE ================= -->
+<section id="perf">
+  <p class="eyebrow rv">07 — Performance</p>
+  <h2 class="rv">Implementation and reported performance</h2>
+  <p class="lead rv">Chapter 5 of the specification reports the operation counts, memory footprint, software timings and FPGA synthesis results of the family.</p>
+
+  <div class="grid2">
+    <div class="card rv">
+      <h3 style="margin-top:0">One compression function, counted (§5.1.1)</h3>
+      <div class="bar-row"><span>Additions</span><div class="bar-track"><div class="bar-fill" data-w="52.6"></div></div><span class="bar-val">640</span></div>
+      <div class="bar-row"><span>XORs</span><div class="bar-track"><div class="bar-fill alt" data-w="100"></div></div><span class="bar-val">1216</span></div>
+      <div class="bar-row"><span>Rotations</span><div class="bar-track"><div class="bar-fill alt" data-w="78.9"></div></div><span class="bar-val">960</span></div>
+      <p class="tblcap">Excluding padding, block loading and state copying, which the specification says are memory moves with negligible arithmetic overhead.</p>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Memory (§5.1.2)</h3>
+      <table style="font-size:13.5px">
+        <tbody>
+          <tr><td class="k">ROM — IV</td><td class="num">128 bytes</td></tr>
+          <tr><td class="k">ROM — phase constants</td><td class="num">128 bytes</td></tr>
+          <tr><td class="k">RAM — full working set</td><td class="num">528 bytes</td></tr>
+          <tr><td class="k">RAM — minimum stated</td><td class="num">400 bytes</td></tr>
+        </tbody>
+      </table>
+      <p class="tblcap">No permutation tables are stored. The specification notes a further 96-byte ROM saving is possible by storing one constant group and index-shifting, at four modular-index operations per round, and that streaming the message block can cut a further 128 bytes of RAM.</p>
+    </div>
+  </div>
+
+  <div class="card rv" style="margin-top:18px">
+    <h3 style="margin-top:0">Software benchmarks (§5.3)</h3>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Platform (§5.3, Table 5.1)</th><th>ISA</th><th>OS / compiler</th><th class="num">10 B</th><th class="num">100 B</th><th class="num">1 kB</th><th class="num">10 kB</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Intel i7-10750H @2.60 GHz</td><td>AVX2</td><td>Windows 11 · GCC 16.1.0</td><td class="num">56.98</td><td class="num">5.77</td><td class="num">3.65</td><td class="num">3.57</td></tr>
+        <tr><td class="k">AMD Ryzen 9 8945HX @2.50 GHz</td><td>AVX2</td><td>Windows 11 · GCC 15.2.0</td><td class="num">44.15</td><td class="num">4.71</td><td class="num">3.09</td><td class="num">3.05</td></tr>
+        <tr><td class="k">Apple M2 Pro @3.50 GHz</td><td>NEON</td><td>macOS 26 · Clang 17.0.0</td><td class="num">55.76</td><td class="num">5.64</td><td class="num">4.19</td><td class="num">4.09</td></tr>
+      </tbody>
+    </table>
+    <p class="tblcap">Specification Table 5.2, FEILIAN-1024, built with <span class="mono">-O3 -march=native</span>, median over thousands of trials. The values scale with message length as cycles per byte.</p>
+  </div>
+
+  <figure class="rv">
+    <div id="cpbchart"></div>
+    <figcaption>Figure 2 · Cycles per byte, FEILIAN-1024 against BLAKE-64, SHA-512 and SHA-3-512 (specification Table 5.3, SUPERCOP/eBACS harness).</figcaption>
+  </figure>
+
+  <div class="grid2" style="margin-top:6px">
+    <div class="card rv">
+      <h3 style="margin-top:0">Vectorisation techniques (§5.2)</h3>
+      <ul class="tight">
+        <li>Each 4-word row packed into one 256-bit AVX2 register — four lanes per instruction.</li>
+        <li>Byte-granularity rotations via <span class="mono">VPSHUFB</span> with static masks, replacing shift/shift/or.</li>
+        <li><span class="mono">ROT63(x) = (x≫63) ⊕ (x+x)</span>, using the add unit instead of the shift unit.</li>
+        <li>All 20 rounds explicitly unrolled as five blocks of four.</li>
+        <li>Feed-forward from registers holding the initial state; no reload from memory.</li>
+        <li>Dual state buffers with pointer swapping, plus two-block-ahead non-temporal prefetch.</li>
+      </ul>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Parallelism (§5.1.3)</h3>
+      <ul class="tight">
+        <li>Four independent SubColumn calls per SubMatrix — 4-way column parallelism, with no cross-column dependency until ShiftRow.</li>
+        <li>Within a SubColumn the first two additions are independent, as are the two rotations inside each Σ.</li>
+        <li>A column is 256 bits wide, so it maps exactly onto one AVX2 register; 512-bit units are not twice as column-efficient but can hash two messages in lockstep.</li>
+        <li>ShiftRow needs cross-register shuffling, which the specification flags as a potential latency cost on some microarchitectures.</li>
+      </ul>
+    </div>
+  </div>
+
+  <figure class="rv">
+    <div id="fpgachart"></div>
+    <figcaption>Figure 3 · FPGA throughput of FEILIAN-f by architecture (§5.5, Table 5.5): 1SC / 2SC / 4SC / 8SC SubColumn units, on Xilinx Virtex-5 xc5vlx110 and AMD Zynq-7000 xc7z100.</figcaption>
+  </figure>
+
+  <div class="grid2">
+    <div class="card rv">
+      <h3 style="margin-top:0">FPGA synthesis results (§5.5, Table 5.5)</h3>
+      <table style="font-size:13px">
+        <thead><tr><th>Arch</th><th class="num">LUTs</th><th class="num">FFs</th><th class="num">MHz</th><th class="num">Lat. µs</th><th class="num">Mbps</th></tr></thead>
+        <tbody>
+          <tr><td class="k" colspan="6" style="background:#f2f5fb">Xilinx Virtex-5 xc5vlx110</td></tr>
+          <tr><td>8SC</td><td class="num">5226</td><td class="num">3419</td><td class="num">60.0</td><td class="num">0.35</td><td class="num">2925.7</td></tr>
+          <tr><td>4SC</td><td class="num">3585</td><td class="num">1057</td><td class="num">84.3</td><td class="num">0.48</td><td class="num">2105.4</td></tr>
+          <tr><td>2SC</td><td class="num">5189</td><td class="num">1561</td><td class="num">78.0</td><td class="num">1.04</td><td class="num">986.1</td></tr>
+          <tr><td>1SC</td><td class="num">3964</td><td class="num">2075</td><td class="num">101.0</td><td class="num">1.58</td><td class="num">644.3</td></tr>
+          <tr><td class="k" colspan="6" style="background:#f2f5fb">AMD Zynq-7000 xc7z100</td></tr>
+          <tr><td>8SC</td><td class="num">5249</td><td class="num">3429</td><td class="num">85.0</td><td class="num">0.24</td><td class="num">4139.8</td></tr>
+          <tr><td>4SC</td><td class="num">3343</td><td class="num">1142</td><td class="num">142.8</td><td class="num">0.28</td><td class="num">3566.5</td></tr>
+          <tr><td>2SC</td><td class="num">5079</td><td class="num">1558</td><td class="num">114.2</td><td class="num">0.71</td><td class="num">1443.7</td></tr>
+          <tr><td>1SC</td><td class="num">3973</td><td class="num">2083</td><td class="num">139.3</td><td class="num">1.16</td><td class="num">886.0</td></tr>
+        </tbody>
+      </table>
+      <p class="tblcap">Synplify Elite W-2024.09, base strategy. Message buffering, padding, bit counters and output registers are outside the measured block; constants and message selection are hard-wired, not in block RAM.</p>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Against the baselines (§5.5, Table 5.6)</h3>
+      <table style="font-size:13.5px">
+        <thead><tr><th>Core on Virtex-5</th><th class="num">Slices</th><th class="num">Mbps</th><th class="num">Mbps/slice</th></tr></thead>
+        <tbody>
+          <tr><td class="k">BLAKE-512</td><td class="num">406</td><td class="num">563</td><td class="num">1.39</td></tr>
+          <tr><td class="k">SHA-512</td><td class="num">818</td><td class="num">2267</td><td class="num">2.77</td></tr>
+          <tr><td class="k">Keccak-512</td><td class="num">1498</td><td class="num">8056</td><td class="num">5.38</td></tr>
+          <tr><td class="k">FEILIAN-1024 ([4SC])</td><td class="num">897</td><td class="num">2105</td><td class="num">2.35</td></tr>
+        </tbody>
+      </table>
+      <p class="tblcap">Slice counts for the baselines are estimated as <span class="mono">max(⌈LUTs/4⌉, ⌈FFs/4⌉)</span> for the platform's slice configuration. Software-wise §5.3 describes FEILIAN-1024 as roughly equivalent to SHA-512 in cycles per byte.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APPLICATIONS ================= -->
+<section id="apps">
+  <p class="eyebrow rv">08 — Applications</p>
+  <h2 class="rv">MAC, KDF and XOF</h2>
+  <p class="lead rv">Chapter 6 builds three standard constructions on the indifferentiability claim, exploiting the built-in counter and final-block flag.</p>
+
+  <div class="grid3">
+    <div class="card lift rv">
+      <h3 style="margin-top:0">MAC (§6.1)</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Because the flag and counter make length extension infeasible, a prefix-key MAC is available without HMAC's nested hashing:</p>
+      <p class="mono" style="margin:0">MAC_K(M) = FEILIAN(K‖M)</p>
+      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Secure up to 512-bit, the birthday bound of the 1024-bit state; the specification says it suits FEILIAN-512 in particular. HMAC over FEILIAN is the alternative given wide HMAC deployment.</p>
+    </div>
+    <div class="card lift rv d1">
+      <h3 style="margin-top:0">KDF (§6.2)</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">An extract-then-expand fit for HKDF-style constructions:</p>
+      <p class="mono" style="margin:0">PRK = FEILIAN(IKM)<br>K_i = FEILIAN(PRK‖info‖i)</p>
+      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Each <span class="mono">K_i</span> is a fresh oracle output on a distinct input, so the derived keys are pseudorandom and mutually independent; output length is unbounded in <span class="mono">i</span>.</p>
+    </div>
+    <div class="card lift rv d2">
+      <h3 style="margin-top:0">XOF (§6.3)</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Absorb and squeeze are separated by the <span class="mono">ver</span> and <span class="mono">flag</span> words, with the counter re-initialised to 0:</p>
+      <p class="mono" style="margin:0">Out₀ = f(h_root, empty, t=0)<br>Out₁ = f(h_root, empty, t=1)<br>XOF(M) = Out₀‖Out₁‖…</p>
+    </div>
+  </div>
+
+  <div class="card rv" style="margin-top:18px">
+    <h3 style="margin-top:0">Squeeze parameters (§6.3, Table 6.1)</h3>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Instance</th><th>absorbing <span class="mono">ver</span></th><th>squeezing <span class="mono">ver</span></th></tr></thead>
+      <tbody>
+        <tr><td class="k">FEILIAN-512</td><td class="mono">0x0000000000000200</td><td class="mono">0xFF00000000000200</td></tr>
+        <tr><td class="k">FEILIAN-768</td><td class="mono">0x0000000000000300</td><td class="mono">0xFF00000000000300</td></tr>
+        <tr><td class="k">FEILIAN-1024</td><td class="mono">0x0000000000000400</td><td class="mono">0xFF00000000000400</td></tr>
+      </tbody>
+    </table>
+    <p class="tblcap">Absorbing uses <span class="mono">flag = 0</span>; squeezing uses <span class="mono">flag = 0xFFFF…FF</span>. The empty squeeze block is padded under the normal rules, and the counter keeps each squeeze a distinct compression query.</p>
+  </div>
+</section>
+
+<!-- ================= COMPONENT ================= -->
+<section id="component">
+  <p class="eyebrow rv">09 — Components</p>
+  <h2 class="rv">Component-level linear-structure analysis</h2>
+  <p class="lead rv">A companion paper (Cryptology ePrint 2026/2236, CC BY 4.0) gives a <strong>complete classification</strong> of the whole-output linear structures of the 64-bit SubColumn. The paper states plainly that its results are component-level and establish <strong>no hash attack and no bound on the hash's security margin</strong>.</p>
+
+  <div class="grid2">
+    <div class="card rv">
+      <h3 style="margin-top:0">Result for FEILIAN</h3>
+      <ul class="tight">
+        <li>For w=64, r=8, s=63: <span class="mono">LD(F) = S</span>, dimension 2.</li>
+        <li>Exactly three nonzero members (<span class="mono">M=2⁶³</span>):
+          <br><span class="mono">(0,M,0,M)→(M,0,M,0)</span>
+          <br><span class="mono">(M,0,M,M)→(M,0,0,0)</span>
+          <br><span class="mono">(M,M,M,0)→(0,0,M,0)</span></li>
+        <li>Beyond the two SubColumn boundaries the family dies: <span class="mono">LD(A∘R∘A)∩LD(A)={0}</span>.</li>
+        <li>Real FEILIAN (ShiftRow <span class="mono">B=I</span>) lands in the first census row (8→0) — the family is cleared at the second boundary.</li>
+      </ul>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Row-mixer census (Theorem 8)</h3>
+      <div class="bar-row"><span>8 → 0</span><div class="bar-track"><div class="bar-fill" data-w="45.7"></div></div><span class="bar-val">9,216</span></div>
+      <div class="bar-row"><span>8 → 4 (→0)</span><div class="bar-track"><div class="bar-fill" data-w="34.3"></div></div><span class="bar-val">6,912</span></div>
+      <div class="bar-row"><span>8 → 4 → 2</span><div class="bar-track"><div class="bar-fill keep" data-w="5.7"></div></div><span class="bar-val">1,152</span></div>
+      <div class="bar-row"><span>8 → 4 → 4</span><div class="bar-track"><div class="bar-fill keep" data-w="11.4"></div></div><span class="bar-val">2,304</span></div>
+      <div class="bar-row"><span>8 → 8</span><div class="bar-track"><div class="bar-fill keep" data-w="2.9"></div></div><span class="bar-val">576</span></div>
+      <p class="mono" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">20,160 mixers total; 4,032 (20%, red) permanently retain the nonzero family. The paper notes this is a structural property, not a security ranking of mixers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFS ================= -->
+<section id="refs">
+  <p class="eyebrow rv">10 — References</p>
+  <h2 class="rv">Sources</h2>
+  <div class="card rv">
+    <div class="ref">[1] Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal — submitted to the Next-generation Cryptographic Algorithms Program, China</i>. Revision 29 September 2026, 70 pages. SHA-256 <span class="mono">7f498f6c4830f78d5f40c1c21b9ad41e0c33dc4d20a91c7277c3add8c4144255</span>.</div>
+    <div class="ref">[2] Mounir IDRASSI. <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
+    <div class="ref">[3] E. Biham, O. Dunkelman. <i>A Framework for Iterative Hash Functions — HAIFA</i>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
+    <div class="ref">[4] J. Black, P. Rogaway, T. Shrimpton. <i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i>, CRYPTO 2002, LNCS 2442.</div>
+    <div class="ref">[5] J. Kelsey, B. Schneier. <i>Second Preimages on n-Bit Hash Functions for Much Less than 2ⁿ Work</i>, EUROCRYPT 2005, LNCS 3494 — the attack class that the tweak counter is designed to defeat.</div>
+    <div class="ref">[6] NIST. <i>SP 800-22 Rev. 1a — A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</i>.</div>
+    <div class="ref">[7] Markku-Juhani O. Saarinen. <i>FEILIAN (hash-10)</i>, personal report, ngcc.dev, 23 &amp; 26 September 2026.</div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>FEILIAN Specification Compendium · Source: submitted Specification.pdf, revision 2026-09-29 (70 pp.) + Cryptology ePrint 2026/2236. Performance figures are those reported in Chapter 5 of the specification.</p>
+    <p>Specification.pdf SHA-256: <span class="mono">7f498f6c4830f78d5f40c1c21b9ad41e0c33dc4d20a91c7277c3add8c4144255</span></p>
+  </div>
+</footer>
+
+<a href="#" class="toplink" id="top">↑</a>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- scroll progress ---------- */
+  var prog=document.getElementById('prog'), top=document.getElementById('top');
+  window.addEventListener('scroll',function(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    prog.style.width=(h>0?(window.scrollY/h*100):0)+'%';
+    if(window.scrollY>500)top.classList.add('show');else top.classList.remove('show');
+  },{passive:true});
+  top.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+
+  /* ---------- reveal on scroll ---------- */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
+
+  /* ---------- animated counters ---------- */
+  var cio=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(!en.isIntersecting)return; var el=en.target;
+      var to=parseInt(el.getAttribute('data-count'),10)||0, sfx=el.getAttribute('data-suffix')||'';
+      var t0=performance.now(), dur=1100;
+      (function tick(now){
+        var p=Math.min(1,(now-t0)/dur); var e=1-Math.pow(1-p,3);
+        el.textContent=Math.round(to*e).toLocaleString()+sfx;
+        if(p<1)requestAnimationFrame(tick);
+      })(t0);
+      cio.unobserve(el);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){cio.observe(el);});
+
+  /* ---------- bars ---------- */
+  var bio=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ en.target.style.width=en.target.getAttribute('data-w')+'%'; bio.unobserve(en.target);} });
+  },{threshold:.4});
+  document.querySelectorAll('.bar-fill').forEach(function(el){bio.observe(el);});
+
+  /* ---------- nav active ---------- */
+  var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+  var sections=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var nio=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(en.isIntersecting){
+        var id='#'+en.target.id;
+        links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')===id);});
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  sections.forEach(function(s){if(s)nio.observe(s);});
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var tgt=b.getAttribute('data-target');
+      var node = (tgt==='vpanel-cur') ? document.querySelector('.vec-panel.on') : document.getElementById(tgt);
+      if(!node)return;
+      var txt=node.innerText;
+      var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){});}
+    });
+  });
+
+  /* ---------- hero hex ticker (IV, row-major) ---------- */
+  var hexObj=document.getElementById('ticker');
+  if(hexObj){
+    var words=["243f6a8885a308d3","13198a2e03707344","a4093822299f31d0","082efa98ec4e6c89",
+               "452821e638d01377","be5466cf34e90c6c","c0ac29b7c97c50dd","3f84d5b5b5470917",
+               "9216d5d98979fb1b","d1310ba698dfb5ac","2ffd72dbd01adfb7","b8e1afed6a267e96",
+               "ba7c9045f12c7f99","24a19947b3916cf7","0801f2e2858efc16","636920d871574e69"];
+    var idx=0, metaEl=document.getElementById('tickmeta');
+    function render(){
+      var a=words[idx%16], b=words[(idx+1)%16];
+      hexObj.innerHTML='<b>'+a+'</b> '+b+'<span class="caret"></span>';
+      metaEl.textContent='word '+(idx%16)+' / 15';
+      idx++;
+    }
+    render(); setInterval(render,900);
+  }
+
+  /* ---------- pipeline stepper ---------- */
+  var phg=document.getElementById('phg');
+  var PH=5, CW=22, CH=34, GAP=5, PW=CW*4+GAP*3, PGAP=19, X0=(700-(PW*5+PGAP*4))/2;
+  var phaseRects=[];
+  for(var p=0;p<PH;p++){
+    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','ph-box');
+    var x=X0+p*(PW+PGAP);
+    var frame=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    frame.setAttribute('class','frame'); frame.setAttribute('x',x); frame.setAttribute('y',58);
+    frame.setAttribute('width',PW); frame.setAttribute('height',CH+22); frame.setAttribute('rx',9);
+    g.appendChild(frame);
+    var lab=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab.setAttribute('class','plab'); lab.setAttribute('x',x+PW/2); lab.setAttribute('y',46);
+    lab.setAttribute('text-anchor','middle'); lab.textContent='Phase '+(p+1);
+    g.appendChild(lab);
+    for(var c=0;c<4;c++){
+      var r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      r.setAttribute('class','ph-cell'+(c===0?' msg':''));
+      r.setAttribute('x',x+c*(CW+GAP)); r.setAttribute('y',72);
+      r.setAttribute('width',CW); r.setAttribute('height',CH); r.setAttribute('rx',4);
+      g.appendChild(r);
+    }
+    var rn=document.createElementNS('http://www.w3.org/2000/svg','text');
+    rn.setAttribute('class','pnum'); rn.setAttribute('x',x+PW/2); rn.setAttribute('y',126);
+    rn.setAttribute('text-anchor','middle'); rn.textContent=(p*4+1)+'–'+(p*4+4);
+    g.appendChild(rn);
+    if(p===4){
+      var tg=document.createElementNS('http://www.w3.org/2000/svg','text');
+      tg.setAttribute('class','ptag'); tg.setAttribute('x',x+PW/2); tg.setAttribute('y',152);
+      tg.setAttribute('text-anchor','middle'); tg.textContent='last msg @ r17';
+      g.appendChild(tg);
+    }
+    phg.appendChild(g); phaseRects.push(g);
+  }
+
+  var cur=-1, timer=null, cap=document.getElementById('cap');
+  function paint(){
+    phaseRects.forEach(function(g,i){g.classList.toggle('active',i===cur);});
+    if(cur<0){ cap.innerHTML='Press <b>Play</b> to walk the 20 rounds'; return; }
+    cap.innerHTML='<b>Phase '+(cur+1)+'</b> · rounds '+(cur*4+1)+'–'+(cur*4+4)+' · R⊕ then R, R, R'+
+      (cur===4?' · last message injection at round 17':'');
+  }
+  document.getElementById('next').addEventListener('click',function(){ cur=(cur+1)%5; if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='▶ Play';} paint(); });
+  document.getElementById('prev').addEventListener('click',function(){ cur=(cur<=0?4:cur-1); if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='▶ Play';} paint(); });
+  var play=document.getElementById('play');
+  play.addEventListener('click',function(){
+    if(timer){ clearInterval(timer); timer=null; play.textContent='▶ Play'; }
+    else{
+      play.textContent='❚❚ Pause';
+      if(cur<0)cur=0; paint();
+      timer=setInterval(function(){ cur=(cur+1)%5; paint(); },1000);
+    }
+  });
+
+  /* ---------- digest size switcher ---------- */
+  var seg=document.getElementById('vecseg'), hint=document.getElementById('vechint');
+  seg.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var v=b.getAttribute('data-v');
+      seg.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+      document.querySelectorAll('.vec-panel').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-v')===v);});
+      hint.innerHTML='Output width: <b>'+v+' bit</b> · '+(v==='1024'?16:v==='768'?12:8)+' words';
+      document.querySelectorAll('#security tr[data-size]').forEach(function(tr){tr.classList.toggle('hl',tr.getAttribute('data-size')===v);});
+    });
+  });
+
+  /* ---------- Figure 2: cycles/byte line chart (spec Table 5.3) ---------- */
+  (function(){
+    var host=document.getElementById('cpbchart'); if(!host)return;
+    var LEN=[64,128,576,1024,1536,4096,64576];
+    var SERIES=[
+      {name:'FEILIAN-1024', color:'#4338ca', w:3,   d:[8.6875,4.34375,4.210069,3.735352,3.694661,3.669678,3.63632]},
+      {name:'SHA-512',      color:'#12805c', w:2,   d:[10.453125,8.640625,4.177083,4.077148,3.873698,3.591797,3.44004]},
+      {name:'BLAKE-64',     color:'#0ea5e9', w:2,   d:[6.640625,6.054688,3.255208,3.252930,3.108724,2.743408,2.661205]},
+      {name:'SHA-3-512',    color:'#b06a00', w:2,   d:[15.140625,10.742188,7.508681,6.689453,6.363932,5.970703,5.831408]}
+    ];
+    var W=900,H=430,ML=62,MR=150,MT=28,MB=54;
+    var pw=W-ML-MR, ph=H-MT-MB, YMAX=16, TICKS=8;
+    var xs=function(i){return ML+pw*i/(LEN.length-1);};
+    var ys=function(v){return MT+ph*(1-v/YMAX);};
+    var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cycles per byte by message length">'];
+    s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5a6478}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#8a94a8}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
+    for(var t=0;t<=TICKS;t++){
+      var v=YMAX*t/TICKS, y=ys(v);
+      s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#c8d2e6':'#eef2f9')+'" stroke-width="1"/>');
+      s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v.toFixed(1)+'</text>');
+    }
+    LEN.forEach(function(L,i){
+      s.push('<line x1="'+xs(i)+'" y1="'+(MT+ph)+'" x2="'+xs(i)+'" y2="'+(MT+ph+5)+'" stroke="#c8d2e6"/>');
+      s.push('<text class="ax" x="'+xs(i)+'" y="'+(MT+ph+21)+'" text-anchor="middle">'+L+'</text>');
+    });
+    s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-12)+'" text-anchor="middle">message length [bytes]</text>');
+    s.push('<text class="ax" transform="translate(16,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">cycles / byte</text>');
+    SERIES.forEach(function(se){
+      var pts=se.d.map(function(v,i){return xs(i)+','+ys(v);}).join(' ');
+      s.push('<polyline points="'+pts+'" fill="none" stroke="'+se.color+'" stroke-width="'+se.w+
+             '" stroke-linejoin="round" stroke-linecap="round"'+(se.w===3?'':' stroke-dasharray="5 4"')+'/>');
+      se.d.forEach(function(v,i){ s.push('<circle cx="'+xs(i)+'" cy="'+ys(v)+'" r="'+(se.w===3?4:2.8)+'" fill="#fff" stroke="'+se.color+'" stroke-width="2"/>'); });
+    });
+    SERIES.forEach(function(se,i){
+      var y=MT+14+i*24;
+      s.push('<line x1="'+(ML+pw+18)+'" y1="'+y+'" x2="'+(ML+pw+40)+'" y2="'+y+'" stroke="'+se.color+'" stroke-width="'+(se.w===3?3:2.4)+'"/>');
+      s.push('<text class="lg" x="'+(ML+pw+47)+'" y="'+(y+4)+'" fill="'+(se.w===3?'#4338ca':'#5a6478')+'">'+se.name+'</text>');
+    });
+    s.push('</svg>');
+    host.innerHTML=s.join('');
+  })();
+
+  /* ---------- Figure 3: FPGA throughput grouped bars (spec Table 5.5) ---------- */
+  (function(){
+    var host=document.getElementById('fpgachart'); if(!host)return;
+    var CAT=['[8SC]','[4SC]','[2SC]','[1SC]'];
+    var SER=[
+      {name:'Virtex-5 xc5vlx110', color:'#4338ca', d:[2925.7,2105.4,986.1,644.3]},
+      {name:'Zynq-7000 xc7z100',  color:'#0ea5e9', d:[4139.8,3566.5,1443.7,886.0]}
+    ];
+    var W=900,H=380,ML=70,MR=190,MT=26,MB=58, pw=W-ML-MR, ph=H-MT-MB, YMAX=4500, TICKS=5;
+    var slot=pw/CAT.length, bw=Math.min(74,(slot-42)/2);
+    var ys=function(v){return MT+ph*(1-v/YMAX);};
+    var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="FPGA throughput by architecture">'];
+    s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5a6478}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#8a94a8}.vl{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#3b4660}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
+    for(var t=0;t<=TICKS;t++){
+      var v=YMAX*t/TICKS, y=ys(v);
+      s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#c8d2e6':'#eef2f9')+'"/>');
+      s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>');
+    }
+    CAT.forEach(function(c,i){
+      var cx=ML+slot*i+slot/2;
+      SER.forEach(function(se,j){
+        var x=cx-slot/2+21+j*(bw+8), v=se.d[i], y=ys(v), h=MT+ph-y;
+        s.push('<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h)+'" rx="5" fill="'+se.color+'"/>');
+        s.push('<text class="vl" x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle">'+v.toFixed(1)+'</text>');
+      });
+      s.push('<text class="ax" x="'+cx+'" y="'+(MT+ph+22)+'" text-anchor="middle">'+c+'</text>');
+    });
+    s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-8)+'" text-anchor="middle">architectures: number of SubColumn units instantiated</text>');
+    s.push('<text class="ax" transform="translate(18,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">throughput [Mbps]</text>');
+    SER.forEach(function(se,i){
+      var y=MT+18+i*24;
+      s.push('<rect x="'+(ML+pw+18)+'" y="'+(y-7)+'" width="12" height="12" rx="3" fill="'+se.color+'"/>');
+      s.push('<text class="lg" x="'+(ML+pw+37)+'" y="'+(y+4)+'" fill="#5a6478">'+se.name+'</text>');
+    });
+    s.push('</svg>');
+    host.innerHTML=s.join('');
+  })();
+})();
+</script>
+</body>
+</html>
