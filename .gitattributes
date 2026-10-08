@@ -9,3 +9,4 @@
 *.txt  text eol=lf
 *.js   text eol=lf
 *.css  text eol=lf
+.gitattributes text eol=lf
