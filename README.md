@@ -28,7 +28,13 @@ python -m http.server 8000
 
 ## Deploy to GitHub Pages
 
-Target: **`pennybenny/FEILIAN`** → <https://pennybenny.github.io/FEILIAN/>
+**Status: live** — <https://pennybenny.github.io/FEILIAN/>
+
+Target repository: **`PENNYBENNY/FEILIAN`**, branch `main`, published from `/ (root)`.
+`github.com/pennybenny/FEILIAN` redirects to the canonical uppercase owner name; both work.
+
+To publish a change: commit, then `git push` (or `git push -u origin main` if the
+upstream is not yet tracked). Pages rebuilds in about a minute.
 
 ### One-liner (recommended)
 
@@ -41,7 +47,7 @@ powershell -ExecutionPolicy Bypass -File ..\FEILIAN_deploy\deploy_github_pages.p
 
 It reuses the repository already initialised in this folder, sets the remote and pushes. If the GitHub CLI is installed and authenticated it also creates the repo and enables Pages automatically.
 
-### By hand
+### First-time setup (already done — kept for reference)
 
 1. Create an empty **public** repo named `FEILIAN`.
 2. From this folder:
@@ -85,29 +91,35 @@ This mirrors the pattern used by the Ascon lab site (`crypto-lab.systemslibraria
 
 ## Downloadable artifacts
 
-`index.html` renders a **Downloads** section from a manifest embedded between
-`/* DOWNLOADS:BEGIN */` and `/* DOWNLOADS:END */`. Nothing is published until you
-build it, so the section shows *Not published* rather than a dead link.
+**Status: published.** `index.html` renders the **Downloads** section from a manifest
+embedded between `/* DOWNLOADS:BEGIN */` and `/* DOWNLOADS:END */`, and the artifacts
+are committed under `files/`, so Pages serves them directly:
+
+| Artifact | Built from | Size | Live URL |
+|---|---|---|---|
+| `specification.pdf` | the specification, as filed | 649 KB | <https://pennybenny.github.io/FEILIAN/files/specification.pdf> |
+| `feilian-code.zip` | `Implementations/` — C (reference + AVX2/SIMD) + SystemVerilog | 107 KB | <https://pennybenny.github.io/FEILIAN/files/feilian-code.zip> |
+| `feilian-archive.zip` | code + `KAT_current/` + Appendix B work + docs | 9.94 MB | <https://pennybenny.github.io/FEILIAN/files/feilian-archive.zip> |
+| `SHA256SUMS.txt` | `sha256sum -c` compatible manifest | 253 B | <https://pennybenny.github.io/FEILIAN/files/SHA256SUMS.txt> |
+
+Each card publishes its own SHA-256, so a download can be verified end to end:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+Rebuild and re-patch the manifest after the artifacts change:
 
 ```bash
 python ../FEILIAN_deploy/make_downloads.py             # dry run — shows what would be built
 python ../FEILIAN_deploy/make_downloads.py --publish   # build files/ and patch the manifest
 ```
 
-Output lands in `FEILIAN_site/files/`:
-
-| File | Built from | Size |
-|---|---|---|
-| `specification.pdf` | the specification, as filed | 649 KB |
-| `feilian-code.zip` | `Implementations/` — C (reference + AVX2/SIMD) + SystemVerilog | 107 KB |
-| `feilian-archive.zip` | code + `KAT_current/` + Appendix B work + docs | 9.94 MB |
-| `SHA256SUMS.txt` | `sha256sum -c` compatible manifest | — |
-
-> ⚠️ **Disclosure.** Copying `specification.pdf`, the implementations or the KAT
-> vectors into a public repository publishes submission material. Confirm with the
-> authors and the NGCC programme that release is permitted before running
-> `--publish` on a public repo. Both the specification PDF and the code are
-> covered by this; only the compendium page itself is analysis.
+> ⚠️ **Disclosure.** These files are submission material — the specification PDF, the
+> implementations and the KAT vectors — and they are now **publicly served**. If the
+> authors or the NGCC programme require release to be restricted, take the site down
+> (`git rm -r files && git commit && git push`, or make the repository private) rather
+> than leaving stale copies online. Only the compendium page itself is analysis.
 
 Zips are written deterministically (sorted entries, fixed timestamps) so the same
 inputs always yield byte-identical archives and identical SHA-256. Flags
