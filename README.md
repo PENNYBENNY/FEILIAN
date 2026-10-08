@@ -28,7 +28,7 @@ python -m http.server 8000
 
 ## Deploy to GitHub Pages
 
-Target: **`pennybenny/crypto-lab-feilian`** → <https://pennybenny.github.io/crypto-lab-feilian/>
+Target: **`pennybenny/FEILIAN`** → <https://pennybenny.github.io/FEILIAN/>
 
 ### One-liner (recommended)
 
@@ -43,22 +43,22 @@ It reuses the repository already initialised in this folder, sets the remote and
 
 ### By hand
 
-1. Create an empty **public** repo named `crypto-lab-feilian`.
+1. Create an empty **public** repo named `FEILIAN`.
 2. From this folder:
 
    ```bash
-   git remote add origin https://github.com/pennybenny/crypto-lab-feilian.git
+   git remote add origin https://github.com/pennybenny/FEILIAN.git
    git push -u origin main
    ```
 
 3. **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch `main`, folder `/ (root)`, Save.
-4. Live in ~1 minute at <https://pennybenny.github.io/crypto-lab-feilian/>.
+4. Live in ~1 minute at <https://pennybenny.github.io/FEILIAN/>.
 
 ### With the GitHub CLI
 
 ```bash
-gh repo create pennybenny/crypto-lab-feilian --public --source=. --push
-gh api -X POST repos/pennybenny/crypto-lab-feilian/pages \
+gh repo create pennybenny/FEILIAN --public --source=. --push
+gh api -X POST repos/pennybenny/FEILIAN/pages \
   -f 'source[branch]=main' -f 'source[path]=/'
 ```
 
@@ -77,8 +77,8 @@ gh api -X POST repos/pennybenny/crypto-lab-feilian/pages \
 
 Optional — the site works fine on the `pennybenny.github.io` URL.
 
-1. Add a file named `CNAME` in this folder containing the bare domain, e.g. `crypto-lab.pennybenny.dev`, and commit it.
-2. At your DNS provider add a `CNAME` record: `crypto-lab` → `pennybenny.github.io`.
+1. Add a file named `CNAME` in this folder containing the bare domain, e.g. `feilian.pennybenny.dev`, and commit it.
+2. At your DNS provider add a `CNAME` record: `feilian` → `pennybenny.github.io`.
 3. In **Settings → Pages → Custom domain** confirm the domain and tick **Enforce HTTPS**.
 
 This mirrors the pattern used by the Ascon lab site (`crypto-lab.systemslibrarian.dev` → `systemslibrarian.github.io/crypto-lab-ascon`).
