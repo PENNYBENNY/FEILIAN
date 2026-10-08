@@ -83,6 +83,47 @@ Optional — the site works fine on the `pennybenny.github.io` URL.
 
 This mirrors the pattern used by the Ascon lab site (`crypto-lab.systemslibrarian.dev` → `systemslibrarian.github.io/crypto-lab-ascon`).
 
+## Troubleshooting: `Connection was reset` when pushing
+
+On mainland-China networks the TLS connection to `github.com:443` is frequently reset. Git for Windows **ignores the Windows system proxy**, so a browser that reaches GitHub fine does not mean git will.
+
+Diagnose:
+
+```bash
+git ls-remote https://github.com/pennybenny/FEILIAN.git
+# fatal: unable to access '...': Recv failure: Connection was reset   -> blocked
+```
+
+Fix — route git through the local proxy the browser is already using:
+
+```bash
+# this repository only
+git config --local http.https://github.com.proxy http://127.0.0.1:7688
+
+# or for every repository
+git config --global http.https://github.com.proxy http://127.0.0.1:7688
+```
+
+Find the port via **Settings → Network & Internet → Proxy** in Windows, or the Clash / v2ray dashboard. The scoped key `http.https://github.com.proxy` applies to github.com only — other remotes keep going direct. Revert with:
+
+```bash
+git config --unset http.https://github.com.proxy
+```
+
+**SSH alternative.** `ssh.github.com:443` is often reachable when `github.com:443` is not:
+
+```
+# ~/.ssh/config
+Host github.com
+  HostName ssh.github.com
+  Port 443
+  User git
+```
+
+then set the remote to `git@github.com:pennybenny/FEILIAN.git` and upload an SSH key. The HTTPS-plus-proxy route above is usually less hassle.
+
+**Note for readers:** `github.io` itself is generally reachable even when `github.com` is not, so a GitHub Pages site normally loads fine in China. If it does not, the Cloudflare Pages route below is the fallback.
+
 ## Provenance and caveats
 
 - Every parameter, test vector and reported measurement is transcribed from the specification. **Performance figures are the specification's own reported values** (Chapter 5), not remeasured here.
