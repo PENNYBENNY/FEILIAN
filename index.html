@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FEILIAN (hash-10) — Introduction, Live Demo, Artifacts and Analysis</title>
-<meta name="description" content="FEILIAN (hash-10), the hash function submitted to the NGCC-CH programme: the design, a live in-browser digest demo, the documents and implementations released with it, and the independent third-party security analyses with the current status of each finding.">
+<meta name="description" content="FEILIAN (hash-10), the hash function submitted to the NGCC-CH programme: the design and its reported performance, a live in-browser digest demo, the documents and implementations released with it, and the independent third-party security analyses it has received, each linked to its source.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FEILIAN — Submission Overview">
 <meta property="og:title" content="FEILIAN (hash-10) — Introduction, Live Demo, Artifacts and Analysis">
-<meta property="og:description" content="An introduction to the FEILIAN hash function (NGCC-CH, hash-10), a live in-browser digest demo, the artifacts that document it, and the independent third-party analyses with the status of each finding.">
+<meta property="og:description" content="An introduction to the FEILIAN hash function (NGCC-CH, hash-10) and its reported performance, a live in-browser digest demo, the artifacts that document it, and the independent third-party analyses it has received.">
 <meta property="og:url" content="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
@@ -25,14 +25,13 @@
 <meta name="citation_author" content="Zicheng Shi">
 <meta name="citation_author" content="Xin Yi">
 <meta name="citation_publication_date" content="2026-10-08">
-<meta name="citation_pdf_url" content="https://pennybenny.github.io/FEILIAN/files/specification.pdf">
 <style>
   :root{
-    --bg:#f7f8fb; --bg2:#eef1f8; --card:#ffffff; --ink:#161c28; --ink-soft:#5a6478;
-    --line:#e4e8f0; --line2:#d6dcea;
-    --p1:#4338ca; --p2:#0ea5e9; --accent:#4338ca; --accent-soft:#eef1fe;
-    --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c; --crit:#8f1d12;
-    --grad:linear-gradient(120deg,#4338ca 0%,#5b53e0 42%,#0ea5e9 100%);
+    --bg:#ffffff; --bg2:#f5f6f8; --card:#ffffff; --ink:#1a1d24; --ink-soft:#5b6470;
+    --line:#e6e8ec; --line2:#d2d6dd;
+    --p1:#1e3a5f; --p2:#3d6fa5; --accent:#1e3a5f; --accent-soft:#eef2f7;
+    --high:#9d2c21; --med:#8a6316; --info:#1e5b84; --ok:#1f6a4d; --crit:#7c1f15;
+    --grad:#1e3a5f;
     --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
     --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang SC",sans-serif;
     --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);
@@ -53,48 +52,40 @@
   .rv.in{opacity:1;transform:none}
   .rv.d1{transition-delay:.06s}.rv.d2{transition-delay:.12s}.rv.d3{transition-delay:.18s}.rv.d4{transition-delay:.24s}
 
-  header.hero{position:relative;overflow:hidden;color:#fff;
-              background:radial-gradient(1200px 500px at 15% -10%,#6d5ff0 0%,transparent 55%),
-                         radial-gradient(900px 500px at 100% 0%,#19b6e8 0%,transparent 50%),
-                         linear-gradient(150deg,#1b1f4b 0%,#2a2e6e 55%,#123a63 100%);
-              padding:70px 0 60px}
-  header.hero::after{content:"";position:absolute;inset:0;
-     background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
-                      linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
-     background-size:44px 44px;mask-image:radial-gradient(700px 400px at 30% 20%,#000,transparent 75%)}
+  header.hero{position:relative;color:#fff;background:#17293f;
+              border-bottom:1px solid #0e1c2c;padding:66px 0 58px}
   header.hero .wrap{position:relative;z-index:2}
   .kicker{display:inline-flex;align-items:center;gap:8px;letter-spacing:.16em;text-transform:uppercase;
-          font-size:11px;font-weight:600;color:#c7d2fe;
-          border:1px solid rgba(199,210,254,.3);background:rgba(199,210,254,.08);
+          font-size:11px;font-weight:600;color:#c2cfdd;
+          border:1px solid rgba(194,207,221,.26);background:rgba(194,207,221,.07);
           padding:6px 12px;border-radius:20px;margin:0 0 18px}
-  .kicker .dot{width:7px;height:7px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 0 rgba(94,234,212,.7);animation:pulse 2s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(94,234,212,.6)}70%{box-shadow:0 0 0 10px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:#8aabcc}
   header.hero h1{margin:0 0 14px;font-size:60px;font-weight:800;letter-spacing:-.02em;line-height:1}
-  header.hero h1 span{background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  header.hero p.sub{margin:0;font-size:17px;color:#dfe5f7;max-width:640px}
+  header.hero h1 span{color:#fff}
+  header.hero p.sub{margin:0;font-size:17px;color:#c6d1de;max-width:640px}
   .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
   .btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
        padding:11px 20px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:.2s}
-  .btn.p{background:#fff;color:#232a54;box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+  .btn.p{background:#fff;color:#17293f;box-shadow:0 6px 18px -8px rgba(0,0,0,.45)}
   .btn.p:hover{transform:translateY(-2px);text-decoration:none}
-  .btn.g{background:rgba(255,255,255,.08);color:#e8ecfb;border-color:rgba(255,255,255,.28)}
-  .btn.g:hover{background:rgba(255,255,255,.16);text-decoration:none}
+  .btn.g{background:transparent;color:#d8e1ec;border-color:rgba(216,225,236,.30)}
+  .btn.g:hover{background:rgba(255,255,255,.10);text-decoration:none}
 
   .dl-sub{font-size:13px;color:var(--ink-soft);margin:6px 0 10px;min-height:36px}
   .dl-meta{font-size:11.5px;color:var(--ink-soft);margin:0 0 14px;word-break:break-all;line-height:1.5}
   .dl-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;
           padding:9px 16px;border-radius:9px;border:1px solid var(--accent);
           background:var(--accent);color:#fff;cursor:pointer;transition:background .18s,transform .18s}
-  .dl-btn:hover{background:#3129a8;text-decoration:none;transform:translateY(-1px)}
+  .dl-btn:hover{background:#16304f;text-decoration:none;transform:translateY(-1px)}
   .dl-btn.off{border-color:var(--line2);background:transparent;color:var(--ink-soft);cursor:not-allowed}
   .dl-btn.off:hover{transform:none;background:transparent}
 
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
-  .chip{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:8px;
-        padding:6px 11px;font-size:12px;font-family:var(--mono);color:#e6ebfa}
-  .chip b{color:#a5b4fc;font-weight:600}
+  .chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:8px;
+        padding:6px 11px;font-size:12px;font-family:var(--mono);color:#d6dfe9}
+  .chip b{color:#9db6d0;font-weight:600}
 
-  nav.toc{position:sticky;top:0;z-index:50;background:rgba(247,248,251,.86);backdrop-filter:blur(10px);
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);
           border-bottom:1px solid var(--line)}
   nav.toc .wrap{display:flex;gap:2px;padding:9px 24px;overflow-x:auto}
   nav.toc a{font-size:13px;color:var(--ink-soft);padding:7px 12px;border-radius:8px;white-space:nowrap;font-weight:500}
@@ -111,6 +102,7 @@
   .lift:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
   @media(max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
   @media(max-width:640px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
@@ -122,9 +114,9 @@
 
   table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
   th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
-  th{background:#f2f5fb;font-weight:600}
+  th{background:#f4f6f8;font-weight:600}
   tbody tr{transition:background .2s}
-  tbody tr:nth-child(even){background:#fafbfe}
+  tbody tr:nth-child(even){background:#fafbfc}
   tbody tr:hover{background:var(--accent-soft)}
   td.k{font-weight:600;white-space:nowrap}
   td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
@@ -133,22 +125,22 @@
   code,.mono{font-family:var(--mono);font-size:13px}
 
   .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
-  .b-high{background:#fdecea;color:var(--high)}
-  .b-med{background:#fdf3e2;color:var(--med)}
-  .b-info{background:#e7f2fb;color:var(--info)}
-  .b-ok{background:#e5f5ee;color:var(--ok)}
+  .b-high{background:#f7e9e7;color:var(--high)}
+  .b-med{background:#f7f0e0;color:var(--med)}
+  .b-info{background:#e8f0f6;color:var(--info)}
+  .b-ok{background:#e7f1ec;color:var(--ok)}
   .b-crit{background:var(--crit);color:#fff}
   th .thsub{display:block;margin-top:2px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--ink-soft)}
   td.k .altid{display:block;margin-top:3px;font-family:var(--mono);font-size:10.5px;font-weight:600;
               color:var(--ink-soft);text-decoration:none}
   td.k .altid:hover{color:var(--accent);text-decoration:underline}
 
-  .note{background:#fff9ea;border:1px solid #f1dcae;border-left:4px solid var(--med);border-radius:10px;
+  .note{background:#fbf8ef;border:1px solid #e9dfc6;border-left:4px solid var(--med);border-radius:10px;
         padding:13px 17px;font-size:13.5px;margin:16px 0}
   .note b{color:var(--med)}
-  .callout{background:var(--accent-soft);border:1px solid #ccd7fb;border-radius:10px;padding:15px 18px;margin:16px 0;font-size:14px}
-  .callout.warn{background:#fdeeec;border-color:#f3bab4}
-  .callout.ok{background:#e8f6f0;border-color:#b7e2d0}
+  .callout{background:var(--accent-soft);border:1px solid #d9e1ea;border-radius:10px;padding:15px 18px;margin:16px 0;font-size:14px}
+  .callout.warn{background:#f9ecea;border-color:#e6c2bd}
+  .callout.ok{background:#ebf3ef;border-color:#c2dcd0}
   .callout h4{margin:0 0 8px;font-size:14px}
 
   figure{margin:18px 0}
@@ -166,17 +158,30 @@
   .tl li:last-child{border-left-color:transparent;padding-bottom:0}
   .tl li::before{content:"";position:absolute;left:-6px;top:5px;width:9px;height:9px;border-radius:50%;
                  background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .tl li.mute::before{background:#b8c2d6;box-shadow:0 0 0 3px #eef1f8}
+  .tl li.mute::before{background:#c2c9d3;box-shadow:0 0 0 3px #f1f3f6}
   .tl li .d{display:block;font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--p2);letter-spacing:.02em}
 
   .revcard{display:flex;flex-direction:column}
   .revcard .who{font-size:12px;color:var(--ink-soft);margin:0 0 10px;font-family:var(--mono);font-size:11.5px}
-  .revcard blockquote{margin:0 0 10px;padding:10px 14px;background:#f7f9fd;border-left:3px solid var(--accent);
+  .revcard blockquote{margin:0 0 10px;padding:10px 14px;background:#f6f8fa;border-left:3px solid var(--accent);
                       border-radius:0 8px 8px 0;font-size:13.5px;color:var(--ink)}
   .revcard p{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0}
   .revcard .srcline{margin:auto 0 0;padding-top:11px;border-top:1px dashed var(--line);
                     font-size:11.5px;font-family:var(--mono);overflow-wrap:anywhere}
   .ref a{color:var(--accent)}
+
+  /* independent reviews — three rows, one column */
+  .revlist{display:grid;grid-template-columns:1fr;gap:12px}
+  .revlist .revcard{display:grid;grid-template-columns:1fr auto;gap:3px 26px;align-items:center}
+  .revlist .revcard h3{grid-column:1;margin:0}
+  .revlist .revcard .who{grid-column:1;margin:2px 0 0}
+  .revlist .revcard .srcline{grid-column:2;grid-row:1 / span 2;margin:0;padding:0;border:0;
+                              text-align:right;white-space:nowrap}
+  @media(max-width:720px){
+    .revlist .revcard{grid-template-columns:1fr}
+    .revlist .revcard .srcline{grid-column:1;grid-row:auto;text-align:left;white-space:normal;
+                               padding-top:9px;border-top:1px dashed var(--line)}
+  }
 
   .steps{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
   .stepbtn{border:1px solid var(--line2);background:#fff;border-radius:9px;width:38px;height:38px;
@@ -185,18 +190,85 @@
   .stepbtn.play{width:auto;padding:0 18px;font-weight:600;font-size:13.5px;background:var(--grad);color:#fff;border:0}
   .stepcap{font-size:13.5px;color:var(--ink-soft)}
   .stepcap b{color:var(--ink)}
-  .ph-box{transition:.35s}
-  .ph-box rect.frame{fill:#f7f9fd;stroke:#dbe3f2;stroke-width:1.5;transition:.35s}
-  .ph-box.active rect.frame{fill:#eaf0ff;stroke:var(--accent);stroke-width:2.4;filter:drop-shadow(0 6px 14px rgba(67,56,202,.22))}
-  .ph-cell{fill:#dfe6f5;transition:.35s}
-  .ph-cell.msg{fill:#c3cef7}
-  .ph-box.active .ph-cell{fill:#9fb0ea}
-  .ph-box.active .ph-cell.msg{fill:var(--p1)}
+  /* ---------- interactive design figure ---------- */
+  #designfig .stagebar{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+  #designfig .stagetab{border:1px solid var(--line2);background:#fff;border-radius:999px;padding:7px 16px;
+    font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:.2s;font-family:inherit}
+  #designfig .stagetab:hover{border-color:var(--accent);color:var(--accent)}
+  #designfig .stagetab.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  #designfig svg{display:block;width:100%;height:auto;margin:0 auto}
+  #designfig .stg{opacity:0;transition:opacity .65s ease;pointer-events:none}
+  #designfig .stg.on{opacity:1}
+  #designfig text{font-family:var(--sans)}
+  #designfig .dg-lb{font-size:12px;font-weight:600;fill:#5b6470;transition:fill .55s}
+  #designfig .dg-lb.mid{text-anchor:middle}
+  #designfig .dg-lb.end{text-anchor:end}
+  #designfig .dg-sb{font-family:var(--mono);font-size:9.6px;fill:#7d8794;transition:fill .55s}
+  #designfig .dg-sb.mid{text-anchor:middle}
+  #designfig .dg-sb.end{text-anchor:end}
+  #designfig .dg-glyph{font-size:10.5px;font-weight:700;fill:#6f7885;text-anchor:middle;transition:fill .55s}
+  #designfig .dg-op{font-size:11px;font-weight:700;fill:#b3bac4;text-anchor:middle;transition:fill .55s}
+  #designfig .opg.on .dg-op{fill:var(--accent)}
+  #designfig .opg.on .dg-w{stroke:var(--accent)}
+  #designfig .opg.on .dg-tip{fill:var(--accent)}
+  #designfig .opg.on .dg-node{fill:var(--accent-soft);stroke:var(--accent)}
+  #designfig .opg.on .dg-glyph{fill:var(--accent)}
+  #designfig .dop.on .dg-dash{stroke:var(--accent);stroke-dasharray:7 4}
+  #designfig .dop.on .dg-tip{fill:var(--accent)}
+  #designfig .dg-w{fill:none;stroke:#c7cdd6;stroke-width:1.5;transition:.55s}
+  #designfig .dg-tip{fill:#c7cdd6;transition:fill .55s}
+  #designfig .dg-w.on{stroke:var(--accent)}
+  #designfig .dg-tip.on{fill:var(--accent)}
+  #designfig .dg-lb.on,#designfig .dg-sb.on{fill:var(--accent)}
+  #designfig .dg-dash{fill:none;stroke:#cbd1d9;stroke-width:1.4;stroke-dasharray:4 4;transition:.55s}
+  #designfig .dg-dash.on{stroke:var(--accent);stroke-dasharray:7 4}
+  #designfig .mf{fill:none;stroke:#cbd1d9;stroke-width:1.4;transition:.55s}
+  #designfig polygon.mf{stroke:none;fill:#cbd1d9}
+  #designfig .mf.on{stroke:var(--p2)}
+  #designfig polygon.mf.on{fill:var(--p2)}
+  #designfig .tf{fill:none;stroke:#dde1e7;stroke-width:1.3;transition:.55s}
+  #designfig polygon.tf{stroke:none;fill:#dde1e7}
+  #designfig .tf.on{stroke:var(--p1)}
+  #designfig polygon.tf.on{fill:var(--p1)}
+  #designfig .dg-box{fill:#fafbfc;stroke:#e3e7ec;stroke-width:1.4;transition:.45s}
+  #designfig .dg-node{fill:#fff;stroke:#c7cdd6;stroke-width:1.5;transition:.45s}
+  #designfig .dg-node.on{fill:var(--accent-soft);stroke:var(--accent)}
+  #designfig .hfo.on .dg-node{fill:var(--accent-soft);stroke:var(--accent)}
+  #designfig .hfo.on .dg-glyph{fill:var(--accent)}
+  #designfig .cfblk{fill:#fafbfc;stroke:#e3e7ec;stroke-width:1.4;transition:.45s}
+  #designfig .cfblk.on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.2;filter:drop-shadow(0 5px 12px rgba(30,58,95,.16))}
+  #designfig .dg-row{transition:transform .85s cubic-bezier(.25,.85,.3,1)}
+  #designfig .dg-cell{transition:transform .85s cubic-bezier(.25,.85,.3,1),opacity .65s}
+  #designfig .mxc{opacity:.22;transition:opacity .65s}
+  #designfig .mgrid.on .mxc{opacity:1}
+  #designfig .opnd .dg-cell{opacity:.22;transition:opacity .4s,transform .6s}
+  #designfig .opnd.on .dg-cell{opacity:1}
+  #designfig .dg-c0{fill:#22496f}
+  #designfig .dg-c1{fill:#4a7fae}
+  #designfig .dg-c2{fill:#3e7d68}
+  #designfig .dg-c3{fill:#9a7a3c}
+  #designfig .dg-cg{fill:#e4e8ed}
+  #designfig .dg-cm{fill:#98a1ac}
+  #designfig .dg-cz{fill:#e8ebef}
+  #designfig .dg-ck{fill:#cbd7e4}
+  #designfig .dg-ct{fill:#c3d8e8}
+  #designfig .dg-tint{opacity:0;transition:opacity .65s}
+  #designfig .dg-tint.on{opacity:1}
+  #designfig .dgn .dg-w,#designfig .dgn .dg-box,#designfig .dgn .dg-node,
+  #designfig .dgn .dg-sb,#designfig .dgn .dg-glyph{transition:.4s}
+  #designfig .dgn.on .dg-w{stroke:var(--accent)}
+  #designfig .dgn.on .dg-tip{fill:var(--accent)}
+  #designfig .dgn.on .dg-box{fill:var(--accent-soft);stroke:var(--accent)}
+  #designfig .dgn.on .dg-node{fill:var(--accent-soft);stroke:var(--accent)}
+  #designfig .dgn.on .dg-glyph{fill:var(--accent)}
+  #designfig .dgn.on .dg-sb{fill:var(--accent)}
+  #designfig .dgn .dg-reg{fill:none;stroke:#ccd2da;stroke-width:1.3;stroke-dasharray:5 5;transition:.4s}
+  #designfig .dgn.on .dg-reg{stroke:var(--accent);stroke-dasharray:none}
 
   .bar-row{display:grid;grid-template-columns:132px 1fr 100px;align-items:center;gap:12px;margin:8px 0;font-size:13px}
-  .bar-track{background:#eef1f8;border-radius:6px;height:22px;overflow:hidden}
+  .bar-track{background:#f2f4f7;border-radius:6px;height:22px;overflow:hidden}
   .bar-fill{height:100%;width:0;background:var(--grad);border-radius:6px;transition:width 1s cubic-bezier(.2,.7,.3,1)}
-  .bar-fill.keep{background:linear-gradient(90deg,#c0271b,#e0603f)}
+  .bar-fill.keep{background:#9d2c21}
   .bar-val{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-align:right}
 
   footer{border-top:1px solid var(--line);margin-top:48px;padding:32px 0 56px;color:var(--ink-soft);font-size:12.5px;background:var(--bg2)}
@@ -207,11 +279,11 @@
   .toplink.show{opacity:1;pointer-events:auto}
   .toplink:hover{transform:translateY(-3px);text-decoration:none}
 
-#demo{--bg:#f7f8fb; --bg2:#eef1f8; --card:#ffffff; --ink:#161c28; --ink-soft:#5a6478;
-  --line:#e4e8f0; --line2:#d6dcea;
-  --p1:#4338ca; --p2:#0ea5e9; --accent:#4338ca; --accent-soft:#eef1fe;
-  --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c;
-  --grad:linear-gradient(120deg,#4338ca 0%,#5b53e0 42%,#0ea5e9 100%);
+#demo{--bg:#ffffff; --bg2:#f5f6f8; --card:#ffffff; --ink:#1a1d24; --ink-soft:#5b6470;
+  --line:#e6e8ec; --line2:#d2d6dd;
+  --p1:#1e3a5f; --p2:#3d6fa5; --accent:#1e3a5f; --accent-soft:#eef2f7;
+  --high:#9d2c21; --med:#8a6316; --info:#1e5b84; --ok:#1f6a4d;
+  --grad:#1e3a5f;
   --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
   --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang SC",sans-serif;
   --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);}
@@ -219,43 +291,39 @@
 #demo .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 #demo h1,#demo h2,#demo h3{line-height:1.25;margin:0}
 #demo code,#demo .mono{font-family:var(--mono)}
-#demo .demo-head{color:#fff;padding:26px 0 24px;
-  background:radial-gradient(900px 380px at 12% -20%,#6d5ff0 0%,transparent 58%),
-             radial-gradient(700px 380px at 100% 0%,#19b6e8 0%,transparent 52%),
-             linear-gradient(150deg,#1b1f4b 0%,#2a2e6e 55%,#123a63 100%)}
+#demo .demo-head{color:#fff;padding:26px 0 24px;background:#17293f}
 #demo .demo-head{display:flex;gap:28px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 #demo .brand{display:flex;gap:15px;align-items:center}
 #demo .logo{width:46px;height:46px;flex:0 0 46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
-      font-weight:800;font-size:22px;background:rgba(255,255,255,.12);border:1px solid rgba(199,210,254,.34);color:#c7d2fe}
+      font-weight:800;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.20);color:#d6dfe9}
 #demo .brand h3{font-size:27px;font-weight:800;letter-spacing:-.02em}
-#demo .brand h3 em{font-style:normal;font-weight:500;color:#a5b4fc}
-#demo .tag{margin:3px 0 0;font-size:13px;color:#d6ddf3;max-width:560px}
+#demo .brand h3 em{font-style:normal;font-weight:500;color:#9db6d0}
 #demo .stamp{display:flex;flex-direction:column;gap:7px;font-family:var(--mono);font-size:12px}
 #demo .stamp-row{display:flex;gap:10px;align-items:center}
-#demo .stamp .k{color:#93a3d6;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;width:74px}
-#demo .stamp .v{color:#e8ecfb}
+#demo .stamp .k{color:#9db0c6;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;width:74px}
+#demo .stamp .v{color:#d8e1ec}
 #demo .pill{border-radius:20px;padding:1px 9px;font-size:11px}
-#demo .pill.ok{background:rgba(40,200,120,.16);border:1px solid rgba(40,200,120,.4);color:#7ee2ac}
-#demo .pill.bad{background:rgba(255,90,80,.16);border:1px solid rgba(255,90,80,.42);color:#ff9b93}
-#demo .pill.run{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#cfd7ef}
+#demo .pill.ok{background:rgba(70,170,120,.18);border:1px solid rgba(70,170,120,.42);color:#94d6b2}
+#demo .pill.bad{background:rgba(210,90,80,.18);border:1px solid rgba(210,90,80,.44);color:#eda49c}
+#demo .pill.run{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#ccd6e2}
 #demo .ctl{position:relative;z-index:1;background:rgba(247,248,251,.92);backdrop-filter:blur(10px);
         border-bottom:1px solid var(--line)}
 #demo .ctl-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:11px 22px}
 #demo .grp{display:flex;gap:9px;align-items:center}
 #demo .grp .lbl{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
-#demo .seg{display:inline-flex;background:#eef1f8;border:1px solid var(--line2);border-radius:9px;padding:3px;gap:3px}
+#demo .seg{display:inline-flex;background:#f2f4f7;border:1px solid var(--line2);border-radius:9px;padding:3px;gap:3px}
 #demo .seg button{border:0;background:transparent;font-family:var(--sans);font-weight:600;font-size:13px;
             color:var(--ink-soft);padding:6px 15px;border-radius:6px;cursor:pointer;transition:.16s}
 #demo .seg button:hover{color:var(--accent)}
 #demo .seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(20,30,60,.15)}
 #demo #bitlen{font-family:var(--mono);font-size:12.5px;width:112px;padding:7px 10px;border-radius:8px;
         border:1px solid var(--line2);background:#fff;color:var(--ink)}
-#demo #bitlen:disabled{background:#f1f4fa;color:#98a2b8}
+#demo #bitlen:disabled{background:#f2f4f7;color:#9aa2ad}
 #demo .btn{border:1px solid var(--line2);background:#fff;color:var(--ink);border-radius:8px;cursor:pointer;
      font-family:var(--sans);font-size:12.5px;font-weight:600;padding:7px 14px;transition:.16s}
 #demo .btn:hover{border-color:var(--accent);color:var(--accent)}
 #demo .btn.solid{background:var(--accent);border-color:var(--accent);color:#fff}
-#demo .btn.solid:hover{background:#3129a8;color:#fff}
+#demo .btn.solid:hover{background:#16304f;color:#fff}
 #demo .demo-body{padding:22px 0 60px}
 #demo .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:960px){#demo .cols{grid-template-columns:1fr}}
@@ -272,9 +340,9 @@
 #demo .digest{flex:1;min-height:196px;font-family:var(--mono);font-size:13.5px;display:flex;flex-direction:column;gap:6px}
 #demo .digest .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 @media(max-width:620px){#demo .digest .row{grid-template-columns:repeat(2,1fr)}}
-#demo .digest .w{background:#f4f7fd;border:1px solid var(--line);border-radius:6px;padding:5px 6px;text-align:center;
+#demo .digest .w{background:#f5f7f9;border:1px solid var(--line);border-radius:6px;padding:5px 6px;text-align:center;
            letter-spacing:.02em;transition:background .3s,color .3s}
-#demo .digest .w.fresh{background:#eaf0ff;border-color:#c3cef7;color:#2a2e6e}
+#demo .digest .w.fresh{background:#eef2f7;border-color:#c9d5e3;color:#1e3a5f}
 #demo .digest .ph{color:#9aa4ba;font-style:italic;font-family:var(--sans);font-size:13px}
 #demo .digest .wrap-any{word-break:break-all;color:var(--ink-soft);font-size:12.5px;line-height:1.7}
 #demo .stats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:13px;padding-top:11px;border-top:1px solid var(--line);
@@ -285,47 +353,22 @@
          border:1px solid var(--line);background:#fff;color:var(--ink-soft)}
 #demo .verdict .badge{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;
                 text-transform:uppercase;padding:2px 9px;border-radius:20px;margin-top:2px}
-#demo .verdict.ok{background:#e8f6f0;border-color:#b7e2d0;color:#0f5c43}
-#demo .verdict.ok .badge{background:#12805c;color:#fff}
-#demo .verdict.info{background:var(--accent-soft);border-color:#ccd7fb;color:#33307e}
+#demo .verdict.ok{background:#ebf3ef;border-color:#c2dcd0;color:#1a5a41}
+#demo .verdict.ok .badge{background:#1f6a4d;color:#fff}
+#demo .verdict.info{background:var(--accent-soft);border-color:#d9e1ea;color:#1e3a5f}
 #demo .verdict.info .badge{background:var(--accent);color:#fff}
-#demo .verdict.warn{background:#fdf6e8;border-color:#f1dcae;color:#7a4a00}
-#demo .verdict.warn .badge{background:#b06a00;color:#fff}
-#demo .verdict.err{background:#fdeeec;border-color:#f3bab4;color:#8c1e14}
-#demo .verdict.err .badge{background:#c0271b;color:#fff}
+#demo .verdict.warn{background:#f7f2e4;border-color:#e6dcc0;color:#6d4f10}
+#demo .verdict.warn .badge{background:#8a6316;color:#fff}
+#demo .verdict.err{background:#f7e9e7;border-color:#e6c2bd;color:#7c1f15}
+#demo .verdict.err .badge{background:#9d2c21;color:#fff}
 #demo .verdict .msg{font-family:var(--mono);font-size:12.5px;word-break:break-word}
 #demo .verdict .msg .lead{font-family:var(--sans);font-size:13.5px;font-weight:600}
 #demo .verdict .msg .why{display:block;font-family:var(--sans);font-size:12.5px;opacity:.85;margin-top:3px}
-#demo .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
-@media(max-width:900px){#demo .grid3{grid-template-columns:1fr}}
-#demo .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:17px 19px;box-shadow:var(--shadow)}
-#demo .card h3{font-size:13px;font-weight:700;letter-spacing:.02em;margin-bottom:9px}
-#demo .card p{font-size:12.8px;color:var(--ink-soft);margin:0 0 8px}
-#demo .card ul{margin:0;padding-left:17px;font-size:12.7px;color:var(--ink-soft)}
-#demo .card li{margin:5px 0}
-#demo .card li code{font-size:12px;color:var(--ink);background:#f2f5fb;padding:1px 5px;border-radius:4px}
-#demo table{border-collapse:collapse;width:100%;font-size:12.6px;margin:2px 0}
-#demo th,#demo td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
-#demo th{background:#f2f5fb;font-weight:600}
-#demo tbody tr:nth-child(even){background:#fafbfe}
-#demo td.m{font-family:var(--mono);font-size:12px}
-#demo .tagline{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap}
-#demo .t-ok{background:#e5f5ee;color:#12805c}
-#demo .t-ui{background:#e7f2fb;color:#0e6ba8}
-#demo .t-sp{background:#fdecea;color:#c0271b}
-#demo .t-po{background:#fdf3e2;color:#b06a00}
-#demo .kats{font-family:var(--mono);font-size:11.5px}
-#demo .kats td{word-break:break-all}
-#demo .kats .pass{color:#12805c;font-weight:700}
-#demo .kats .fail{color:#c0271b;font-weight:700}
-#demo .demo-src{border-top:1px solid var(--line);background:var(--bg2);padding:22px 0 40px;color:var(--ink-soft);font-size:12.5px}
-#demo .src{font-family:var(--mono);font-size:11.5px;word-break:break-all}
 /* ============ live demonstration (#demo) ============ */
 #demo .demo{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
 #demo .demo-head{padding:20px 22px}
 #demo .ctl-row{padding:11px 22px}
 #demo .demo-body{padding:20px 22px 22px}
-#demo .demo-src{border-top:1px solid var(--line);background:var(--bg2);padding:12px 22px}
 #demo .wrap{max-width:none;margin:0;padding:0}
 #demo .logo{background:rgba(255,255,255,.14)}
 #demo > h2{margin:0 0 10px}   /* the demo's own h1-h3 reset must not flatten the section title */
@@ -383,78 +426,290 @@
     <div class="card stat lift rv d4"><div class="v" data-count="3">0</div><div class="l">Digest sizes · 512 / 768 / 1024</div></div>
   </div>
 
-  <div class="grid2" style="margin-top:18px">
-    <div class="card lift rv">
-      <h3 style="margin-top:0">Design highlights</h3>
-      <ul class="tight">
-        <li>HAIFA-style iteration with a public tweak</li>
-        <li>Davies–Meyer feed-forward: <span class="mono">h′ = v₀ ⊕ v₅ = E(h) ⊕ h</span></li>
-        <li>Permutation <span class="mono">E</span>: 20 rounds in 5 phases, two SubColumn layers per round</li>
-        <li>Strictly ARX — additions, rotations and XORs only; no message-word re-ordering, no linear expansion</li>
-        <li>Six rotation constants in total: 5, 48, 8 and 11, 40, 63</li>
-      </ul>
-    </div>
-    <div class="card lift rv d1">
-      <h3 style="margin-top:0">Public tweak <span class="mono" style="font-weight:400">tw = (ver, flag, t₀, t₁)</span></h3>
-      <ul class="tight">
-        <li><b>Version</b> <span class="mono">ver</span> — 64-bit: <span class="mono">0x200 / 0x300 / 0x400</span> for 512 / 768 / 1024</li>
-        <li><b>Final-call flag</b> <span class="mono">flag</span> — 64-bit, <span class="mono">0</span> or all-ones, distinguishing the last block of a message</li>
-        <li><b>Counter</b> <span class="mono">t</span> — 128-bit message-bit count, split <span class="mono">t₀‖t₁</span></li>
-      </ul>
-      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Version, flag and counter are folded into every compression, so the same block processed at a different position in a different variant is a different computation. The counter is what binds the true message length under zero-only padding.</p>
-    </div>
-  </div>
+  <div class="card rv" id="designfig" style="margin-top:18px">
+    <h3 style="margin-top:0">The design in four views</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 12px">Four views of the same object, redrawn from the specification's own figures. <b>Compression function</b> — the block diagram of FEILIAN-<i>f</i>: five phases, one 1024-bit message block absorbed by all of them, the tweak folded in at every round, and the Davies&ndash;Meyer feed-forward. <b>One round</b> — the 4×4 state matrix walking SubColumn → ShiftRow → SubColumn → ShiftRow → AddConstant. <b>SubColumn</b> — the two stacked tweakable ARX S-boxes and the tweaks they exchange. <b>ARX S-box</b> — the add-rotate-XOR network the whole family is built from.</p>
 
-  <div class="card rv" style="margin-top:18px">
-    <h3 style="margin-top:0">The design in one picture</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 12px">Each of the five phases holds four rounds: one message-bearing round <span class="mono">R⊕</span> followed by three message-free rounds <span class="mono">R</span>. Message halves are absorbed at rounds 1, 5, 9, 13 and 17, so the last injection is round 17.</p>
-    <div class="steps">
-      <button class="stepbtn" id="prev" aria-label="previous phase">‹</button>
-      <button class="stepbtn play" id="play">▶ Play</button>
-      <button class="stepbtn" id="next" aria-label="next phase">›</button>
-      <span class="stepcap" id="cap">Press <b>Play</b> to walk the 20 rounds</span>
+    <div class="stagebar" role="tablist" aria-label="Design views">
+      <button class="stagetab on" data-stg="0" role="tab" aria-selected="true">Compression function</button>
+      <button class="stagetab" data-stg="1" role="tab" aria-selected="false">One round</button>
+      <button class="stagetab" data-stg="2" role="tab" aria-selected="false">SubColumn</button>
+      <button class="stagetab" data-stg="3" role="tab" aria-selected="false">ARX S-box</button>
     </div>
-    <figure style="margin:6px 0 0">
-      <svg viewBox="0 0 700 210" id="phasesvg" role="img" aria-label="Five-phase permutation pipeline">
-        <defs>
-          <style>
-            .plab{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12.5px;fill:#5a6478;font-weight:600}
-            .pnum{font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;fill:#8a94a8}
-            .ptag{font-family:'Inter',Arial,sans-serif;font-size:10.5px;font-weight:700;fill:#4338ca}
-          </style>
-        </defs>
-        <g id="phg"></g>
-        <line x1="30" y1="186" x2="670" y2="186" stroke="#dbe3f2" stroke-width="2"/>
-        <text class="pnum" x="30" y="203">round 1</text>
-        <text class="pnum" x="636" y="203">round 20</text>
+
+    <figure style="margin:4px 0 0">
+      <svg viewBox="0 0 700 300" id="dsvg" role="img" aria-label="Four interactive views of the FEILIAN design: the compression function, one round, SubColumn, and the ARX S-box">
+
+        <!-- ================= VIEW 1 — COMPRESSION FUNCTION ================= -->
+        <g class="stg on" id="stg0">
+          <text class="dg-lb end mfin" x="330" y="19">m</text>
+          <text class="dg-sb mfin" x="338" y="19">1024-bit</text>
+          <line class="dg-w mfin" x1="348" y1="25" x2="348" y2="46"/>
+          <polygon class="dg-tip mfin" points="348,52 344,45 352,45"/>
+          <line class="mf" x1="192" y1="52" x2="504" y2="52"/>
+
+          <line class="mf" data-cf="0" x1="192" y1="52" x2="192" y2="88"/><polygon class="mf" data-cf="0" points="192,94 188,87 196,87"/>
+          <line class="mf" data-cf="1" x1="270" y1="52" x2="270" y2="88"/><polygon class="mf" data-cf="1" points="270,94 266,87 274,87"/>
+          <line class="mf" data-cf="2" x1="348" y1="52" x2="348" y2="88"/><polygon class="mf" data-cf="2" points="348,94 344,87 352,87"/>
+          <line class="mf" data-cf="3" x1="426" y1="52" x2="426" y2="88"/><polygon class="mf" data-cf="3" points="426,94 422,87 430,87"/>
+          <line class="mf" data-cf="4" x1="504" y1="52" x2="504" y2="88"/><polygon class="mf" data-cf="4" points="504,94 500,87 508,87"/>
+
+          <line class="tf" x1="192" y1="180" x2="504" y2="180"/>
+          <line class="tf" data-cf="0" x1="192" y1="146" x2="192" y2="180"/><polygon class="tf" data-cf="0" points="192,141 188,148 196,148"/>
+          <line class="tf" data-cf="1" x1="270" y1="146" x2="270" y2="180"/><polygon class="tf" data-cf="1" points="270,141 266,148 274,148"/>
+          <line class="tf" data-cf="2" x1="348" y1="146" x2="348" y2="180"/><polygon class="tf" data-cf="2" points="348,141 344,148 352,148"/>
+          <line class="tf" data-cf="3" x1="426" y1="146" x2="426" y2="180"/><polygon class="tf" data-cf="3" points="426,141 422,148 430,148"/>
+          <line class="tf" data-cf="4" x1="504" y1="146" x2="504" y2="180"/><polygon class="tf" data-cf="4" points="504,141 500,148 508,148"/>
+          <line class="tf" x1="348" y1="180" x2="348" y2="198"/>
+          <text class="dg-sb mid" x="348" y="210">tw = (ver, flag, t&#8320;, t&#8321;)</text>
+
+          <text class="dg-lb end hfin" x="102" y="122">h</text>
+          <text class="dg-sb end hfin" x="102" y="136">1024-bit</text>
+          <line class="dg-w hfin" x1="108" y1="118" x2="154" y2="118"/>
+          <polygon class="dg-tip hfin" points="161,118 154,114 154,122"/>
+          <circle cx="120" cy="118" r="3" fill="#c7cdd6"/>
+
+          <rect class="cfblk" data-cf="0" x="161" y="96" width="62" height="44" rx="8"/>
+          <text class="dg-lb mid" data-cf="0" x="192" y="115">P&#8320;</text><text class="dg-sb mid" data-cf="0" x="192" y="131">msg @ 1</text>
+          <rect class="cfblk" data-cf="1" x="239" y="96" width="62" height="44" rx="8"/>
+          <text class="dg-lb mid" data-cf="1" x="270" y="115">P&#8321;</text><text class="dg-sb mid" data-cf="1" x="270" y="131">msg @ 5</text>
+          <rect class="cfblk" data-cf="2" x="317" y="96" width="62" height="44" rx="8"/>
+          <text class="dg-lb mid" data-cf="2" x="348" y="115">P&#8322;</text><text class="dg-sb mid" data-cf="2" x="348" y="131">msg @ 9</text>
+          <rect class="cfblk" data-cf="3" x="395" y="96" width="62" height="44" rx="8"/>
+          <text class="dg-lb mid" data-cf="3" x="426" y="115">P&#8323;</text><text class="dg-sb mid" data-cf="3" x="426" y="131">msg @ 13</text>
+          <rect class="cfblk" data-cf="4" x="473" y="96" width="62" height="44" rx="8"/>
+          <text class="dg-lb mid" data-cf="4" x="504" y="115">P&#8324;</text><text class="dg-sb mid" data-cf="4" x="504" y="131">msg @ 17</text>
+
+          <line class="dg-w" x1="225" y1="118" x2="232" y2="118"/><polygon class="dg-tip" points="239,118 232,114 232,122"/>
+          <line class="dg-w" x1="303" y1="118" x2="310" y2="118"/><polygon class="dg-tip" points="317,118 310,114 310,122"/>
+          <line class="dg-w" x1="381" y1="118" x2="388" y2="118"/><polygon class="dg-tip" points="395,118 388,114 388,122"/>
+          <line class="dg-w" x1="459" y1="118" x2="466" y2="118"/><polygon class="dg-tip" points="473,118 466,114 466,122"/>
+          <line class="dg-w" x1="537" y1="118" x2="548" y2="118"/><polygon class="dg-tip" points="553,118 548,114 548,122"/>
+
+          <g class="hfo">
+            <circle class="dg-node" cx="566" cy="118" r="13"/>
+            <text class="dg-glyph" x="566" y="123">+</text>
+          </g>
+
+          <line class="dg-w hfout" x1="579" y1="118" x2="610" y2="118"/>
+          <polygon class="dg-tip hfout" points="617,118 610,114 610,122"/>
+          <text class="dg-lb hfout" x="622" y="122">h&#8242;</text>
+
+          <path class="dg-w hfff" d="M120 118 V236 H566 V137"/>
+          <polygon class="dg-tip hfff" points="566,131 562,138 570,138"/>
+          <text class="dg-sb hfff mid" x="343" y="256">Davies&ndash;Meyer feed-forward &#8212; h&#8242; = h &#8853; v&#8325;</text>
+        </g>
+
+        <!-- ================= VIEW 2 — ONE ROUND ================= -->
+        <g class="stg" id="stg1">
+          <text class="dg-lb mid" x="92" y="28">v</text>
+          <text class="dg-lb mid" x="484" y="322">v&#8242;</text>
+
+          <g class="mx mgrid" id="mx0" transform="translate(60,36)"></g>
+          <g class="mx mgrid" id="mx1" transform="translate(256,36)"></g>
+          <g class="mx mgrid" id="mx2" transform="translate(452,36)"></g>
+          <g class="mx mgrid" id="mx3" transform="translate(60,240)"></g>
+          <g class="mx mgrid" id="mx4" transform="translate(256,240)"></g>
+          <g class="mx mgrid" id="mx5" transform="translate(452,240)"></g>
+
+          <g class="opg">
+            <line class="dg-w" x1="124" y1="68" x2="180" y2="68"/>
+            <line class="dg-w" x1="200" y1="68" x2="247" y2="68"/>
+            <polygon class="dg-tip" points="252,68 245,64 245,72"/>
+            <circle class="dg-node" cx="190" cy="68" r="8"/><text class="dg-glyph" x="190" y="72">+</text>
+            <text class="dg-op" x="190" y="52">SC</text>
+          </g>
+          <g class="opg">
+            <line class="dg-w" x1="320" y1="68" x2="447" y2="68"/>
+            <polygon class="dg-tip" points="452,68 445,64 445,72"/>
+            <text class="dg-op" x="386" y="52">SR</text>
+          </g>
+          <g class="opg">
+            <path class="dg-w" d="M516 68 H600 V196 H24 V272 H52"/>
+            <polygon class="dg-tip" points="57,272 50,268 50,276"/>
+            <circle class="dg-node" cx="350" cy="196" r="8"/><text class="dg-glyph" x="350" y="200">+</text>
+            <text class="dg-op" x="388" y="180">SC</text>
+          </g>
+          <g class="opg">
+            <line class="dg-w" x1="124" y1="272" x2="249" y2="272"/>
+            <polygon class="dg-tip" points="254,272 247,268 247,276"/>
+            <text class="dg-op" x="190" y="256">SR</text>
+          </g>
+          <g class="opg">
+            <line class="dg-w" x1="320" y1="272" x2="378" y2="272"/>
+            <line class="dg-w" x1="398" y1="272" x2="447" y2="272"/>
+            <polygon class="dg-tip" points="452,272 445,268 445,276"/>
+            <circle class="dg-node" cx="388" cy="272" r="8"/><text class="dg-glyph" x="388" y="276">+</text>
+            <text class="dg-op" x="388" y="256">AC</text>
+          </g>
+
+          <g class="dop">
+            <line class="dg-dash" x1="190" y1="116" x2="190" y2="81"/>
+            <polygon class="dg-tip" points="190,75 186,82 194,82"/>
+          </g>
+          <g class="dop">
+            <line class="dg-dash" x1="350" y1="164" x2="350" y2="186"/>
+            <polygon class="dg-tip" points="350,188 346,181 354,181"/>
+          </g>
+          <g class="dop">
+            <line class="dg-dash" x1="388" y1="328" x2="388" y2="287"/>
+            <polygon class="dg-tip" points="388,281 384,288 392,288"/>
+          </g>
+
+          <g class="mx opnd" id="op0" transform="translate(166,116)"></g>
+          <g class="mx opnd" id="op1" transform="translate(326,116)"></g>
+          <g class="mx opnd" id="op2" transform="translate(364,328)"></g>
+
+          <text class="dg-sb end" x="158" y="148">m&#8320; &#8230; m&#8327;</text>
+          <text class="dg-sb end" x="318" y="148">m&#8328; &#8230; m&#8321;&#8325;</text>
+          <text class="dg-sb end" x="356" y="354">C&#8242; &#8214; tw</text>
+
+          <path class="dg-w looparc" d="M516 272 H664 V402 H8 V68 H52"/>
+          <polygon class="dg-tip looparc" points="57,68 50,64 50,72"/>
+          <text class="dg-sb mid looparc" x="250" y="416">next round &#8635;</text>
+        </g>
+
+        <!-- ================= VIEW 3 — SUBCOLUMN ================= -->
+        <g class="stg" id="stg2">
+          <g class="dgn dgs1">
+            <rect class="dg-reg" x="64" y="24" width="556" height="122" rx="14"/>
+            <text class="dg-lb" x="76" y="42">S&#771;&#8321;</text>
+            <text class="dg-lb end" x="46" y="60">a&#8321;</text><text class="dg-lb" x="636" y="60">a&#8321;&#8242;</text>
+            <line class="dg-w" x1="56" y1="56" x2="628" y2="56"/>
+            <rect class="dg-box" x="136" y="48" width="16" height="16" rx="3"/><text class="dg-glyph" x="144" y="60">+</text>
+            <rect class="dg-box" x="473" y="48" width="16" height="16" rx="3"/><text class="dg-glyph" x="481" y="60">+</text>
+            <text class="dg-lb end" x="46" y="132">b&#8321;</text><text class="dg-lb" x="636" y="132">b&#8321;&#8242;</text>
+            <line class="dg-w" x1="56" y1="128" x2="628" y2="128"/>
+            <circle class="dg-node" cx="360" cy="128" r="9"/><text class="dg-glyph" x="360" y="132">+</text>
+            <rect class="dg-box" x="388" y="120" width="56" height="16" rx="3"/>
+            <text class="dg-sb mid" x="416" y="132">&#8811; 63</text>
+            <rect class="dg-box" x="452" y="80" width="58" height="30" rx="4"/>
+            <text class="dg-sb mid" x="481" y="99">&#931;&#8321;</text>
+            <line class="dg-w" x1="481" y1="80" x2="481" y2="70"/><polygon class="dg-tip" points="481,64 477,71 485,71"/>
+            <line class="dg-w" x1="481" y1="128" x2="481" y2="116"/><polygon class="dg-tip" points="481,110 477,117 485,117"/>
+            <line class="dg-w" x1="144" y1="128" x2="144" y2="70"/><polygon class="dg-tip" points="144,64 140,71 148,71"/>
+            <circle cx="144" cy="128" r="3" fill="#c7cdd6"/>
+            <line class="dg-w" x1="176" y1="56" x2="176" y2="273"/><polygon class="dg-tip" points="176,279 172,272 180,272"/>
+            <circle cx="176" cy="56" r="3" fill="#c7cdd6"/>
+            <text class="dg-sb" x="190" y="170">s&#8320; = a&#8321; + b&#8321;</text>
+          </g>
+          <g class="dgn dgs0">
+            <rect class="dg-reg" x="64" y="186" width="556" height="122" rx="14"/>
+            <text class="dg-lb" x="76" y="204">S&#771;&#8320;</text>
+            <text class="dg-lb end" x="46" y="212">a&#8320;</text><text class="dg-lb" x="636" y="212">a&#8320;&#8242;</text>
+            <line class="dg-w" x1="56" y1="208" x2="628" y2="208"/>
+            <rect class="dg-box" x="104" y="200" width="16" height="16" rx="3"/><text class="dg-glyph" x="112" y="212">+</text>
+            <rect class="dg-box" x="307" y="200" width="16" height="16" rx="3"/><text class="dg-glyph" x="315" y="212">+</text>
+            <text class="dg-lb end" x="46" y="292">b&#8320;</text><text class="dg-lb" x="636" y="292">b&#8320;&#8242;</text>
+            <line class="dg-w" x1="56" y1="288" x2="628" y2="288"/>
+            <circle class="dg-node" cx="176" cy="288" r="9"/><text class="dg-glyph" x="176" y="292">+</text>
+            <rect class="dg-box" x="204" y="280" width="56" height="16" rx="3"/>
+            <text class="dg-sb mid" x="232" y="292">&#8811; 8</text>
+            <rect class="dg-box" x="286" y="240" width="58" height="30" rx="4"/>
+            <text class="dg-sb mid" x="315" y="259">&#931;&#8320;</text>
+            <line class="dg-w" x1="315" y1="240" x2="315" y2="222"/><polygon class="dg-tip" points="315,216 311,223 319,223"/>
+            <line class="dg-w" x1="315" y1="288" x2="315" y2="276"/><polygon class="dg-tip" points="315,270 311,277 319,277"/>
+            <line class="dg-w" x1="112" y1="288" x2="112" y2="222"/><polygon class="dg-tip" points="112,216 108,223 116,223"/>
+            <circle cx="112" cy="288" r="3" fill="#c7cdd6"/>
+            <line class="dg-w" x1="360" y1="208" x2="360" y2="143"/><polygon class="dg-tip" points="360,137 356,144 364,144"/>
+            <circle cx="360" cy="208" r="3" fill="#c7cdd6"/>
+            <text class="dg-sb" x="374" y="170">s&#8321; = a&#8320;&#8242;</text>
+          </g>
+        </g>
+
+        <!-- ================= VIEW 4 — ARX S-BOX ================= -->
+        <g class="stg" id="stg3">
+          <g class="dgn">
+            <text class="dg-lb" x="24" y="44">S&#771;&#8320;</text>
+            <text class="dg-sb" x="24" y="60">&#931;&#8320;(b) = b &#8853; (b &#8811; 5) &#8853; (b &#8811; 48)</text>
+            <line class="dg-w" x1="24" y1="84" x2="270" y2="84"/>
+            <text class="dg-lb end" x="16" y="88">a</text><text class="dg-lb" x="278" y="88">a&#8242;</text>
+            <rect class="dg-box" x="72" y="76" width="16" height="16" rx="3"/><text class="dg-glyph" x="80" y="88">+</text>
+            <rect class="dg-box" x="212" y="76" width="16" height="16" rx="3"/><text class="dg-glyph" x="220" y="88">+</text>
+            <line class="dg-w" x1="24" y1="176" x2="270" y2="176"/>
+            <text class="dg-lb end" x="16" y="180">b</text><text class="dg-lb" x="278" y="180">b&#8242;</text>
+            <circle class="dg-node" cx="144" cy="176" r="8"/><text class="dg-glyph" x="144" y="180">+</text>
+            <rect class="dg-box" x="176" y="168" width="40" height="16" rx="3"/>
+            <text class="dg-sb mid" x="196" y="180">&#8811; 8</text>
+            <rect class="dg-box" x="200" y="112" width="40" height="22" rx="4"/>
+            <text class="dg-sb mid" x="220" y="127">&#931;&#8320;</text>
+            <line class="dg-w" x1="220" y1="112" x2="220" y2="97"/><polygon class="dg-tip" points="220,93 216,98 224,98"/>
+            <line class="dg-w" x1="230" y1="176" x2="230" y2="139"/><polygon class="dg-tip" points="230,135 226,140 234,140"/>
+            <line class="dg-w" x1="80" y1="176" x2="80" y2="97"/><polygon class="dg-tip" points="80,93 76,98 84,98"/>
+            <line class="dg-w" x1="144" y1="222" x2="144" y2="189"/><polygon class="dg-tip" points="144,185 140,190 148,190"/>
+            <text class="dg-lb end" x="136" y="232">s</text>
+          </g>
+          <g class="dgn">
+            <text class="dg-lb" x="376" y="44">S&#771;&#8321;</text>
+            <text class="dg-sb" x="376" y="60">&#931;&#8321;(b) = b &#8853; (b &#8811; 11) &#8853; (b &#8811; 40)</text>
+            <line class="dg-w" x1="376" y1="84" x2="622" y2="84"/>
+            <text class="dg-lb end" x="368" y="88">a</text><text class="dg-lb" x="630" y="88">a&#8242;</text>
+            <rect class="dg-box" x="424" y="76" width="16" height="16" rx="3"/><text class="dg-glyph" x="432" y="88">+</text>
+            <rect class="dg-box" x="564" y="76" width="16" height="16" rx="3"/><text class="dg-glyph" x="572" y="88">+</text>
+            <line class="dg-w" x1="376" y1="176" x2="622" y2="176"/>
+            <text class="dg-lb end" x="368" y="180">b</text><text class="dg-lb" x="630" y="180">b&#8242;</text>
+            <circle class="dg-node" cx="496" cy="176" r="8"/><text class="dg-glyph" x="496" y="180">+</text>
+            <rect class="dg-box" x="528" y="168" width="40" height="16" rx="3"/>
+            <text class="dg-sb mid" x="548" y="180">&#8811; 63</text>
+            <rect class="dg-box" x="552" y="112" width="40" height="22" rx="4"/>
+            <text class="dg-sb mid" x="572" y="127">&#931;&#8321;</text>
+            <line class="dg-w" x1="572" y1="112" x2="572" y2="97"/><polygon class="dg-tip" points="572,93 568,98 576,98"/>
+            <line class="dg-w" x1="582" y1="176" x2="582" y2="139"/><polygon class="dg-tip" points="582,135 578,140 586,140"/>
+            <line class="dg-w" x1="432" y1="176" x2="432" y2="97"/><polygon class="dg-tip" points="432,93 428,98 436,98"/>
+            <line class="dg-w" x1="496" y1="222" x2="496" y2="189"/><polygon class="dg-tip" points="496,185 492,190 500,190"/>
+            <text class="dg-lb end" x="488" y="232">s</text>
+          </g>
+        </g>
       </svg>
-      <figcaption>Figure 1 · Permutation E — 5 phases × 4 rounds; the message-bearing round of each phase is shown dark.</figcaption>
+      <figcaption>Figure 1 &middot; The design, redrawn from the specification's Figures 2.1&ndash;2.6 and 4.1. The 4&times;4 state matrices are coloured as the specification colours them: colour tracks a column through the round, and in each operand matrix the lit rows are the rows that operand is added to &mdash; a message half into rows 0 and 2, the round constants into row 1 and the tweak into row 3.</figcaption>
     </figure>
+
+    <div class="steps">
+      <button class="stepbtn" id="dprev" aria-label="previous view">&lsaquo;</button>
+      <button class="stepbtn play" id="dplay">&#9654; Play</button>
+      <button class="stepbtn" id="dnext" aria-label="next view">&rsaquo;</button>
+      <span class="stepcap" id="dcap">Compression function</span>
+    </div>
   </div>
 
   <div class="card rv" style="margin-top:18px">
-    <h3 style="margin-top:0">At a glance</h3>
-    <table>
+    <h3 style="margin-top:0">Performance</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Chapter 5 of the specification reports the cost of the family: operation counts, memory footprint, software timings on three platforms and FPGA synthesis. The three views below are its reported values — nothing on this page was benchmarked, synthesised or otherwise measured locally. In cycles per byte FEILIAN-1024 settles essentially level with SHA-512 on long messages, ahead of SHA-3-512 and behind BLAKE-64.</p>
+
+    <figure style="margin:6px 0 4px">
+      <div id="cpbchart"></div>
+      <figcaption>Figure 2 · Cycles per byte, FEILIAN-1024 against BLAKE-64, SHA-512 and SHA-3-512 (specification Table 5.3, SUPERCOP/eBACS harness).</figcaption>
+    </figure>
+
+    <table style="font-size:13.5px;margin-top:6px">
+      <thead><tr><th>Software benchmarks, FEILIAN-1024 (specification Table 5.2)</th><th>ISA</th><th>OS / compiler</th><th class="num">10 B</th><th class="num">100 B</th><th class="num">1 kB</th><th class="num">10 kB</th></tr></thead>
       <tbody>
-        <tr><td class="k">Chaining state</td><td>1024 bit — the only internal state width; the 512/768 digests reuse it and truncate the output</td></tr>
-        <tr><td class="k">Message block</td><td>1024 bit (128 bytes)</td></tr>
-        <tr><td class="k">Digest lengths</td><td>512 / 768 / 1024 bit — the state prefix <span class="mono">h₀…h₇</span> / <span class="mono">h₀…h₁₁</span> / <span class="mono">h₀…h₁₅</span></td></tr>
-        <tr><td class="k">Version word</td><td><span class="mono">ver = 0x200</span> (512) · <span class="mono">0x300</span> (768) · <span class="mono">0x400</span> (1024)</td></tr>
-        <tr><td class="k">Permutation E</td><td>20 rounds in 5 phases; a phase is one message-bearing round followed by three message-free rounds</td></tr>
-        <tr><td class="k">Layer sequence</td><td>SubColumn → ShiftRow, twice per round; 40 layers in the whole permutation</td></tr>
-        <tr><td class="k">ShiftRow</td><td>Row <span class="mono">i</span> rotated left by <span class="mono">i</span> positions, <span class="mono">i ∈ {0,1,2,3}</span></td></tr>
-        <tr><td class="k">Compression mode</td><td>Davies–Meyer feed-forward: <span class="mono">h′ ← v₀ ⊕ v₅</span></td></tr>
-        <tr><td class="k">Tweak</td><td><span class="mono">tw = (ver, flag, t₀‖t₁)</span> — version, final-call flag, 128-bit message-bit counter</td></tr>
-        <tr><td class="k">Constants</td><td>IV — first 256 hexadecimal fractional digits of π; four round constants — first 64 bits of the fractional parts of √2, √3, √5, √7</td></tr>
-        <tr><td class="k">Padding</td><td>Zero bits appended only if the last block is short; the final-call flag carries the role padding would otherwise play</td></tr>
-        <tr><td class="k">Byte order · message space</td><td>Little-endian · bit length &lt; 2¹²⁸</td></tr>
+        <tr><td class="k">Intel i7-10750H @2.60 GHz</td><td>AVX2</td><td>Windows 11 · GCC 16.1.0</td><td class="num">56.98</td><td class="num">5.77</td><td class="num">3.65</td><td class="num">3.57</td></tr>
+        <tr><td class="k">AMD Ryzen 9 8945HX @2.50 GHz</td><td>AVX2</td><td>Windows 11 · GCC 15.2.0</td><td class="num">44.15</td><td class="num">4.71</td><td class="num">3.09</td><td class="num">3.05</td></tr>
+        <tr><td class="k">Apple M2 Pro @3.50 GHz</td><td>NEON</td><td>macOS 26 · Clang 17.0.0</td><td class="num">55.76</td><td class="num">5.64</td><td class="num">4.19</td><td class="num">4.09</td></tr>
       </tbody>
     </table>
-    <p class="tblcap">A summary only. The full parameter tables, the round-by-round definition, the IV and round-constant words, the canonical Appendix B test vectors and the Chapter 5 measurements are in the specification — <a href="#downloads">download it below</a>.</p>
+    <p class="tblcap">FEILIAN-1024, built with <span class="mono">-O3 -march=native</span>, median over thousands of trials. Values are cycles per byte and settle as the message grows.</p>
+
+    <figure style="margin:16px 0 0">
+      <div id="fpgachart"></div>
+      <figcaption>Figure 3 · FPGA throughput of FEILIAN-<i>f</i> by architecture (§5.5, Table 5.5): 1SC / 2SC / 4SC / 8SC SubColumn units, on Xilinx Virtex-5 xc5vlx110 and AMD Zynq-7000 xc7z100.</figcaption>
+    </figure>
+    <p class="tblcap">Synplify Elite W-2024.09, base strategy. Message buffering, padding, bit counters and output registers lie outside the measured block; constants and message selection are hard-wired, not in block RAM. The operation counts, the vectorisation and parallelism notes of §5.1–5.2, and the FPGA resource counts are in the specification.</p>
   </div>
 
   <div class="callout rv">
-    Security claims (specification Table 4.1) and the arguments behind them are <b>not</b> reproduced here — their status is exactly what the third-party analyses in §04 discuss. Continue to <a href="#analysis">Third-party analysis →</a>.
+    Security claims (specification Table 4.1) and the arguments behind them are <b>not</b> reproduced here — the independent analyses that address them are cited, with links to their own documents, in <a href="#analysis">Third-party analysis ↓</a>.
+  </div>
+
+  <div class="card rv">
+    <h3 style="margin-top:0">Revision history of the submission</h3>
+    <ul class="tl">
+      <li><span class="d">2026-10-08</span><b>Specification v1.0.1</b> (69 pp.) and the three-page <b>erratum</b>, released together. The erratum records the four typographical corrections of its Table 1, the software and hardware corrections of its Table 2, and five further text changes made in response to the assessments.</li>
+      <li><span class="d">2026-09-27</span>M. Idrassi, <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, v1.0.2 (14 pp., CC BY 4.0). The same day, ePrint 2026/2236 was submitted and approved on 28 September.</li>
+      <li><span class="d">2026-09-26 · 09-23</span>M.-J. O. Saarinen publishes his FEILIAN (hash-10) report on ngcc.dev — entries <span class="mono">hash-10-1 … hash-10-5</span>.</li>
+      <li class="mute"><span class="d">2026-06-30</span><b>Original submission v1.0</b> (68 pp.) — the revision examined by the third-party assessment.</li>
+    </ul>
   </div>
 </section>
 
@@ -462,7 +717,6 @@
 <section id="demo">
   <p class="eyebrow rv">02 — Live demonstration</p>
   <h2 class="rv">Hash it yourself, in this page</h2>
-  <p class="lead rv">Every digest below is computed in your browser by a JavaScript port of the compression function, locked to the reference-code convention and self-tested against the canonical Appendix&nbsp;B vectors before any input is hashed. There is no server, no network call and no build step — the whole implementation is in the page source.</p>
 
   <div class="demo">
     <div class="demo-head">
@@ -470,7 +724,6 @@
         <div class="logo">F</div>
         <div>
           <h3>FEILIAN <em>live hash</em></h3>
-          <p class="tag">Digests are computed in this page, in your browser. No server, no network, no build step.</p>
         </div>
       </div>
       <div class="stamp">
@@ -528,55 +781,6 @@
         </div>
       </div>
 
-      <div class="grid3">
-        <div class="card">
-          <h3>Convention frozen in this core</h3>
-          <p>The core follows the reference implementation in every detail. The four points below are where the June&nbsp;2026 specification text and that implementation diverged; all four are reconciled in version&nbsp;1.0.1 (&sect;05), and this demo has always taken the implementation's reading.</p>
-          <ul>
-            <li>IV word at row&nbsp;1, col&nbsp;3 = <code>0x3F84D5B5B5470917</code> (v1.0 printed <code>0x3D&hellip;</code>; corrected in v1.0.1)</li>
-            <li>Round constants injected into row&nbsp;1 (v1.0 printed row&nbsp;3; corrected in v1.0.1)</li>
-            <li>Counter words, high 64 bits first</li>
-            <li>Final block counter = true message length, not a full 1024</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>What this accepts</h3>
-          <table>
-            <thead><tr><th>input</th><th>outcome</th><th>layer</th></tr></thead>
-            <tbody>
-              <tr><td class="m">text / hex / bit string</td><td>digest</td><td><span class="tagline t-ok">hashed</span></td></tr>
-              <tr><td class="m">hex, odd nibble count</td><td>rejected before decoding</td><td><span class="tagline t-ui">input</span></td></tr>
-              <tr><td class="m">hex, non-hex char</td><td>rejected before decoding</td><td><span class="tagline t-ui">input</span></td></tr>
-              <tr><td class="m">bit length &gt; supplied bits</td><td><span class="m">message too short: &hellip;</span></td><td><span class="tagline t-sp">spec</span></td></tr>
-              <tr><td class="m">bit length &ge; 2<sup>128</sup></td><td><span class="m">must fit the 128-bit counter</span></td><td><span class="tagline t-sp">spec</span></td></tr>
-              <tr><td class="m">input &gt; 8&nbsp;KiB</td><td>manual trigger, not automatic</td><td><span class="tagline t-po">policy</span></td></tr>
-              <tr><td class="m">input &gt; 1&nbsp;MiB</td><td>refused</td><td><span class="tagline t-po">policy</span></td></tr>
-            </tbody>
-          </table>
-          <p style="margin-top:9px">The <em>spec</em> layer is the ported core speaking; the <em>policy</em> layer is this page, and is not a specification limit.</p>
-        </div>
-
-        <div class="card">
-          <h3>Known-answer self-test</h3>
-          <p>Run on load against the canonical Appendix&nbsp;B vectors and the bit-level cases, before any user input is hashed.</p>
-          <table class="kats" id="katTable"><tbody><tr><td>running&hellip;</td></tr></tbody></table>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:16px">
-        <h3>Cost of one digest</h3>
-        <p>This core is a straightforward BigInt port: correct and portable, not fast. Measured in this tab:
-          roughly <b>190&ndash;260&nbsp;&micro;s per 1024-bit block</b>, i.e. about <b>0.5&nbsp;MB/s</b>. For comparison the supplied AVX2 C code
-          runs the same 20 rounds at roughly 730&nbsp;MB/s, and a 32-bit word-pair port measured about 17&nbsp;MB/s in the same engine.
-          Timings below are an average over repeated calls, so they are stable enough to compare, but they are a JavaScript
-          measurement and say nothing about the algorithm's own performance.</p>
-      </div>
-    </div>
-
-    <div class="demo-src">
-      <div class="src">core: feilian_bigint.js &nbsp;&middot;&nbsp; inlined at build time &nbsp;&middot;&nbsp; dadd22e5cdb176b684f3591bc42fbf6f5429a93f3d19502a202c0eabc5f29c1d<br>
-      engine: <span id="uaStamp"></span></div>
     </div>
   </div>
 </section>
@@ -584,247 +788,68 @@
 <!-- ================= DOWNLOADS ================= -->
 <section id="downloads">
   <p class="eyebrow rv">03 — Downloads</p>
-  <h2 class="rv">Artifacts and revision history</h2>
-  <p class="lead rv">The documents and implementations as released — specification <b>v1.0.1</b> (8 October 2026), the two-page erratum recording every change from v1.0, and the v1.0.1 reference, optimized and RTL code — plus the revision history of the submission itself. Each artifact publishes its SHA-256 so a download can be verified end to end.</p>
-  <div id="dlgrid" class="grid3 rv"></div>
+  <h2 class="rv">Artifacts</h2>
+  <p class="lead rv">The submission is distributed as a single <b>version 1.0.1 release package</b> (8 October 2026): the specification, the three-page erratum recording every change from v1.0, and the reference, optimized and RTL implementations, in one archive. The package is published byte-for-byte as distributed, with its SHA-256, so a download can be verified end to end. The erratum is also published on its own, for reading without the archive (<a href="files/FEILIAN_Erratum.pdf" target="_blank" rel="noopener">open the PDF</a>, or see <a href="#erratum">&sect;05</a>). The revision history of the submission is at the end of <a href="#introduction">&sect;01</a>.</p>
+  <div id="dlgrid" class="grid-auto rv"></div>
   <p class="tblcap rv" id="dlnote"></p>
 
-  <div class="grid2" style="margin-top:22px">
+  <div style="margin-top:22px">
     <div class="card rv">
-      <h3 style="margin-top:0">Revision history of the submission</h3>
-      <ul class="tl">
-        <li><span class="d">2026-10-08</span><b>Specification v1.0.1</b> (69 pp.) and the two-page <b>erratum</b>, released together. The erratum records the four typographical corrections of its Table 1, the software and hardware corrections of its Table 2, and four further text changes made in response to the assessment.</li>
-        <li><span class="d">2026-09-27</span>M. Idrassi, <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, v1.0.2 (14 pp., CC BY 4.0). The same day, ePrint 2026/2236 was submitted and approved on 28 September.</li>
-        <li><span class="d">2026-09-26 · 09-23</span>M.-J. O. Saarinen publishes his FEILIAN (hash-10) report on ngcc.dev — entries <span class="mono">hash-10-1 … hash-10-5</span>.</li>
-        <li class="mute"><span class="d">2026-06-30</span><b>Original submission v1.0</b> (68 pp.) — the revision examined by the third-party assessment.</li>
-      </ul>
-    </div>
-    <div class="card rv d1">
       <h3 style="margin-top:0">Which revision is which</h3>
       <table style="font-size:13.5px">
         <thead><tr><th>Revision</th><th class="num">Pages</th><th>SHA-256 (prefix)</th></tr></thead>
         <tbody>
-          <tr><td>Examined by the assessment (§04, R1–R8)</td><td class="num">68</td><td class="mono">8e3a9a109f3188ab…</td></tr>
+          <tr><td>Examined by the assessment [2] (R1–R8)</td><td class="num">68</td><td class="mono">8e3a9a109f3188ab…</td></tr>
           <tr><td><b>Distributed here — v1.0.1</b></td><td class="num">69</td><td class="mono">2d14bcf877eb9fbd…</td></tr>
         </tbody>
       </table>
-      <p class="tblcap">The third-party assessment of §04 reviewed the 30 June 2026 text. The copy released here is version 1.0.1 (8 October 2026); every check in §04 compares against the released version, and the differences that matter are stated in the status column.</p>
-      <div class="note" style="margin-bottom:0"><b>Read this first.</b> Download the specification before quoting any parameter: the tables on this page are a summary, and where the page and the specification disagree, the specification prevails.</div>
+      <p class="tblcap">The technical assessment [2] reviewed the 30 June 2026 text. The copy released here is version 1.0.1 (8 October 2026); the erratum recording every change between the two revisions is published on its own as well as inside the release package, and is introduced in §05. The review documents themselves are linked in §04.</p>
+      <div class="note" style="margin-bottom:0"><b>Read this first.</b> Open the specification inside the package before quoting any parameter: the tables on this page are a summary, and where the page and the specification disagree, the specification prevails.</div>
     </div>
   </div>
 </section>
 
 <!-- ================= THIRD-PARTY ANALYSIS ================= -->
 <section id="analysis">
-  <p class="eyebrow rv">04 — Third-party analysis</p>
-  <h2 class="rv">Independent reviews and their status</h2>
-  <p class="lead rv">Three independent sources have analysed this submission. None of them establishes a full-round cryptanalytic break of the correctly encoded software hash. What follows is what each one found, and the current status of every finding against the material released here.</p>
+  <p class="eyebrow rv">04 &mdash; Third-party analysis</p>
+  <h2 class="rv">Independent reviews</h2>
+  <p class="lead rv">Three independent sources have analysed this submission. Their documents are published by their authors, so this page links to the sources rather than restating their findings. None of the three establishes a full-round cryptanalytic break of the correctly encoded software hash.</p>
 
-  <div class="grid3">
+  <div class="revlist">
     <div class="card revcard lift rv">
-      <h3 style="margin-top:0">Mounir Idrassi — technical assessment</h3>
-      <p class="who">v1.0.2 · 27 September 2026 · 14 pp. · AM Crypto, Japan · CC BY 4.0</p>
-      <blockquote>“Withhold a positive security assessment and integration approval for this submission… These are sufficient grounds to request a corrected submission and renewed review.”</blockquote>
-      <p>Eight findings, R1–R8, spanning the RTL wrappers, the C sources, the mathematical argument and the shared test infrastructure. It states plainly that it does <b>not</b> establish a full-round break of the hash defined by the written compression algorithm, or of the normally operating C implementations.</p>
-      <p>The hardware conclusions are <b>source-level</b>: no RTL simulation was performed, so the assessment itself calls for end-to-end validation of any corrected implementation.</p>
+      <h3 style="margin-top:0">Mounir Idrassi &mdash; technical assessment</h3>
+      <p class="who">Technical assessment of the submitted specification and implementations &middot; v1.0.2 &middot; 27 September 2026 &middot; 14 pp. &middot; AM Crypto, Japan &middot; CC BY 4.0</p>
       <p class="srcline"><a href="https://github.com/amcrypto-jp/feilian-cryptanalysis">github.com/amcrypto-jp/feilian-cryptanalysis &rarr;</a></p>
     </div>
     <div class="card revcard lift rv d1">
-      <h3 style="margin-top:0">Markku-Juhani O. Saarinen — ngcc.dev</h3>
-      <p class="who">23 &amp; 26 September 2026 · personal report · unaffiliated with NICCS</p>
-      <blockquote>Reference C implementations return success with an all-zero digest when the padding allocation fails.</blockquote>
-      <p>This is the earlier, source-level finding on which the assessment's R5 builds: the assessment extends the observation to the optimized SIMD implementations and credits the original report.</p>
-      <p>The site publishes follow-up RTL simulations and reference-C partial-byte checks. The assessment attributes those to that venue and does not rerun them; this page does the same, and cites them as reports rather than as reproduced results.</p>
-      <p>Its five entries — <span class="mono">hash-10-1 … hash-10-5</span> — are a numbering of their own, including the <b>Critical</b> RTL collision. The findings table below carries them beside R1–R5; the two schemes are kept separate, and neither renumbers the other.</p>
+      <h3 style="margin-top:0">Markku-Juhani O. Saarinen &mdash; ngcc.dev</h3>
+      <p class="who">Personal report on ngcc.dev &middot; entries dated 23 &amp; 26 September 2026 &middot; unaffiliated with NICCS</p>
       <p class="srcline"><a href="https://ngcc.dev/reports/hash-10.html">ngcc.dev/reports/hash-10.html &rarr;</a></p>
     </div>
     <div class="card revcard lift rv d2">
-      <h3 style="margin-top:0">Mounir Idrassi — ePrint 2026/2236</h3>
-      <p class="who">submitted 27 September 2026 · approved 28 September · CC BY 4.0</p>
-      <blockquote>“The component results establish no hash attack or bound on the hash's security margin.”</blockquote>
-      <p>A complete classification of the whole-output linear structures of the 64-bit SubColumn. For FEILIAN's parameters the structure space is exactly the two-dimensional MSB family, with three nonzero members, and no nonzero member survives the second SubColumn boundary.</p>
-      <p>It is a component-level structural property — not a security ranking of any hash construction, and not a claim about FEILIAN as a whole.</p>
+      <h3 style="margin-top:0">Mounir Idrassi &mdash; ePrint 2026/2236</h3>
+      <p class="who">Component-level analysis &middot; Cryptology ePrint Archive, Report 2026/2236 &middot; submitted 27 September 2026, approved 28 September &middot; CC BY 4.0</p>
       <p class="srcline"><a href="https://eprint.iacr.org/2026/2236">eprint.iacr.org/2026/2236 &rarr;</a></p>
     </div>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">Findings and current status</h3>
-    <table style="font-size:13.5px">
-      <thead><tr><th style="width:100px">#<span class="thsub">assessment · ngcc.dev</span></th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status against the material released here</th></tr></thead>
-      <tbody>
-        <tr>
-          <td class="k">R1<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-2-three-feilian-rtl-cores-have-trivial-zero-extension-collisions">hash-10-2</a></td>
-          <td>The 1SC, 4SC and 8SC hardware wrappers omit the current block's length from the compression input, so their message encoding is not injective. The 2SC core contains a different, corrected counter path.</td>
-          <td><span class="badge b-crit">Critical</span> — three RTL cores, as rated by ngcc.dev</td>
-          <td><span class="badge b-ok">Addressed</span> Fixed in v1.0.1 for all four architectures: the current block length is part of the compression input, and the block, final flag and cumulative length are transaction-consistent (&sect;05).</td>
-        </tr>
-        <tr>
-          <td class="k">R2<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-3-the-specification-examples-and-rtl-define-incompatible-feilian-variants">hash-10-3</a></td>
-          <td>Chapter 2, the C sources and the RTL do not define one consistent algorithm — IV word 7, the AddConstant row placement, the counter word order and the hardware variant labels disagree.</td>
-          <td><span class="badge b-med">Conformance</span> — blocks transfer of security conclusions</td>
-          <td><span class="badge b-ok">Addressed</span> The revision distributed here designates the conventions: IV₇ <span class="mono">0x3F84D5B5B5470917</span>, constants in state row 1 and the tweak in row 3, counter split <span class="mono">t₀‖t₁</span>. The hardware variant labels are unchanged — v1.0.1 fixes the README wording that explains them (&sect;05).</td>
-        </tr>
-        <tr>
-          <td class="k">R3<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-3-the-specification-examples-and-rtl-define-incompatible-feilian-variants">hash-10-3</a></td>
-          <td>Appendix B printed cumulative <i>padded-block</i> counts for the 512- and 768-bit examples while the C code and KATs use true message lengths.</td>
-          <td><span class="badge b-med">Security-relevant encoding</span></td>
-          <td><span class="badge b-ok">Addressed</span> Appendix B is reprinted under true message-length binding — 24 sections changed in the revision distributed here, and the 512/768 digests now agree with the C reference.</td>
-        </tr>
-        <tr>
-          <td class="k">R4<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-4-c-implementations-hash-storage-bits-outside-partial-byte-messages">hash-10-4</a><a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-5-c-input-length-conversion-and-padding-arithmetic-are-unchecked">hash-10-5</a></td>
-          <td>The C bit-input and length contracts are incomplete: the unused low bits of a partial final byte are not masked, one padding addition can wrap, and an <span class="mono">unsigned long long</span> bit length is cast to <span class="mono">size_t</span> unchecked.</td>
-          <td><span class="badge b-med">Correctness</span> — platform-dependent severity</td>
-          <td><span class="badge b-ok">Addressed</span> In v1.0.1 <span class="mono">pad_message()</span> masks the final partial byte and guards both additions, and the length cast is rejected where it cannot be represented — in all six C variants, reference and optimized.</td>
-        </tr>
-        <tr>
-          <td class="k">R5<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-1-padding-allocation-failure-returns-a-successful-all-zero-digest">hash-10-1</a></td>
-          <td>Padding-allocation failure is silently accepted: the reference and optimized C return success and an all-zero digest.</td>
-          <td><span class="badge b-med">Implementation</span></td>
-          <td><span class="badge b-ok">Addressed</span> In v1.0.1 the failure is detected and propagated through <span class="mono">CryptHash()</span>'s return code, so a failed call no longer yields a well-formed digest; v1.0.1 also returns an error when the requested digest length does not match the configured version.</td>
-        </tr>
-        <tr>
-          <td class="k">R6</td>
-          <td>The mode proof is written for a different interface — salt and length-encoding padding — than the construction it is applied to, and the claimed margins are not established for the actual composition.</td>
-          <td><span class="badge b-med">Assurance gap</span> — not a demonstrated break</td>
-          <td><span class="badge b-med">Open — text-level</span> Recorded as an unresolved argument in the specification. No full-round break is claimed by the assessment or found here.</td>
-        </tr>
-        <tr>
-          <td class="k">R7</td>
-          <td>The MAC, KDF and XOF recommendations exceed what the indifferentiability argument licenses; each needs its own specification and bounds.</td>
-          <td><span class="badge b-med">Assurance gap</span> — separate review needed</td>
-          <td><span class="badge b-med">Open — text-level</span> Recorded as requiring specifications and bounds of their own. No implementations or KATs for these modes are distributed.</td>
-        </tr>
-        <tr>
-          <td class="k">R8</td>
-          <td>The shared DRNG and KAT driver contain portability and error-propagation defects — including a shift-by-width case in the SM3 rotation macro and ignored return values.</td>
-          <td><span class="badge b-info">Test-generation reliability</span> — vectors unaffected</td>
-          <td><span class="badge b-info">Reported, not applied</span> These files are marked <span class="mono">SHALL NOT be modified</span> and are byte-identical to the submission. A defect report and a patch are prepared for coordination with ICCS; the fixed message/digest pairs are unaffected.</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="tblcap">Two numbering schemes are kept separate. Findings are numbered <b>R1–R8</b> as in the technical assessment [2]; where the ngcc.dev report [3] covers the same defect it numbers it independently, and that second identifier is shown beneath the row number — neither scheme is renumbered onto the other. Severity is quoted from the source that raised the finding, so R1 carries ngcc.dev's rating of the three affected RTL cores. The right-hand column records the status of each finding against the material released here, as assessed by the submission — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">What the component analysis does and does not say</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The ePrint 2026/2236 result, in the paper's own terms. Like the assessment, the paper states its boundary explicitly: this is a property of a component, not a hash attack and not a bound on the hash's security margin.</p>
-    <div class="grid2">
-      <div>
-        <h4 style="margin:0 0 6px">Result for FEILIAN</h4>
-        <ul class="tight">
-          <li>For <span class="mono">w=64, r=8, s=63</span>: <span class="mono">LD(F) = S</span>, dimension 2.</li>
-          <li>Exactly three nonzero members (<span class="mono">M = 2⁶³</span>):
-            <br><span class="mono">(0,M,0,M) → (M,0,M,0)</span>
-            <br><span class="mono">(M,0,M,M) → (M,0,0,0)</span>
-            <br><span class="mono">(M,M,M,0) → (0,0,M,0)</span></li>
-          <li>Beyond the two SubColumn boundaries the family dies: <span class="mono">LD(A∘R∘A) ∩ LD(A) = {0}</span>.</li>
-          <li>Real FEILIAN (ShiftRow <span class="mono">B = I</span>) lands in the first census row — the family is cleared at the second boundary.</li>
-        </ul>
-      </div>
-      <div>
-        <h4 style="margin:0 0 6px">Row-mixer census (Theorem 8)</h4>
-        <div class="bar-row"><span>8 → 0</span><div class="bar-track"><div class="bar-fill" data-w="45.7"></div></div><span class="bar-val">9,216</span></div>
-        <div class="bar-row"><span>8 → 4 (→0)</span><div class="bar-track"><div class="bar-fill" data-w="34.3"></div></div><span class="bar-val">6,912</span></div>
-        <div class="bar-row"><span>8 → 4 → 2</span><div class="bar-track"><div class="bar-fill keep" data-w="5.7"></div></div><span class="bar-val">1,152</span></div>
-        <div class="bar-row"><span>8 → 4 → 4</span><div class="bar-track"><div class="bar-fill keep" data-w="11.4"></div></div><span class="bar-val">2,304</span></div>
-        <div class="bar-row"><span>8 → 8</span><div class="bar-track"><div class="bar-fill keep" data-w="2.9"></div></div><span class="bar-val">576</span></div>
-        <p class="mono" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">20,160 mixers total; 4,032 (20%, red) permanently retain the nonzero family. A structural property, not a security ranking of mixers.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="callout ok rv">
-    <h4>What none of these analyses claim</h4>
-    <p style="margin:0 0 8px">None of the three establishes a full-round cryptanalytic break of the hash defined by the written compression algorithm, or of the correctly encoded software implementations. The assessment says so in as many words; the component paper says so in as many words.</p>
-    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1 in the assessment's numbering, <span class="mono">hash-10-2</span> on ngcc.dev — the only <b>Critical</b> rating in either report); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§05). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
   </div>
 </section>
 
 <!-- ================= ERRATUM ================= -->
 <section id="erratum">
-  <p class="eyebrow rv">05 — Erratum</p>
+  <p class="eyebrow rv">05 &mdash; Erratum</p>
   <h2 class="rv">The designers' erratum: v1.0 &rarr; v1.0.1</h2>
-  <p class="lead rv">On 8 October 2026 the designers released <b>specification version 1.0.1</b> together with a two-page <b>erratum</b> that records every change made to the June 2026 text. The erratum is reproduced below in full. Its opening note is the single most important sentence in it, and it is quoted verbatim: <i>&ldquo;The design of hash function FEILIAN does not change. All details should refer to the reference code that illustrates FEILIAN correctly and fully.&rdquo;</i></p>
+  <p class="lead rv">On 8 October 2026 the designers released <b>specification version 1.0.1</b> together with a three-page <b>erratum</b> that records every change made to the June 2026 text. The erratum is not reproduced on this page, but it is published on its own beside it and can be opened directly below. Its opening sentence is the one that matters most, and it is quoted verbatim: <i>&ldquo;The design of hash function FEILIAN does not change. All details should refer to the reference code that illustrates FEILIAN fully and correctly.&rdquo;</i></p>
 
-  <div class="callout ok rv">
-    <h4>Design unchanged &mdash; typographies, not structure</h4>
-    <p style="margin:0 0 8px">No round, constant, counter rule or iteration count is altered by v1.0.1. Four <b>typographical errors</b> are corrected in the specification (Table 1 of the erratum). The implementations are <b>refined towards the full-fledged version</b>, not repaired: the erratum states plainly that <i>&ldquo;the software implementation (both reference and optimized codes) are correct&rdquo;</i>. Its own summary of the software changes is that they (1) handle exceptional execution situations properly, (2) handle non-full-byte strings properly, and (3) correct some inconsistency in program comments.</p>
-    <p style="margin:0">The distinction matters for reading &sect;04: the compression function, the IV, the round constants and the counter conventions are what the third-party analyses examined, and none of them moves here.</p>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">1 &middot; Typos corrected in the specification</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Table 1 of the erratum, with the location it cites for each correction.</p>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Location</th><th>As printed in v1.0</th><th>Corrected in v1.0.1</th></tr></thead>
-      <tbody>
-        <tr><td>p. 3, &sect;2.1 &mdash; the initial vector</td><td class="mono">IV<sub>7</sub> = 0x3D84D5B5B5470917</td><td class="mono">IV<sub>7</sub> = 0x3F84D5B5B5470917</td></tr>
-        <tr><td>p. 9, &sect;2.2.2 &mdash; the round constant</td><td class="mono">(0, tw, 0, Const)</td><td class="mono">(0, Const, 0, tw)</td></tr>
-        <tr><td>p. 61, bibliography &mdash; &ldquo;Second preimage attacks on dithered hash functions&rdquo;</td><td class="mono">[IKD+08]</td><td class="mono">[ABF+08]</td></tr>
-        <tr><td>pp. 59&ndash;68, Appendix B.2/B.3 &mdash; printed test vectors for FEILIAN-768/512</td><td>wrong historical version</td><td>correct version</td></tr>
-      </tbody>
-    </table>
-    <p class="tblcap">Both design-affecting corrections were already what the reference code did; the printed text carried the older value. v1.0.1 now prints <span class="mono">0x3F84D5B5B5470917</span> for the seventh IV word and places the round constant in the second word of the AddConstant row.</p>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">2 &middot; Corrections to the implementations</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Table 2 of the erratum, grouped as the erratum groups it into software and hardware.</p>
-
-    <h4 style="margin:0 0 6px">Software</h4>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Issue</th><th>Change</th></tr></thead>
-      <tbody>
-        <tr><td>Allocation failure</td><td><span class="mono">pad_message()</span> returns <span class="mono">0</span> if allocation fails; the internal hash function detects this and returns <span class="mono">&minus;1</span>; <span class="mono">CryptHash()</span> propagates the error.</td></tr>
-        <tr><td>Non-full-byte string</td><td>After copying the input, <span class="mono">pad_message()</span> masks the unused low-order bits of the final byte when <span class="mono">msg_bits % 8 != 0</span>. Those bits are cleared before compression.</td></tr>
-        <tr><td>Length representability</td><td>Before converting the input length to <span class="mono">size_t</span>, <span class="mono">CryptHash()</span> checks whether it is representable. <span class="mono">pad_message()</span> computes the rounded-up byte and block counts by division and remainder, then checks <span class="mono">num_blocks &gt; SIZE_MAX / BLOCK_BYTES</span> before computing the allocation size.</td></tr>
-        <tr><td>Non-compliant usage</td><td>The requested digest length is checked against the current version (512/768/1024) and an error is returned when it does not match.</td></tr>
-        <tr><td>Counter-word comments</td><td><span class="mono">hash_bits[0]</span> holds the high word; <span class="mono">hash_bits[1]</span> holds the low word.</td></tr>
-      </tbody>
-    </table>
-
-    <h4 style="margin:22px 0 6px">Hardware</h4>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Issue</th><th>Change</th></tr></thead>
-      <tbody>
-        <tr><td>Current block length omitted in 1SC/4SC/8SC</td><td>The 1SC/4SC/8SC cores are revised so that the current block length is included in the compression input.</td></tr>
-        <tr><td>Block / final flag / cumulative length made transaction-consistent</td><td>The message block, the tweak (including the final flag and the cumulative bit count) and the initial chaining state are latched when a compression transaction is accepted, and preserved throughout compression.</td></tr>
-        <tr><td>Counter-word ordering</td><td>All RTL implementations use the same ordering: domain word 2 carries the upper 64 bits, domain word 3 the lower 64 bits.</td></tr>
-        <tr><td>Digest variants</td><td>All four architectures support 512/768/1024 configurations.</td></tr>
-        <tr><td>Parameter propagation</td><td>The top-level <span class="mono">DIGEST_BITS</span> parameter is forwarded to the core, which derives the version value and the output-word count; digest selection and MMIO address bounds now follow the configured output length.</td></tr>
-        <tr><td>Intermediate state exposure and clearing</td><td>The 1SC/2SC/4SC cores restrict the digest output to completed hashes; the top-level MMIO read path is restricted the same way.</td></tr>
-        <tr><td>README typo</td><td>Fixed so the README states that the four RTL architectures support three instances, and that the architecture names indicate SubColumn parallelism.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">3 &middot; Further text changes made in response to the assessment [2]</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Beyond the typos, the erratum lists four additions the designers made after reading the community assessment.</p>
+  <div class="card rv" style="margin-top:18px">
+    <h3 style="margin-top:0">Three short pages &mdash; what they contain</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 16px">The erratum is short enough to read whole. No round, constant, counter rule or iteration count is altered by v1.0.1, and it has three parts.</p>
     <ul class="tight">
-      <li>p. 18, &sect;4.2 &mdash; more detailed NIST SP 800-22 test results are provided.</li>
-      <li>p. 19, &sect;4.3.1 &mdash; the notations in the indifferentiability proof are unified to be fully consistent with FEILIAN, while sketching and adapting the HAIFA proof.</li>
-      <li>p. 37, &sect;6.2 &mdash; a footnote is added to emphasise the necessity of an unambiguous encoding of context and counter.</li>
-      <li>pp. 37&ndash;38, &sect;6.3 &mdash; a note is added clarifying that the XOF should be regarded as a <b>variable-output-length hash function</b>, leveraging the same FEILIAN-<i>f</i> compression function.</li>
+      <li><b>Table 1 &mdash; four typographical corrections</b> in the specification: the seventh IV word, the word order of the AddConstant row, a bibliography key, and the printed Appendix&nbsp;B.2/B.3 vectors for FEILIAN-768/512. Both design-affecting corrections were already what the reference code did; the printed text carried the older value.</li>
+      <li><b>Table 2 &mdash; corrections to the implementations</b>, grouped into software and hardware: proper handling of exceptional execution situations, masking of non-full-byte input, allocation, length-representability and digest-length checks in software; and in hardware the current block length included in the 1SC/4SC/8SC compression input, transaction-consistent latching of block, final flag and cumulative length, one counter-word order across all RTL cores, and digest output restricted to completed hashes.</li>
+      <li><b>&sect;3 &mdash; five further text changes</b> made after reading the community assessments, among them writing the counter convention out explicitly (<span class="mono">t<sub>0</sub></span> the high word, <span class="mono">t<sub>1</sub></span> the low word) and clarifying that the XOF is a variable-output-length hash function.</li>
     </ul>
-  </div>
-
-  <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">How this maps onto the findings of &sect;04</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The erratum is the designers' response to the assessment. Read against the R-numbers of &sect;04, the corrections above fall out as follows.</p>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Finding</th><th>Status after v1.0.1</th></tr></thead>
-      <tbody>
-        <tr><td>R1 &mdash; hardware length-binding defect</td><td><b>Addressed.</b> The current block length is now included in the compression input for all four architectures, and the block, final flag and cumulative length are transaction-consistent.</td></tr>
-        <tr><td>R2 &mdash; specification/implementation divergences</td><td><b>Addressed.</b> The two typo corrections (IV<sub>7</sub>, AddConstant order) remove the printed discrepancies; the reference code was already the correct side.</td></tr>
-        <tr><td>R3 &mdash; Appendix B vector inconsistencies</td><td><b>Addressed.</b> Appendix B.2/B.3 are reprinted with the correct vectors under true message-length counts.</td></tr>
-        <tr><td>R4 &mdash; non-full-byte message handling</td><td><b>Addressed.</b> Unused low-order bits of the final byte are now masked before compression.</td></tr>
-        <tr><td>R5 &mdash; exceptional paths and digest-length validation</td><td><b>Addressed.</b> Allocation failure is propagated, length representability is checked, and a mismatched digest length now returns an error.</td></tr>
-        <tr><td>R6, R7 &mdash; scope and modelling of the security argument</td><td><b>Partly clarified.</b> The notation of the proof is unified (&sect;4.3.1) and the encoding/XOF footnotes (&sect;6.2&ndash;6.3) are added; the argument still has to be read against its stated interface, as &sect;04 sets out.</td></tr>
-        <tr><td>R8 &mdash; test-infrastructure defects</td><td><b>Not covered by this erratum.</b> The erratum makes no claim about the shared KAT/DRNG tooling; see &sect;04.</td></tr>
-      </tbody>
-    </table>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:16px 0 0">The erratum is published on its own as well, so it can be read without taking the whole archive: <span class="mono">files/FEILIAN_Erratum.pdf</span>, byte-identical to the copy at the top level of the release package, beside the specification. Its SHA-256 begins <span class="mono">98e74ec289636cea&hellip;</span>; the full digest, and the digest of the package, are in <span class="mono">files/SHA256SUMS.txt</span>.</p>
+    <p style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="dl-btn" href="files/FEILIAN_Erratum.pdf" target="_blank" rel="noopener">Open the erratum (PDF, 3 pp.) &nearr;</a><a href="#downloads" style="font-size:13.5px">or take the release package v1.0.1 &darr;</a></p>
   </div>
 </section>
 
@@ -833,9 +858,9 @@
   <p class="eyebrow rv">Sources</p>
   <h2 class="rv">Documents referenced</h2>
   <div class="card rv">
-    <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download</a>. A two-page erratum recording every change from v1.0 is distributed with it (§05).</div>
+    <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. The specification PDF inside the release package has SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download the package</a>. A three-page erratum recording every change from v1.0 is issued with it and is also published <a href="files/FEILIAN_Erratum.pdf" target="_blank" rel="noopener">as a document of its own</a> (§05).</div>
     <div class="ref"><b>[2]</b> Mounir Idrassi (AM Crypto, Japan). <a href="https://github.com/amcrypto-jp/feilian-cryptanalysis"><i>FEILIAN: technical assessment of the submitted specification and implementations</i></a>, version 1.0.2, 27 September 2026, 14 pp. CC BY 4.0. Findings R1–R8.</div>
-    <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <a href="https://ngcc.dev/reports/hash-10.html"><i>FEILIAN (hash-10)</i></a>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site.</div>
+    <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <a href="https://ngcc.dev/reports/hash-10.html"><i>FEILIAN (hash-10)</i></a>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site. The designers' erratum cites this report as its own reference [2].</div>
     <div class="ref"><b>[4]</b> Mounir Idrassi. <a href="https://eprint.iacr.org/2026/2236"><i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i></a>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
     <div class="ref"><b>[5]</b> E. Biham, O. Dunkelman. <a href="https://eprint.iacr.org/2007/278"><i>A Framework for Iterative Hash Functions — HAIFA</i></a>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
     <div class="ref"><b>[6]</b> J. Black, P. Rogaway, T. Shrimpton. <a href="https://doi.org/10.1007/3-540-45708-9_21"><i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i></a>, CRYPTO 2002, LNCS 2442.</div>
@@ -850,10 +875,10 @@
 
 <footer>
   <div class="wrap">
-    <p><b>FEILIAN — Submission Overview</b> · release v1.3.0 · 9 October 2026 · designation hash-10</p>
-    <p>Published for the FEILIAN submission to the NGCC-CH programme: the specification and its erratum as released, the reference, optimized and RTL implementations, and the independent third-party analyses the submission has received — each finding listed with its status. Where this page and the specification disagree, the specification prevails. Timings reported by the live demo are JavaScript measurements taken in your browser and say nothing about the implementations themselves.</p>
-    <p>Page text and figures: <a href="LICENSE">CC BY 4.0</a>. The specification PDF, the erratum and the implementation archives are submission material, © their designers, redistributed as released — see <a href="NOTICE.md">NOTICE</a>.</p>
-    <p>Specification SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span> · <a href="files/SHA256SUMS.txt">checksums</a> · <a href="https://github.com/PENNYBENNY/FEILIAN">source repository</a></p>
+    <p><b>FEILIAN — Submission Overview</b> · release v1.6.1 · 9 October 2026 · designation hash-10</p>
+    <p>Published for the FEILIAN submission to the NGCC-CH programme: the version 1.0.1 release package as distributed &mdash; specification, erratum and implementations &mdash; and the independent third-party analyses the submission has received, each linked to its own document. Where this page and the specification disagree, the specification prevails. Timings reported by the live demo are JavaScript measurements taken in your browser and say nothing about the implementations themselves.</p>
+    <p>Page text and figures: <a href="LICENSE">CC BY 4.0</a>. The release package and the erratum are submission material, © its designers, redistributed as distributed — see <a href="NOTICE.md">NOTICE</a>.</p>
+    <p>Release package SHA-256 <span class="mono">23d3e6721563a27b15b39b14a3e3042b9c5da6925fb3d540464d85206de05d5c</span> · erratum <span class="mono">98e74ec289636cea…</span> · <a href="files/SHA256SUMS.txt">checksums</a> · <a href="https://github.com/PENNYBENNY/FEILIAN">source repository</a></p>
   </div>
 </footer>
 
@@ -865,18 +890,9 @@
 <script>
 /* DOWNLOADS:BEGIN */
 var DOWNLOADS = [
-  {id:"spec", title:"Specification",
-   sub:"PDF · version 1.0.1 · 8 October 2026 · 69 pp.",
-   file:"files/specification.pdf", size:"649.8 KB", sha:"2d14bcf877eb9fbd…", ready:true},
-  {id:"erratum", title:"Erratum",
-   sub:"PDF · corrections from v1.0 to v1.0.1 · October 2026",
-   file:"files/FEILIAN_Erratum.pdf", size:"123.9 KB", sha:"04969502772e3d2f…", ready:true},
-  {id:"code", title:"Reference code",
-   sub:"C (reference + AVX2/SIMD) and SystemVerilog cores · v1.0.1",
-   file:"files/feilian-code.zip", size:"107.9 KB", sha:"c9962a89df794f45…", ready:true},
-  {id:"archive", title:"Full archive",
-   sub:"Implementations, KAT vectors, Appendix B data and verification tooling",
-   file:"files/feilian-archive.zip", size:"9.94 MB", sha:"c76e8fa4f3cc0970…", ready:true}
+  {id:"v101", title:"Release package v1.0.1",
+   sub:"Specification 1.0.1 (69 pp.) + erratum v1.0→v1.0.1 + reference, optimized and RTL implementations",
+   file:"files/FEILIAN-v1.0.1.zip", size:"856.0 KB", sha:"23d3e6721563a27b…", ready:true}
 ];
 var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
 /* DOWNLOADS:END */
@@ -962,60 +978,178 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
   },{rootMargin:'-45% 0px -50% 0px'});
   sections.forEach(function(s){if(s)nio.observe(s);});
 
-  /* ---------- pipeline stepper ---------- */
-  var phg=document.getElementById('phg');
-  var PH=5, CW=22, CH=34, GAP=5, PW=CW*4+GAP*3, PGAP=19, X0=(700-(PW*5+PGAP*4))/2;
-  var phaseRects=[];
-  for(var p=0;p<PH;p++){
-    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('class','ph-box');
-    var x=X0+p*(PW+PGAP);
-    var frame=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    frame.setAttribute('class','frame'); frame.setAttribute('x',x); frame.setAttribute('y',58);
-    frame.setAttribute('width',PW); frame.setAttribute('height',CH+22); frame.setAttribute('rx',9);
-    g.appendChild(frame);
-    var lab=document.createElementNS('http://www.w3.org/2000/svg','text');
-    lab.setAttribute('class','plab'); lab.setAttribute('x',x+PW/2); lab.setAttribute('y',46);
-    lab.setAttribute('text-anchor','middle'); lab.textContent='Phase '+(p+1);
-    g.appendChild(lab);
-    for(var c=0;c<4;c++){
-      var r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      r.setAttribute('class','ph-cell'+(c===0?' msg':''));
-      r.setAttribute('x',x+c*(CW+GAP)); r.setAttribute('y',72);
-      r.setAttribute('width',CW); r.setAttribute('height',CH); r.setAttribute('rx',4);
-      g.appendChild(r);
-    }
-    var rn=document.createElementNS('http://www.w3.org/2000/svg','text');
-    rn.setAttribute('class','pnum'); rn.setAttribute('x',x+PW/2); rn.setAttribute('y',126);
-    rn.setAttribute('text-anchor','middle'); rn.textContent=(p*4+1)+'–'+(p*4+4);
-    g.appendChild(rn);
-    if(p===4){
-      var tg=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tg.setAttribute('class','ptag'); tg.setAttribute('x',x+PW/2); tg.setAttribute('y',152);
-      tg.setAttribute('text-anchor','middle'); tg.textContent='last msg @ r17';
-      g.appendChild(tg);
-    }
-    phg.appendChild(g); phaseRects.push(g);
-  }
+  /* ---------- interactive design figure ---------- */
+  (function(){
+    "use strict";
+    var root=document.getElementById('designfig');
+    if(!root)return;
+    var fig=document.getElementById('dsvg');
+    var NS='http://www.w3.org/2000/svg';
+    var CELL=16, OCELL=12;
+    var reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  var cur=-1, timer=null, cap=document.getElementById('cap');
-  function paint(){
-    phaseRects.forEach(function(g,i){g.classList.toggle('active',i===cur);});
-    if(cur<0){ cap.innerHTML='Press <b>Play</b> to walk the 20 rounds'; return; }
-    cap.innerHTML='<b>Phase '+(cur+1)+'</b> · rounds '+(cur*4+1)+'–'+(cur*4+4)+' · R⊕ then R, R, R'+
-      (cur===4?' · last message injection at round 17':'');
-  }
-  document.getElementById('next').addEventListener('click',function(){ cur=(cur+1)%5; if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='▶ Play';} paint(); });
-  document.getElementById('prev').addEventListener('click',function(){ cur=(cur<=0?4:cur-1); if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='▶ Play';} paint(); });
-  var play=document.getElementById('play');
-  play.addEventListener('click',function(){
-    if(timer){ clearInterval(timer); timer=null; play.textContent='▶ Play'; }
-    else{
-      play.textContent='❚❚ Pause';
-      if(cur<0)cur=0; paint();
-      timer=setInterval(function(){ cur=(cur+1)%5; paint(); },1000);
+    var BODY=[
+      'the compression function FEILIAN-<i>f</i>. The same 1024-bit block <span class="mono">m</span> is absorbed by all five phases; the tweak <span class="mono">tw</span> enters every round; the feed-forward XORs the incoming chaining value into the result, so <span class="mono">h&#8242; = h &#8853; v&#8325;</span>.',
+      'one round <span class="mono">R&#770;<sup>&#8853;</sup></span>: SubColumn, ShiftRow, SubColumn, ShiftRow, AddConstant, with one message half absorbed before each SubColumn. Colour tracks a column &#8212; SubColumn mixes within a column, ShiftRow carries the mixture into a new column.',
+      'SubColumn: two tweakable ARX S-boxes stacked. <span class="mono">S&#771;&#8321;</span> is driven by <span class="mono">s&#8321; = a&#8320;&#8242;</span>, <span class="mono">S&#771;&#8320;</span> by <span class="mono">s&#8320; = a&#8321; + b&#8321;</span>. Both tweaks are derived inside SubColumn &#8212; no external value enters.',
+      'the ARX S-box: addition, rotation and XOR only. <span class="mono">&#931;&#8320;</span> rotates by 5 and 48 after a rotation of 8; <span class="mono">&#931;&#8321;</span> rotates by 11 and 40 after a rotation of 63.'
+    ];
+    var STEPS=[
+      ['h enters','phase 0 absorbs m','phase 1','phase 2','phase 3','phase 4','feed-forward','h&#8242; out'],
+      ['state v','&#8853; m&#8320;&#8230;m&#8327; then SubColumn','ShiftRow','&#8853; m&#8328;&#8230;m&#8321;&#8325; then SubColumn','ShiftRow','AddConstant'],
+      ['S&#771;&#8320;','S&#771;&#8321;'],
+      ['S&#771;&#8320;','S&#771;&#8321;']
+    ];
+    var MAXK=[8,6,2,2], TICK=[1050,1550,3000,3000];
+    /* Each view keeps its own natural proportions: VB is the tight box around the
+       drawing, MW the widest it is allowed to grow. The figures are therefore
+       centred at roughly their design size instead of being stretched to the full
+       width of the card, which flattened the wide, sparse views. */
+    var VB=['48 2 600 262','0 12 672 412','32 16 624 300','0 28 652 214'];
+    var MW=[740,700,700,660];
+    function fit(s){
+      if(!fig)return;
+      fig.setAttribute('viewBox',VB[s]);
+      fig.style.maxWidth=MW[s]+'px';
     }
-  });
+
+    function mk(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function buildMatrix(host,cell,paint,gate){
+      for(var r=0;r<4;r++){
+        var row=mk('g',{'class':'dg-row','data-r':r});
+        for(var c=0;c<4;c++){
+          row.appendChild(mk('rect',{'class':'dg-cell'+(gate?' mxc':'')+' '+paint(r,c),
+            x:(c*cell+1),y:(r*cell+1),width:(cell-2),height:(cell-2),rx:2}));
+        }
+        host.appendChild(row);
+      }
+    }
+    function paintCol(r,c){return 'dg-c'+c;}
+    function paintGrey(){return 'dg-cg';}
+    function paintMsg(r){return (r===0||r===2)?'dg-cm':'dg-cz';}
+    function paintConst(r){return r===1?'dg-ck':(r===3?'dg-ct':'dg-cz');}
+
+    var MG=[];
+    ['mx0','mx1','mx2','mx3','mx4','mx5'].forEach(function(id,i){
+      var h=document.getElementById(id); if(!h)return;
+      MG.push(h); buildMatrix(h,CELL, i===0?paintGrey:paintCol, true);
+    });
+    if(MG[5]){
+      var tint=mk('g',{'class':'dg-tint',id:'actint'});
+      [1,3].forEach(function(r){
+        tint.appendChild(mk('rect',{x:0.5,y:(r*CELL+0.5),width:(CELL*4-1),height:(CELL-1),
+          fill:'none',stroke:'#3d6fa5','stroke-width':2,rx:2}));
+      });
+      MG[5].appendChild(tint);
+    }
+    ['op0','op1','op2'].forEach(function(id,i){
+      var h=document.getElementById(id); if(!h)return;
+      buildMatrix(h,OCELL, i===2?paintConst:paintMsg, false);
+    });
+
+    var G0=document.getElementById('stg0'), G1=document.getElementById('stg1'),
+        G2=document.getElementById('stg2'), G3=document.getElementById('stg3');
+
+    function r0(k){
+      if(!G0)return;
+      for(var i=0;i<5;i++){
+        var n=G0.querySelectorAll('[data-cf="'+i+'"]');
+        for(var j=0;j<n.length;j++){
+          var e=n[j], tap=e.classList.contains('mf')||e.classList.contains('tf');
+          e.classList.toggle('on', tap ? (k>=1&&k<=5&&(k-1)===i) : (k>=1&&(k-1)>=i));
+        }
+      }
+      G0.querySelectorAll('.hfin,.mfin').forEach(function(e){e.classList.toggle('on',k===0);});
+      G0.querySelectorAll('.hfff').forEach(function(e){e.classList.toggle('on',k>=6);});
+      G0.querySelectorAll('.hfo,.hfout').forEach(function(e){e.classList.toggle('on',k===7);});
+    }
+
+    function srSet(grid,shift){
+      if(!grid)return;
+      var rows=grid.querySelectorAll('.dg-row');
+      for(var i=0;i<rows.length;i++){
+        var row=rows[i], ri=parseInt(row.getAttribute('data-r'),10)||0;
+        row.style.transform=shift?('translate('+(-ri*CELL)+'px,0)'):'translate(0,0)';
+        var cs=row.querySelectorAll('.dg-cell');
+        for(var j=0;j<cs.length;j++){
+          cs[j].style.transform=(shift&&j<ri)?('translate('+(4*CELL)+'px,0)'):'translate(0,0)';
+        }
+      }
+    }
+    function r1(k){
+      if(!G1)return;
+      G1.querySelectorAll('.opg').forEach(function(e,i){e.classList.toggle('on',k>=1+i);});
+      for(var i=0;i<MG.length;i++) MG[i].classList.toggle('on',k>=i);
+      var live=[k===1,k===3,k===5];
+      G1.querySelectorAll('.dop').forEach(function(e,i){e.classList.toggle('on',live[i]);});
+      G1.querySelectorAll('.opnd').forEach(function(e,i){e.classList.toggle('on',live[i]);});
+      srSet(MG[2],k>=2); srSet(MG[4],k>=4);
+      var t=document.getElementById('actint'); if(t)t.classList.toggle('on',k>=5);
+      G1.querySelectorAll('.looparc').forEach(function(e){e.classList.toggle('on',k>=5);});
+    }
+    function r2(k){
+      if(!G2)return;
+      G2.querySelector('.dgs0').classList.toggle('on',k===0);
+      G2.querySelector('.dgs1').classList.toggle('on',k===1);
+    }
+    function r3(k){
+      if(!G3)return;
+      G3.querySelectorAll('.dgn').forEach(function(e,i){e.classList.toggle('on',(i===0?k===0:k===1));});
+    }
+
+    var RENDER=[r0,r1,r2,r3];
+    var dcap=document.getElementById('dcap'), dplay=document.getElementById('dplay');
+    var stage=0, k=0, tid=null, ptid=null, visible=false;
+
+    function resetAll(){ r0(-1); r1(-1); r2(-1); r3(-1); }
+    function paint(){ RENDER[stage](k); dcap.innerHTML='<b>'+STEPS[stage][k]+'</b> &middot; '+BODY[stage]; }
+    function finalState(){
+      resetAll();
+      if(G0)['[data-cf]','.hfin','.mfin','.hfff','.hfo','.hfout'].forEach(function(sel){
+        G0.querySelectorAll(sel).forEach(function(e){e.classList.add('on');});
+      });
+      r1(5); r2(0); r3(0);
+    }
+    function start(){
+      if(reduce||!visible||tid)return;
+      tid=setInterval(function(){ k=(k+1)%MAXK[stage]; paint(); },TICK[stage]);
+    }
+    function stop(){ if(tid){clearInterval(tid);tid=null;} }
+    function haltTour(){ if(ptid){clearInterval(ptid);ptid=null;dplay.textContent='\u25B6 Play';} }
+    function goto(s){
+      stop(); haltTour();
+      fit(s);
+      root.querySelectorAll('.stg').forEach(function(e,i){e.classList.toggle('on',i===s);});
+      root.querySelectorAll('.stagetab').forEach(function(e,i){
+        e.classList.toggle('on',i===s); e.setAttribute('aria-selected',i===s?'true':'false');
+      });
+      stage=s; k=0;
+      if(reduce){ finalState(); dcap.innerHTML='<b>'+STEPS[s][0]+'</b> &middot; '+BODY[s]; }
+      else{ paint(); start(); }
+    }
+
+    root.querySelectorAll('.stagetab').forEach(function(tab,i){
+      tab.addEventListener('click',function(){ goto(i); });
+    });
+    document.getElementById('dprev').addEventListener('click',function(){ goto((stage+3)%4); });
+    document.getElementById('dnext').addEventListener('click',function(){ goto((stage+1)%4); });
+    dplay.addEventListener('click',function(){
+      if(ptid){ haltTour(); return; }
+      dplay.textContent='\u275A\u275A Pause';
+      ptid=setInterval(function(){ goto((stage+1)%4); },15000);
+    });
+
+    if(window.IntersectionObserver){
+      new IntersectionObserver(function(es){
+        es.forEach(function(en){ visible=en.isIntersecting; if(visible)start(); else stop(); });
+      },{threshold:.15}).observe(root);
+    }else{ visible=true; }
+
+    root.querySelectorAll('.stg').forEach(function(e,i){e.classList.toggle('on',i===0);});
+    if(reduce){ finalState(); dcap.innerHTML='<b>'+STEPS[0][0]+'</b> &middot; '+BODY[0]; }
+    else{ paint(); }
+    fit(0);
+  })();
 })();
 </script>
 
@@ -1730,9 +1864,9 @@ bitlen.addEventListener('input', schedule);
  * Self-test
  * ------------------------------------------------------------------ */
 function selfTest() {
-  var rows = [], pass = 0;
+  var pass = 0;
   for (var i = 0; i < KAT.length; i++) {
-    var v = KAT[i], got = null, ok = false, err = null;
+    var v = KAT[i], got = null, ok = false;
     try {
       if (v.kind === 'bits') {
         var pb = parseBits(v.val);
@@ -1743,12 +1877,9 @@ function selfTest() {
         got = runCore(eb, eb.length * 8, v.bits);
       }
       ok = got === v.hex;
-    } catch (e) { err = e; }
+    } catch (e) { /* a throw counts as a failure, same as a digest mismatch */ }
     if (ok) pass++;
-    rows.push('<tr><td>' + escapeHtml(v.label) + '</td><td class="'
-      + (ok ? 'pass' : 'fail') + '">' + (ok ? 'pass' : (err ? 'throw' : 'FAIL')) + '</td></tr>');
   }
-  $('katTable').innerHTML = '<tbody>' + rows.join('') + '</tbody>';
   var pill = $('stampTest');
   if (pass === KAT.length) {
     pill.innerHTML = '<span class="pill ok">' + pass + '/' + KAT.length + ' pass</span>';
@@ -1764,7 +1895,6 @@ function selfTest() {
   }
 }
 
-$('uaStamp').textContent = navigator.userAgent;
 try {
   selfTest();
 } catch (e) {
@@ -1775,6 +1905,86 @@ inp.value = 'abc';
 schedule();
 
 })();
+})();
+
+/* ---------- Introduction · Figure 2: cycles/byte line chart (spec Table 5.3) ---------- */
+(function(){
+  var host=document.getElementById('cpbchart'); if(!host)return;
+  var LEN=[64,128,576,1024,1536,4096,64576];
+  var SERIES=[
+    {name:'FEILIAN-1024', color:'#1e3a5f', w:3,   d:[8.6875,4.34375,4.210069,3.735352,3.694661,3.669678,3.63632]},
+    {name:'SHA-512',      color:'#2f6b56', w:2,   d:[10.453125,8.640625,4.177083,4.077148,3.873698,3.591797,3.44004]},
+    {name:'BLAKE-64',     color:'#3d6fa5', w:2,   d:[6.640625,6.054688,3.255208,3.252930,3.108724,2.743408,2.661205]},
+    {name:'SHA-3-512',    color:'#8a6316', w:2,   d:[15.140625,10.742188,7.508681,6.689453,6.363932,5.970703,5.831408]}
+  ];
+  var W=900,H=430,ML=62,MR=150,MT=28,MB=54;
+  var pw=W-ML-MR, ph=H-MT-MB, YMAX=16, TICKS=8;
+  var xs=function(i){return ML+pw*i/(LEN.length-1);};
+  var ys=function(v){return MT+ph*(1-v/YMAX);};
+  var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cycles per byte by message length">'];
+  s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5b6470}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#7d8794}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
+  for(var t=0;t<=TICKS;t++){
+    var v=YMAX*t/TICKS, y=ys(v);
+    s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#cbd1d9':'#f0f2f5')+'" stroke-width="1"/>');
+    s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v.toFixed(1)+'</text>');
+  }
+  LEN.forEach(function(L,i){
+    s.push('<line x1="'+xs(i)+'" y1="'+(MT+ph)+'" x2="'+xs(i)+'" y2="'+(MT+ph+5)+'" stroke="#cbd1d9"/>');
+    s.push('<text class="ax" x="'+xs(i)+'" y="'+(MT+ph+21)+'" text-anchor="middle">'+L+'</text>');
+  });
+  s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-12)+'" text-anchor="middle">message length [bytes]</text>');
+  s.push('<text class="ax" transform="translate(16,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">cycles / byte</text>');
+  SERIES.forEach(function(se){
+    var pts=se.d.map(function(v,i){return xs(i)+','+ys(v);}).join(' ');
+    s.push('<polyline points="'+pts+'" fill="none" stroke="'+se.color+'" stroke-width="'+se.w+
+           '" stroke-linejoin="round" stroke-linecap="round"'+(se.w===3?'':' stroke-dasharray="5 4"')+'/>');
+    se.d.forEach(function(v,i){ s.push('<circle cx="'+xs(i)+'" cy="'+ys(v)+'" r="'+(se.w===3?4:2.8)+'" fill="#fff" stroke="'+se.color+'" stroke-width="2"/>'); });
+  });
+  SERIES.forEach(function(se,i){
+    var y=MT+14+i*24;
+    s.push('<line x1="'+(ML+pw+18)+'" y1="'+y+'" x2="'+(ML+pw+40)+'" y2="'+y+'" stroke="'+se.color+'" stroke-width="'+(se.w===3?3:2.4)+'"/>');
+    s.push('<text class="lg" x="'+(ML+pw+47)+'" y="'+(y+4)+'" fill="'+(se.w===3?'#1e3a5f':'#5b6470')+'">'+se.name+'</text>');
+  });
+  s.push('</svg>');
+  host.innerHTML=s.join('');
+})();
+
+/* ---------- Introduction · Figure 3: FPGA throughput grouped bars (spec Table 5.5) ---------- */
+(function(){
+  var host=document.getElementById('fpgachart'); if(!host)return;
+  var CAT=['[8SC]','[4SC]','[2SC]','[1SC]'];
+  var SER=[
+    {name:'Virtex-5 xc5vlx110', color:'#1e3a5f', d:[2925.7,2105.4,986.1,644.3]},
+    {name:'Zynq-7000 xc7z100',  color:'#3d6fa5', d:[4139.8,3566.5,1443.7,886.0]}
+  ];
+  var W=900,H=380,ML=70,MR=190,MT=26,MB=58, pw=W-ML-MR, ph=H-MT-MB, YMAX=4500, TICKS=5;
+  var slot=pw/CAT.length, bw=Math.min(74,(slot-42)/2);
+  var ys=function(v){return MT+ph*(1-v/YMAX);};
+  var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="FPGA throughput by architecture">'];
+  s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5b6470}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#7d8794}.vl{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#39424e}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
+  for(var t=0;t<=TICKS;t++){
+    var v=YMAX*t/TICKS, y=ys(v);
+    s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#cbd1d9':'#f0f2f5')+'"/>');
+    s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>');
+  }
+  CAT.forEach(function(c,i){
+    var cx=ML+slot*i+slot/2;
+    SER.forEach(function(se,j){
+      var x=cx-slot/2+21+j*(bw+8), v=se.d[i], y=ys(v), h=MT+ph-y;
+      s.push('<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h)+'" rx="5" fill="'+se.color+'"/>');
+      s.push('<text class="vl" x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle">'+v.toFixed(1)+'</text>');
+    });
+    s.push('<text class="ax" x="'+cx+'" y="'+(MT+ph+22)+'" text-anchor="middle">'+c+'</text>');
+  });
+  s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-8)+'" text-anchor="middle">architectures: number of SubColumn units instantiated</text>');
+  s.push('<text class="ax" transform="translate(18,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">throughput [Mbps]</text>');
+  SER.forEach(function(se,i){
+    var y=MT+18+i*24;
+    s.push('<rect x="'+(ML+pw+18)+'" y="'+(y-7)+'" width="12" height="12" rx="3" fill="'+se.color+'"/>');
+    s.push('<text class="lg" x="'+(ML+pw+37)+'" y="'+(y+4)+'" fill="#5b6470">'+se.name+'</text>');
+  });
+  s.push('</svg>');
+  host.innerHTML=s.join('');
 })();
 </script>
 </body>

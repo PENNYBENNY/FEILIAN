@@ -71,10 +71,12 @@ def main():
     body = html.encode("utf-8")
 
     print("== checksums ==")
+    published = {}
     if not os.path.exists(SUMS):
         report(False, "files/SHA256SUMS.txt present")
     else:
         pairs = [l.split() for l in open(SUMS, encoding="utf-8").read().strip().splitlines() if l.strip()]
+        published = dict((name, expect) for expect, name in pairs)
         report(len(pairs) > 0, "SHA256SUMS.txt non-empty", f"{len(pairs)} entries")
         for expect, name in pairs:
             p = os.path.join(FILES, name)
@@ -90,6 +92,22 @@ def main():
         report(os.path.exists(os.path.join(REPO, rel.replace("/", os.sep))), f"{rel} exists")
     report(html.count("ready:false") == 0, "no artifact left unpublished",
            f"{html.count('ready:true')} ready")
+    # Documents the text links straight with an href, outside the manifest - the
+    # erratum of section 05. A dead one of these is invisible to the check above,
+    # and so is one that was published without being checksummed.
+    direct = sorted(set(re.findall(r'href="(files/[^"]+)"', html)))
+    report(bool(direct), "in-text document links found", f"{len(direct)}")
+    for rel in direct:
+        report(os.path.exists(os.path.join(REPO, rel.replace("/", os.sep))), f"{rel} exists")
+    for rel in direct:
+        name = os.path.basename(rel)
+        if name == "SHA256SUMS.txt":
+            continue  # the list of digests is not itself one of them
+        if name in published:
+            report(published[name][:16] in html, f"page prints the digest of {name}",
+                   f"{published[name][:16]}\u2026")
+        else:
+            report(False, f"{name} is listed in files/SHA256SUMS.txt")
 
     print("\n== page structure ==")
     sec = re.findall(r'<section id="([A-Za-z0-9_-]+)">', html)
@@ -110,7 +128,7 @@ def main():
     m = re.search(r"<title>(.*?)</title>", html, re.S)
     report(bool(m), "has <title>", m.group(1) if m else "")
     for need in ('name="description"', 'rel="canonical"', 'property="og:title"',
-                 'name="citation_pdf_url"'):
+                 'name="citation_title"'):
         report(need in html, f"has {need}")
     report("DOWNLOADS:BEGIN" in html and "DOWNLOADS:END" in html, "manifest markers intact")
 
@@ -124,7 +142,7 @@ def main():
                    "byte-identical" if sha_bytes(served) == sha_bytes(body) else "DIFFERS")
         except Exception as e:
             report(False, "GET /", f"{type(e).__name__}: {e}")
-        for rel in refs:
+        for rel in sorted(set(refs) | set(direct)):
             try:
                 st, hd, data = get(base + rel)
                 local = os.path.join(REPO, rel.replace("/", os.sep))

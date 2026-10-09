@@ -35,39 +35,53 @@ matched set, and hand-patching one in isolation will desynchronise them.
 `github.com/pennybenny/FEILIAN` redirects to the canonical uppercase owner name
 `PENNYBENNY`; both forms resolve, and the site URL stays lowercase.
 
-## Rebuilding the downloadable artifacts
+## Publishing a release package
 
-`tools/make_downloads.py` assembles `files/` from the submission workspace and
-rewrites the manifest block in `index.html` with the real sizes and checksums.
+`tools/make_downloads.py` copies a release package from the submission workspace
+into `files/` and rewrites the manifest block in `index.html` with the real size
+and checksum.
 
 ```bash
-python tools/make_downloads.py                 # dry run — lists what would be built
-python tools/make_downloads.py --publish       # build files/ and patch index.html
+python tools/make_downloads.py                 # dry run — lists what would be published
+python tools/make_downloads.py --publish       # copy files/ and patch index.html
 ```
 
 It is a dry run by default. Copying the specification and the implementations
 into a public repository is a disclosure decision, so it takes an explicit
 `--publish` to write anything.
 
-Four artifacts are published: the specification, the erratum, the code bundle and
-the full archive. The code is packaged by default from `v1.0.1/Implementations` in
-the workspace — the tree belonging to the current specification release; pass
-`--impl` to package a different one.
+A **release package** is the unit the designers distribute: one archive per
+revision, holding the specification, the erratum and every implementation. The
+script copies it **verbatim, never repacked**, so the digest the page publishes is
+the digest of the official artifact and can be checked against any other copy of
+it — nothing here rebuilds an archive, and nothing here can make the digest drift.
+
+Two tables at the top of the script drive it:
+
+| Table | Published | Gets a download card |
+|---|---|---|
+| `PACKAGES` | yes, verbatim, plus a SHA-256 | yes — rendered by the manifest block |
+| `ASSETS` | yes, verbatim, plus a SHA-256 | no — the page links it from the text |
+
+`ASSETS` exists for documents the page opens directly instead of offering as a
+card. The erratum of §5 is the case in point: the section links
+`files/FEILIAN_Erratum.pdf` with a plain `href`, which only works if the file is
+published on its own rather than left inside the archive. Such a link is
+same-origin, so it keeps working from `file://`, from Pages and from any mirror,
+and it survives a move to another host — which a `raw.githubusercontent.com` or
+GitHub Releases URL would not. Put the file in `files/` and give it an `ASSETS`
+row; do not link it from outside the repository.
+
+`files/` is reconciled to those two tables on every `--publish` — any file in
+`files/` that no row names is deleted from it. Add a `PACKAGES` row to publish
+another revision, an `ASSETS` row to publish another directly linked document.
 
 | Flag | Effect |
 |---|---|
 | `--workspace DIR` | where the submission material lives (default: the parent directory of this repo) |
-| `--spec PATH` | the specification PDF (default: `<workspace>/v1.0.1/Specification_v1.0.1.pdf`, else `files/`, else `~/Specification.pdf`) |
-| `--erratum PATH` | the erratum PDF (default: `<workspace>/v1.0.1/FEILIAN_Erratum.pdf`) |
-| `--impl DIR` | the implementations tree to package, relative to the workspace (default: `v1.0.1/Implementations`) |
-| `--with-bench` | also bundle the benchmark suite into the archive |
-| `--with-reference` | also bundle the third-party reference implementation |
-| `--out DIR` | stage the build somewhere other than `files/` |
-| `--no-patch` | build the artifacts but leave `index.html` alone |
-
-Archives are byte-reproducible: entries are sorted, timestamps fixed to
-`2026-09-29`, permissions fixed. Rebuilding from the same inputs reproduces the
-same SHA-256, so the published checksums stay meaningful.
+| `--package PATH` | publish this package instead of the built-in list; repeat for more than one, path relative to the workspace |
+| `--out DIR` | stage the copy somewhere other than `files/` |
+| `--no-patch` | publish the package but leave `index.html` alone |
 
 ## Verifying a release
 
@@ -77,11 +91,13 @@ python tools/verify_release.py --url https://pennybenny.github.io/FEILIAN/
 ```
 
 Checks that every digest in `files/SHA256SUMS.txt` matches the file on disk, that
-every artifact the page links to exists, that the navigation anchors resolve to
-real sections, that the tags balance, and that the release metadata is present.
-With `--url` it also fetches the deployed page and every artifact and compares
-the served bytes against the local copies. Exit status is non-zero if anything
-fails.
+every package the page links to exists — the download manifest and the documents
+linked straight from the text are both covered — that each of those is
+checksummed and that the text prints its digest, that the navigation anchors
+resolve to real sections, that the tags balance, and that the release metadata is
+present. With `--url` it also fetches the deployed page and every listed package
+and document and compares the served bytes against the local copies. Exit status
+is non-zero if anything fails.
 
 ## Where the downloads live, and why
 
@@ -170,5 +186,5 @@ Optional; the `pennybenny.github.io` URL works fine.
 2. At your DNS provider add a `CNAME` record: `feilian` → `pennybenny.github.io`.
 3. **Settings → Pages → Custom domain**, confirm, and tick **Enforce HTTPS**.
 
-Remember to update the `rel="canonical"`, `og:url` and `citation_pdf_url` values
-in `index.html` if the site moves.
+Remember to update the `rel="canonical"` and `og:url` values in `index.html` if
+the site moves.
