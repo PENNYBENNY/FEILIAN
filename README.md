@@ -30,7 +30,7 @@ the page renders and the demo runs identically offline, from `file://`, and from
 | 1 | Introduction | The design in brief — 1024-bit state and block, the tweakable ARX permutation, Davies–Meyer, the public tweak — with an interactive five-phase figure and a one-table parameter summary. Detail beyond that is in the PDF |
 | 2 | Live demonstration | A JavaScript port of the compression function running in the page: text / hex / bit-string input, 512 / 768 / 1024 output, a known-answer self-test against the Appendix B vectors, and the timings it measures itself |
 | 3 | Downloads | The specification, the erratum, the implementations and the full archive, each with its SHA-256, plus the revision history of the submission and a note on which revision is which |
-| 4 | Third-party analysis | The three independent sources, the R1–R8 findings table with the status of each against the material released here, and the ePrint 2026/2236 component result |
+| 4 | Third-party analysis | The three independent sources, each linking to its document; the findings table — numbered R1–R8 as in the assessment, with the ngcc.dev identifiers kept alongside wherever that report covers the same defect — and the ePrint 2026/2236 component result |
 | 5 | Erratum | The designers' erratum from v1.0 to v1.0.1 reproduced in full — the specification typo corrections, the software and hardware implementation corrections, the further text changes made in response to the assessment, and how each maps onto R1–R8 |
 | — | Sources | Documents referenced |
 

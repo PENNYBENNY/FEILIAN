@@ -7,6 +7,38 @@ the update log in §3 of the page.
 This project uses [semantic versioning](https://semver.org/); the major version
 tracks the specification revision it was built against.
 
+## [1.3.1] — 2026-10-09
+
+Every source the page cites is now reachable from the page, and the two
+numbering schemes in the findings table are kept side by side instead of one
+being folded into the other.
+
+### Added
+
+- **External links** — the three reviewer cards each carry a source line, and
+  references [2]–[10] in **Sources** link to their documents: the technical
+  assessment's repository, the ngcc.dev report, ePrint 2026/2236, HAIFA, the PGV
+  and composition papers, Kelsey–Schneier, NIST SP 800-22 and RFC 5869.
+  External links go from 2 to 14. The "no external dependencies" claim is
+  unaffected — it concerns what the page loads at runtime, not hyperlinks.
+- **A second numbering scheme** — where the ngcc.dev report covers a defect the
+  assessment numbers R1–R8, its own identifier (`hash-10-1 … hash-10-5`) is
+  shown beneath the row number and deep-links to that entry. The two schemes are
+  kept separate; neither renumbers the other.
+
+### Changed
+
+- **R1 severity** — recorded as **Critical**, ngcc.dev's rating of the three
+  affected RTL cores, instead of *High*; the badge gets its own solid style
+  (`--crit`). The table caption now states that each severity is quoted from the
+  source that raised the finding.
+- `README.md` describes the dual numbering in its §4 entry.
+
+### Removed
+
+- The note recording a residual wording issue in the specification's description
+  of the IV ("the first decimal digits of π", §2.1) is removed from the page.
+
 ## [1.3.0] — 2026-10-09
 
 The page is presented as the submission's own overview, the update log becomes a

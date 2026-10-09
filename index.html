@@ -31,7 +31,7 @@
     --bg:#f7f8fb; --bg2:#eef1f8; --card:#ffffff; --ink:#161c28; --ink-soft:#5a6478;
     --line:#e4e8f0; --line2:#d6dcea;
     --p1:#4338ca; --p2:#0ea5e9; --accent:#4338ca; --accent-soft:#eef1fe;
-    --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c;
+    --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c; --crit:#8f1d12;
     --grad:linear-gradient(120deg,#4338ca 0%,#5b53e0 42%,#0ea5e9 100%);
     --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
     --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang SC",sans-serif;
@@ -137,6 +137,11 @@
   .b-med{background:#fdf3e2;color:var(--med)}
   .b-info{background:#e7f2fb;color:var(--info)}
   .b-ok{background:#e5f5ee;color:var(--ok)}
+  .b-crit{background:var(--crit);color:#fff}
+  th .thsub{display:block;margin-top:2px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--ink-soft)}
+  td.k .altid{display:block;margin-top:3px;font-family:var(--mono);font-size:10.5px;font-weight:600;
+              color:var(--ink-soft);text-decoration:none}
+  td.k .altid:hover{color:var(--accent);text-decoration:underline}
 
   .note{background:#fff9ea;border:1px solid #f1dcae;border-left:4px solid var(--med);border-radius:10px;
         padding:13px 17px;font-size:13.5px;margin:16px 0}
@@ -169,6 +174,9 @@
   .revcard blockquote{margin:0 0 10px;padding:10px 14px;background:#f7f9fd;border-left:3px solid var(--accent);
                       border-radius:0 8px 8px 0;font-size:13.5px;color:var(--ink)}
   .revcard p{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0}
+  .revcard .srcline{margin:auto 0 0;padding-top:11px;border-top:1px dashed var(--line);
+                    font-size:11.5px;font-family:var(--mono);overflow-wrap:anywhere}
+  .ref a{color:var(--accent)}
 
   .steps{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
   .stepbtn{border:1px solid var(--line2);background:#fff;border-radius:9px;width:38px;height:38px;
@@ -619,6 +627,7 @@
       <blockquote>“Withhold a positive security assessment and integration approval for this submission… These are sufficient grounds to request a corrected submission and renewed review.”</blockquote>
       <p>Eight findings, R1–R8, spanning the RTL wrappers, the C sources, the mathematical argument and the shared test infrastructure. It states plainly that it does <b>not</b> establish a full-round break of the hash defined by the written compression algorithm, or of the normally operating C implementations.</p>
       <p>The hardware conclusions are <b>source-level</b>: no RTL simulation was performed, so the assessment itself calls for end-to-end validation of any corrected implementation.</p>
+      <p class="srcline"><a href="https://github.com/amcrypto-jp/feilian-cryptanalysis">github.com/amcrypto-jp/feilian-cryptanalysis &rarr;</a></p>
     </div>
     <div class="card revcard lift rv d1">
       <h3 style="margin-top:0">Markku-Juhani O. Saarinen — ngcc.dev</h3>
@@ -626,6 +635,8 @@
       <blockquote>Reference C implementations return success with an all-zero digest when the padding allocation fails.</blockquote>
       <p>This is the earlier, source-level finding on which the assessment's R5 builds: the assessment extends the observation to the optimized SIMD implementations and credits the original report.</p>
       <p>The site publishes follow-up RTL simulations and reference-C partial-byte checks. The assessment attributes those to that venue and does not rerun them; this page does the same, and cites them as reports rather than as reproduced results.</p>
+      <p>Its five entries — <span class="mono">hash-10-1 … hash-10-5</span> — are a numbering of their own, including the <b>Critical</b> RTL collision. The findings table below carries them beside R1–R5; the two schemes are kept separate, and neither renumbers the other.</p>
+      <p class="srcline"><a href="https://ngcc.dev/reports/hash-10.html">ngcc.dev/reports/hash-10.html &rarr;</a></p>
     </div>
     <div class="card revcard lift rv d2">
       <h3 style="margin-top:0">Mounir Idrassi — ePrint 2026/2236</h3>
@@ -633,40 +644,41 @@
       <blockquote>“The component results establish no hash attack or bound on the hash's security margin.”</blockquote>
       <p>A complete classification of the whole-output linear structures of the 64-bit SubColumn. For FEILIAN's parameters the structure space is exactly the two-dimensional MSB family, with three nonzero members, and no nonzero member survives the second SubColumn boundary.</p>
       <p>It is a component-level structural property — not a security ranking of any hash construction, and not a claim about FEILIAN as a whole.</p>
+      <p class="srcline"><a href="https://eprint.iacr.org/2026/2236">eprint.iacr.org/2026/2236 &rarr;</a></p>
     </div>
   </div>
 
   <div class="card rv" style="margin-top:22px">
     <h3 style="margin-top:0">Findings and current status</h3>
     <table style="font-size:13.5px">
-      <thead><tr><th style="width:44px">#</th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status against the material released here</th></tr></thead>
+      <thead><tr><th style="width:100px">#<span class="thsub">assessment · ngcc.dev</span></th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status against the material released here</th></tr></thead>
       <tbody>
         <tr>
-          <td class="k">R1</td>
+          <td class="k">R1<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-2-three-feilian-rtl-cores-have-trivial-zero-extension-collisions">hash-10-2</a></td>
           <td>The 1SC, 4SC and 8SC hardware wrappers omit the current block's length from the compression input, so their message encoding is not injective. The 2SC core contains a different, corrected counter path.</td>
-          <td><span class="badge b-high">High</span> — for those hardware implementations</td>
+          <td><span class="badge b-crit">Critical</span> — three RTL cores, as rated by ngcc.dev</td>
           <td><span class="badge b-ok">Addressed</span> Fixed in v1.0.1 for all four architectures: the current block length is part of the compression input, and the block, final flag and cumulative length are transaction-consistent (&sect;05).</td>
         </tr>
         <tr>
-          <td class="k">R2</td>
+          <td class="k">R2<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-3-the-specification-examples-and-rtl-define-incompatible-feilian-variants">hash-10-3</a></td>
           <td>Chapter 2, the C sources and the RTL do not define one consistent algorithm — IV word 7, the AddConstant row placement, the counter word order and the hardware variant labels disagree.</td>
           <td><span class="badge b-med">Conformance</span> — blocks transfer of security conclusions</td>
           <td><span class="badge b-ok">Addressed</span> The revision distributed here designates the conventions: IV₇ <span class="mono">0x3F84D5B5B5470917</span>, constants in state row 1 and the tweak in row 3, counter split <span class="mono">t₀‖t₁</span>. The hardware variant labels are unchanged — v1.0.1 fixes the README wording that explains them (&sect;05).</td>
         </tr>
         <tr>
-          <td class="k">R3</td>
+          <td class="k">R3<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-3-the-specification-examples-and-rtl-define-incompatible-feilian-variants">hash-10-3</a></td>
           <td>Appendix B printed cumulative <i>padded-block</i> counts for the 512- and 768-bit examples while the C code and KATs use true message lengths.</td>
           <td><span class="badge b-med">Security-relevant encoding</span></td>
           <td><span class="badge b-ok">Addressed</span> Appendix B is reprinted under true message-length binding — 24 sections changed in the revision distributed here, and the 512/768 digests now agree with the C reference.</td>
         </tr>
         <tr>
-          <td class="k">R4</td>
+          <td class="k">R4<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-4-c-implementations-hash-storage-bits-outside-partial-byte-messages">hash-10-4</a><a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-5-c-input-length-conversion-and-padding-arithmetic-are-unchecked">hash-10-5</a></td>
           <td>The C bit-input and length contracts are incomplete: the unused low bits of a partial final byte are not masked, one padding addition can wrap, and an <span class="mono">unsigned long long</span> bit length is cast to <span class="mono">size_t</span> unchecked.</td>
           <td><span class="badge b-med">Correctness</span> — platform-dependent severity</td>
           <td><span class="badge b-ok">Addressed</span> In v1.0.1 <span class="mono">pad_message()</span> masks the final partial byte and guards both additions, and the length cast is rejected where it cannot be represented — in all six C variants, reference and optimized.</td>
         </tr>
         <tr>
-          <td class="k">R5</td>
+          <td class="k">R5<a class="altid" href="https://ngcc.dev/reports/hash-10.html#hash-10-1-padding-allocation-failure-returns-a-successful-all-zero-digest">hash-10-1</a></td>
           <td>Padding-allocation failure is silently accepted: the reference and optimized C return success and an all-zero digest.</td>
           <td><span class="badge b-med">Implementation</span></td>
           <td><span class="badge b-ok">Addressed</span> In v1.0.1 the failure is detected and propagated through <span class="mono">CryptHash()</span>'s return code, so a failed call no longer yields a well-formed digest; v1.0.1 also returns an error when the requested digest length does not match the configured version.</td>
@@ -691,8 +703,7 @@
         </tr>
       </tbody>
     </table>
-    <p class="tblcap">Findings are numbered as in the assessment; its verdict is quoted above. The right-hand column records the status of each finding against the material released here, as assessed by the submission — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
-    <div class="note"><b>One residual wording issue.</b> The revision still describes the IV as “the first decimal digits of π” (§2.1); the printed words are hexadecimal. The digests are unaffected, and the page above states the values in hexadecimal. Noted for the next revision.</div>
+    <p class="tblcap">Two numbering schemes are kept separate. Findings are numbered <b>R1–R8</b> as in the technical assessment [2]; where the ngcc.dev report [3] covers the same defect it numbers it independently, and that second identifier is shown beneath the row number — neither scheme is renumbered onto the other. Severity is quoted from the source that raised the finding, so R1 carries ngcc.dev's rating of the three affected RTL cores. The right-hand column records the status of each finding against the material released here, as assessed by the submission — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
   </div>
 
   <div class="card rv" style="margin-top:22px">
@@ -726,7 +737,7 @@
   <div class="callout ok rv">
     <h4>What none of these analyses claim</h4>
     <p style="margin:0 0 8px">None of the three establishes a full-round cryptanalytic break of the hash defined by the written compression algorithm, or of the correctly encoded software implementations. The assessment says so in as many words; the component paper says so in as many words.</p>
-    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§05). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
+    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1 in the assessment's numbering, <span class="mono">hash-10-2</span> on ngcc.dev — the only <b>Critical</b> rating in either report); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§05). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
   </div>
 </section>
 
@@ -823,15 +834,15 @@
   <h2 class="rv">Documents referenced</h2>
   <div class="card rv">
     <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download</a>. A two-page erratum recording every change from v1.0 is distributed with it (§05).</div>
-    <div class="ref"><b>[2]</b> Mounir Idrassi (AM Crypto, Japan). <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, version 1.0.2, 27 September 2026, 14 pp. CC BY 4.0. Findings R1–R8.</div>
-    <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <i>FEILIAN (hash-10)</i>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site.</div>
-    <div class="ref"><b>[4]</b> Mounir Idrassi. <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
-    <div class="ref"><b>[5]</b> E. Biham, O. Dunkelman. <i>A Framework for Iterative Hash Functions — HAIFA</i>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
-    <div class="ref"><b>[6]</b> J. Black, P. Rogaway, T. Shrimpton. <i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i>, CRYPTO 2002, LNCS 2442.</div>
-    <div class="ref"><b>[7]</b> T. Ristenpart, H. Shacham, T. Shrimpton. <i>Careful with Composition: Limitations of the Indifferentiability Framework</i>, EUROCRYPT 2011, LNCS 6632.</div>
-    <div class="ref"><b>[8]</b> J. Kelsey, B. Schneier. <i>Second Preimages on n-Bit Hash Functions for Much Less than 2ⁿ Work</i>, EUROCRYPT 2005, LNCS 3494.</div>
-    <div class="ref"><b>[9]</b> NIST. <i>SP 800-22 Rev. 1a — A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</i>.</div>
-    <div class="ref"><b>[10]</b> H. Krawczyk, P. Eronen. <i>HMAC-based Extract-and-Expand Key Derivation Function (HKDF)</i>, RFC 5869, May 2010.</div>
+    <div class="ref"><b>[2]</b> Mounir Idrassi (AM Crypto, Japan). <a href="https://github.com/amcrypto-jp/feilian-cryptanalysis"><i>FEILIAN: technical assessment of the submitted specification and implementations</i></a>, version 1.0.2, 27 September 2026, 14 pp. CC BY 4.0. Findings R1–R8.</div>
+    <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <a href="https://ngcc.dev/reports/hash-10.html"><i>FEILIAN (hash-10)</i></a>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site.</div>
+    <div class="ref"><b>[4]</b> Mounir Idrassi. <a href="https://eprint.iacr.org/2026/2236"><i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i></a>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
+    <div class="ref"><b>[5]</b> E. Biham, O. Dunkelman. <a href="https://eprint.iacr.org/2007/278"><i>A Framework for Iterative Hash Functions — HAIFA</i></a>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
+    <div class="ref"><b>[6]</b> J. Black, P. Rogaway, T. Shrimpton. <a href="https://doi.org/10.1007/3-540-45708-9_21"><i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i></a>, CRYPTO 2002, LNCS 2442.</div>
+    <div class="ref"><b>[7]</b> T. Ristenpart, H. Shacham, T. Shrimpton. <a href="https://doi.org/10.1007/978-3-642-20465-4_27"><i>Careful with Composition: Limitations of the Indifferentiability Framework</i></a>, EUROCRYPT 2011, LNCS 6632.</div>
+    <div class="ref"><b>[8]</b> J. Kelsey, B. Schneier. <a href="https://doi.org/10.1007/11426639_28"><i>Second Preimages on n-Bit Hash Functions for Much Less than 2ⁿ Work</i></a>, EUROCRYPT 2005, LNCS 3494.</div>
+    <div class="ref"><b>[9]</b> NIST. <a href="https://csrc.nist.gov/pubs/sp/800/22/r1/upd1/final"><i>SP 800-22 Rev. 1a — A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</i></a>.</div>
+    <div class="ref"><b>[10]</b> H. Krawczyk, P. Eronen. <a href="https://www.rfc-editor.org/rfc/rfc5869"><i>HMAC-based Extract-and-Expand Key Derivation Function (HKDF)</i></a>, RFC 5869, May 2010.</div>
   </div>
 </section>
 
