@@ -92,11 +92,18 @@ def main():
            f"{html.count('ready:true')} ready")
 
     print("\n== page structure ==")
-    nav = re.findall(r'<a href="#([A-Za-z0-9_-]+)">', html)
     sec = re.findall(r'<section id="([A-Za-z0-9_-]+)">', html)
-    report(all(n in sec for n in nav), "every nav anchor resolves",
-           f"{len(nav)} nav / {len(sec)} sections")
+    navblock = re.search(r'<nav\b[^>]*>([\s\S]*?)</nav>', html)
+    nav = re.findall(r'<a href="#([A-Za-z0-9_-]+)">', navblock.group(1)) if navblock else []
+    report(bool(nav), "navigation found", f"{len(nav)} items / {len(sec)} sections")
+    report(all(n in sec for n in nav), "every nav anchor resolves")
     report(sorted(nav) == sorted(sec), "nav and sections correspond")
+    # every in-page anchor anywhere on the page (hero, in-text cross-references,
+    # sources) must resolve too - stronger than the nav-only check above.
+    all_anchors = re.findall(r'href="#([A-Za-z0-9_-]+)"', html)
+    dangling = sorted(set(a for a in all_anchors if a not in sec))
+    report(not dangling, "every in-page anchor resolves",
+           f"{len(set(all_anchors))} distinct" + (f", dangling: {dangling}" if dangling else ""))
     for tag in ("div", "section", "table", "pre", "svg"):
         o, c = len(re.findall(rf"<{tag}[\s>]", html)), html.count(f"</{tag}>")
         report(o == c, f"<{tag}> balanced", f"{o}/{c}")

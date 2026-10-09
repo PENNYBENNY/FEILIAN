@@ -6,11 +6,17 @@ designation `hash-10`.
 
 **Live site — <https://pennybenny.github.io/FEILIAN/>**
 
-The compendium transcribes the submitted specification (revision 29 September 2026, 70 pp.) into a
-single browsable page: design parameters, the compression pipeline, IV and round constants, the
-canonical Appendix B test vectors for all three digest sizes, the security argument of Chapter 4,
-the performance reported in Chapter 5, and the applications of Chapter 6 — together with a summary
-of the independent component-level analysis in Cryptology ePrint 2026/2236.
+The page is organised around four things: an **introduction** to the design, the **artifacts** —
+downloadable, checksummed, with the update log of the material distributed — the **independent
+third-party analyses**, each finding listed with its current status, and the **erratum** in which the
+designers record every change from v1.0 to v1.0.1. Detailed specification tables are deliberately
+kept out of the page and left to the PDF; the page carries a one-screen summary and a single
+interactive figure.
+
+The third-party material presented is the technical assessment by Mounir Idrassi (findings R1–R8),
+the ngcc.dev report by Markku-Juhani O. Saarinen, and the component-level analysis in Cryptology
+ePrint 2026/2236. None of them establishes a full-round cryptanalytic break, and the page states
+that boundary as plainly as they do.
 
 It is one HTML file with **no build step, no framework and no external dependencies**. Every figure
 is inline SVG or plain JavaScript, so it renders identically offline, from `file://`, and from any
@@ -22,17 +28,11 @@ static host.
 
 | § | Section | What it covers |
 |---|---|---|
-| 1 | Overview | Architecture diagram and the design in brief |
-| 2 | Specification | Official parameters: 1024-bit state, 512-bit blocks, 20 rounds in 5 phases, Davies–Meyer with HAIFA-style domain extension |
-| 3 | Pipeline | Interactive walkthrough of the five phases across four rounds |
-| 4 | IV & Constants | The sixteen π-derived IV words and the four round constants |
-| 5 | Test Vectors | Appendix B digests and intermediate states, 512 / 768 / 1024 |
-| 6 | Security | Chapter 4 claims, the NIST SP 800-22 sampling, and the structural arguments |
-| 7 | Performance | Chapter 5 operation counts, software timings and FPGA synthesis results |
-| 8 | Applications | MAC, KDF and XOF constructions from Chapter 6 |
-| 9 | Components | Whole-output linear structures in FEILIAN-type components (ePrint 2026/2236) |
-| 10 | Downloads | The specification, the implementations and the full archive |
-| 11 | References | Sources |
+| 1 | Introduction | The design in brief — 1024-bit state and block, the tweakable ARX permutation, Davies–Meyer, the public tweak — with an interactive five-phase figure and a one-table parameter summary. Detail beyond that is in the PDF |
+| 2 | Downloads | The specification, the implementations and the full archive, each with its SHA-256, plus the update log and a note on which revision is which |
+| 3 | Third-party analysis | The three independent sources, the R1–R8 findings table with the status of each against the material distributed here, and the ePrint 2026/2236 component result |
+| 4 | Erratum | The designers' erratum from v1.0 to v1.0.1 reproduced in full — the specification typo corrections, the software and hardware implementation corrections, the further text changes made in response to the assessment, and how each maps onto R1–R8 |
+| — | Sources | Documents referenced |
 
 ---
 
@@ -40,15 +40,17 @@ static host.
 
 | Artifact | File | Contents | Size |
 |---|---|---|---|
-| Specification | [`files/specification.pdf`](files/specification.pdf) | the submission, as filed — 70 pp. | 649 KB |
-| Reference code | [`files/feilian-code.zip`](files/feilian-code.zip) | C (reference + AVX2/SIMD) and SystemVerilog cores | 107 KB |
+| Specification | [`files/specification.pdf`](files/specification.pdf) | the submission, as filed — version 1.0.1, 69 pp. | 650 KB |
+| Erratum | [`files/FEILIAN_Erratum.pdf`](files/FEILIAN_Erratum.pdf) | corrections from v1.0 to v1.0.1, October 2026, 2 pp. | 124 KB |
+| Reference code | [`files/feilian-code.zip`](files/feilian-code.zip) | C (reference + AVX2/SIMD) and SystemVerilog cores, v1.0.1 | 108 KB |
 | Full archive | [`files/feilian-archive.zip`](files/feilian-archive.zip) | implementations, KAT vectors, Appendix B material, analysis notes, tooling | 9.94 MB |
 | Checksums | [`files/SHA256SUMS.txt`](files/SHA256SUMS.txt) | `sha256sum -c` compatible | — |
 
 ```
-7f498f6c4830f78d5f40c1c21b9ad41e0c33dc4d20a91c7277c3add8c4144255  specification.pdf
-fcb148478f5e06b13b8837fac549a905d5c50b69fe6ac2f8f69a37d5b57693f5  feilian-code.zip
-60a587d284415c79db027fe2424b51d979ef19f9e993684744824c6a73bc9b42  feilian-archive.zip
+2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db  specification.pdf
+04969502772e3d2f380549f80f3edf68a1bf6e1479d03094a2f251bbc4bd235e  FEILIAN_Erratum.pdf
+c9962a89df794f453bbd1a688eecd71bb9e7bd4649b9ab15a64e8b8c3912d034  feilian-code.zip
+c76e8fa4f3cc09703f25464fe02accd9f47b3e8abfaf3fa2fa3d8b2af8f081a4  feilian-archive.zip
 ```
 
 [`files/SHA256SUMS.txt`](files/SHA256SUMS.txt) is the canonical list of digests; the
@@ -95,6 +97,7 @@ python -m http.server 8000     # then visit http://localhost:8000/
 index.html                    the entire site — single file, no dependencies
 files/                        published artifacts and their checksums
   specification.pdf
+  FEILIAN_Erratum.pdf
   feilian-code.zip
   feilian-archive.zip
   SHA256SUMS.txt
@@ -126,15 +129,19 @@ document disagree, the specification and the original papers prevail.
 **The specification is by** Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi and Xin Yi
 (Shanghai Jiao Tong University; Jinan University; Xiamen University).
 
-**The component analysis summarised in §9 is by** Mounir Idrassi (AM Crypto, Japan), Cryptology
-ePrint Archive, Report 2026/2236, distributed under CC BY 4.0.
+**The component analysis of §3 is by** Mounir Idrassi (AM Crypto, Japan), Cryptology ePrint Archive,
+Report 2026/2236, distributed under CC BY 4.0. **The technical assessment of §3 is by** the same
+author, version 1.0.2, 27 September 2026, also CC BY 4.0. **The ngcc.dev report** is by
+Markku-Juhani O. Saarinen; ngcc.dev is his personal site and states that it is unaffiliated with
+NICCS — its identifiers and editorial labels belong to that site and are not official competition
+assessments.
 
 Licensing is split, because the repository contains two kinds of material:
 
 | Material | Terms |
 |---|---|
 | The compendium — `index.html`, the documentation, `tools/` | **CC BY 4.0** — see [`LICENSE`](LICENSE) |
-| `files/specification.pdf`, `files/feilian-code.zip`, `files/feilian-archive.zip` | redistributed as filed; all rights remain with the authors; **no licence granted** |
+| `files/specification.pdf`, `files/FEILIAN_Erratum.pdf`, `files/feilian-code.zip`, `files/feilian-archive.zip` | redistributed as filed; all rights remain with the authors; **no licence granted** |
 | `files/SHA256SUMS.txt` | checksums — copy freely |
 
 See [`NOTICE.md`](NOTICE.md) for the full statement. If you are a rights holder and want any file
@@ -148,8 +155,8 @@ The specification:
 
 > Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi and Xin Yi.
 > *FEILIAN: A Hash Function Proposal.* Submitted to the Next-generation Cryptographic Algorithms
-> Program (NGCC-CH), Institute of Commercial Cryptography Standards, China. Revision 29 September
-> 2026, 70 pp.
+> Program (NGCC-CH), Institute of Commercial Cryptography Standards, China. Version 1.0.1, 8 October
+> 2026, 69 pp. (Erratum from v1.0 released with it.)
 
 The component analysis:
 
@@ -159,7 +166,7 @@ The component analysis:
 
 This compendium, if you need to point at it:
 
-> *FEILIAN Specification Compendium* (v1.0.0), <https://pennybenny.github.io/FEILIAN/>
+> *FEILIAN Specification Compendium* (v1.2.0), <https://pennybenny.github.io/FEILIAN/>
 
 ---
 
@@ -171,5 +178,5 @@ a misattributed figure — and it will be fixed and recorded in [`CHANGELOG.md`]
 
 ## Release history
 
-See [`CHANGELOG.md`](CHANGELOG.md). Current release: **v1.0.0** (8 October 2026), tracking
-specification revision 2026-09-29.
+See [`CHANGELOG.md`](CHANGELOG.md). Current release: **v1.2.0** (9 October 2026), tracking
+specification **v1.0.1** (8 October 2026).

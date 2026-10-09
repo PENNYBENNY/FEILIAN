@@ -41,10 +41,17 @@ It is a dry run by default. Copying the specification and the implementations
 into a public repository is a disclosure decision, so it takes an explicit
 `--publish` to write anything.
 
+Four artifacts are published: the specification, the erratum, the code bundle and
+the full archive. The code is packaged by default from `v1.0.1/Implementations` in
+the workspace — the tree belonging to the current specification release; pass
+`--impl` to package a different one.
+
 | Flag | Effect |
 |---|---|
 | `--workspace DIR` | where the submission material lives (default: the parent directory of this repo) |
-| `--spec PATH` | the specification PDF, if not in `files/` or `~/Specification.pdf` |
+| `--spec PATH` | the specification PDF (default: `<workspace>/v1.0.1/Specification_v1.0.1.pdf`, else `files/`, else `~/Specification.pdf`) |
+| `--erratum PATH` | the erratum PDF (default: `<workspace>/v1.0.1/FEILIAN_Erratum.pdf`) |
+| `--impl DIR` | the implementations tree to package, relative to the workspace (default: `v1.0.1/Implementations`) |
 | `--with-bench` | also bundle the benchmark suite into the archive |
 | `--with-reference` | also bundle the third-party reference implementation |
 | `--out DIR` | stage the build somewhere other than `files/` |

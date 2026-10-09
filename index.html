@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FEILIAN — Specification Compendium (hash-10)</title>
-<meta name="description" content="A structured compendium of the FEILIAN hash function, submitted to the NGCC-CH programme as hash-10: design parameters, IV and round constants, canonical Appendix B test vectors, the security claims, and the performance reported in the specification (revision 2026-09-29).">
+<title>FEILIAN — Introduction, Artifacts and Third-Party Analysis</title>
+<meta name="description" content="FEILIAN (hash-10), a candidate hash function submitted to the NGCC-CH programme: what the design is, the documents and reference code distributed with it, and the independent third-party security analyses with the current status of each finding.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="FEILIAN — Specification Compendium">
-<meta property="og:title" content="FEILIAN — Specification Compendium (hash-10)">
-<meta property="og:description" content="Parameters, IV and round constants, canonical Appendix B test vectors, security claims and reported performance for the FEILIAN hash function (NGCC-CH, hash-10).">
+<meta property="og:site_name" content="FEILIAN — Submission Overview">
+<meta property="og:title" content="FEILIAN — Introduction, Artifacts and Third-Party Analysis">
+<meta property="og:description" content="An introduction to the FEILIAN hash function (NGCC-CH, hash-10), the artifacts that document it, and the independent third-party analyses with the status of each finding.">
 <meta property="og:url" content="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="FEILIAN — Specification Compendium (hash-10)">
-<meta name="twitter:description" content="Parameters, test vectors, security claims and reported performance for the FEILIAN hash function (NGCC-CH, hash-10).">
+<meta name="twitter:title" content="FEILIAN — Introduction, Artifacts and Third-Party Analysis">
+<meta name="twitter:description" content="Introduction, downloadable artifacts, and the third-party security analyses of the FEILIAN hash function (hash-10).">
 <!-- Scholarly indexing metadata for the underlying specification. -->
-<meta name="citation_title" content="FEILIAN: A Hash Function Proposal (submitted specification, revision 2026-09-29)">
+<meta name="citation_title" content="FEILIAN: A Hash Function Proposal (submitted specification, version 1.0.1, 8 October 2026)">
 <meta name="citation_author" content="Lei Wang">
 <meta name="citation_author" content="Ling Song">
 <meta name="citation_author" content="Yaobin Shen">
 <meta name="citation_author" content="Kaixuan Wang">
 <meta name="citation_author" content="Zicheng Shi">
 <meta name="citation_author" content="Xin Yi">
-<meta name="citation_publication_date" content="2026-09-29">
+<meta name="citation_publication_date" content="2026-10-08">
 <meta name="citation_pdf_url" content="https://pennybenny.github.io/FEILIAN/files/specification.pdf">
 <style>
   :root{
@@ -73,7 +73,7 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(94,234,212,.6)}70%{box-shadow:0 0 0 10px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}
   header.hero h1{margin:0 0 14px;font-size:60px;font-weight:800;letter-spacing:-.02em;line-height:1}
   header.hero h1 span{background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  header.hero p.sub{margin:0;font-size:17px;color:#dfe5f7;max-width:620px}
+  header.hero p.sub{margin:0;font-size:17px;color:#dfe5f7;max-width:640px}
   .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
   .btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
        padding:11px 20px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:.2s}
@@ -140,19 +140,11 @@
   tbody tr{transition:background .2s}
   tbody tr:nth-child(even){background:#fafbfe}
   tbody tr:hover{background:var(--accent-soft)}
-  tbody tr.hl{background:#e7f6ff!important;box-shadow:inset 3px 0 0 var(--p2)}
   td.k{font-weight:600;white-space:nowrap}
   td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
-  .tblcap{font-size:12.5px;color:var(--ink-soft);margin:4px 0 0}
+  .tblcap{font-size:12.5px;color:var(--ink-soft);margin:6px 0 0}
 
   code,.mono{font-family:var(--mono);font-size:13px}
-  pre{background:#0d1424;color:#e6edf6;border-radius:10px;padding:16px 18px;overflow:auto;
-      font-family:var(--mono);font-size:12.5px;line-height:1.6;margin:8px 0}
-  pre .lbl{color:#7fd1c4}
-  .vecbox{position:relative}
-  .copy{position:absolute;top:12px;right:12px;background:#22384f;color:#cfe3f5;border:0;border-radius:6px;
-        font-size:11px;padding:5px 10px;cursor:pointer;font-family:var(--sans);font-weight:600;transition:.2s}
-  .copy:hover{background:var(--p2)}
 
   .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
   .b-high{background:#fdecea;color:var(--high)}
@@ -166,6 +158,7 @@
   .callout{background:var(--accent-soft);border:1px solid #ccd7fb;border-radius:10px;padding:15px 18px;margin:16px 0;font-size:14px}
   .callout.warn{background:#fdeeec;border-color:#f3bab4}
   .callout.ok{background:#e8f6f0;border-color:#b7e2d0}
+  .callout h4{margin:0 0 8px;font-size:14px}
 
   figure{margin:18px 0}
   figure svg{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:14px}
@@ -175,15 +168,21 @@
   ul.tight li{margin:5px 0}
   .ref{font-size:13px;color:var(--ink-soft);padding:7px 0;border-bottom:1px dashed var(--line)}
   .ref:last-child{border-bottom:0}
+  .ref b{color:var(--ink)}
 
-  .seg{display:inline-flex;background:#eef1f8;border:1px solid var(--line2);border-radius:10px;padding:4px;gap:4px}
-  .seg button{border:0;background:transparent;font-family:var(--sans);font-weight:600;font-size:13.5px;
-              color:var(--ink-soft);padding:8px 18px;border-radius:7px;cursor:pointer;transition:.2s}
-  .seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(20,30,60,.14)}
+  .tl{list-style:none;margin:10px 0 0;padding:0}
+  .tl li{position:relative;padding:0 0 14px 20px;border-left:2px solid var(--line2);font-size:13.5px;color:var(--ink-soft)}
+  .tl li:last-child{border-left-color:transparent;padding-bottom:0}
+  .tl li::before{content:"";position:absolute;left:-6px;top:5px;width:9px;height:9px;border-radius:50%;
+                 background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .tl li.mute::before{background:#b8c2d6;box-shadow:0 0 0 3px #eef1f8}
+  .tl li .d{display:block;font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--p2);letter-spacing:.02em}
 
-  .vec-panel{display:none}
-  .vec-panel.on{display:block;animation:fade .45s cubic-bezier(.2,.7,.3,1)}
-  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .revcard{display:flex;flex-direction:column}
+  .revcard .who{font-size:12px;color:var(--ink-soft);margin:0 0 10px;font-family:var(--mono);font-size:11.5px}
+  .revcard blockquote{margin:0 0 10px;padding:10px 14px;background:#f7f9fd;border-left:3px solid var(--accent);
+                      border-radius:0 8px 8px 0;font-size:13.5px;color:var(--ink)}
+  .revcard p{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0}
 
   .steps{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
   .stepbtn{border:1px solid var(--line2);background:#fff;border-radius:9px;width:38px;height:38px;
@@ -204,14 +203,7 @@
   .bar-track{background:#eef1f8;border-radius:6px;height:22px;overflow:hidden}
   .bar-fill{height:100%;width:0;background:var(--grad);border-radius:6px;transition:width 1s cubic-bezier(.2,.7,.3,1)}
   .bar-fill.keep{background:linear-gradient(90deg,#c0271b,#e0603f)}
-  .bar-fill.alt{background:linear-gradient(90deg,#0e6ba8,#38bdf8)}
   .bar-val{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-align:right}
-
-  .chk{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}
-  .chk:last-child{border-bottom:0}
-  .chk .n{flex:0 0 62px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
-          display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--mono);font-size:12px}
-  .chk .t{font-size:14px}
 
   footer{border-top:1px solid var(--line);margin-top:48px;padding:32px 0 56px;color:var(--ink-soft);font-size:12.5px;background:var(--bg2)}
   .disclaimer{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 19px;margin:16px 0}
@@ -230,18 +222,20 @@
   <div class="wrap">
     <div class="herogrid">
       <div>
-        <p class="kicker"><span class="dot"></span> NGCC-CH Submission · Technical Compendium</p>
+        <p class="kicker"><span class="dot"></span> NGCC-CH Submission · hash-10</p>
         <h1><span>FEILIAN</span></h1>
-        <p class="sub">A 1024-bit ARX hash function on a single narrow-pipe compression function. Parameters, canonical test vectors, security analysis, reported performance and applications — assembled from the submitted specification into one interactive walkthrough.</p>
+        <p class="sub">A 1024-bit ARX hash function submitted to the Next-generation Commercial Cryptographic Algorithms programme. This page is the front door to the submission: what the design is, the documents and reference code distributed with it, and the independent third-party analyses — with the current status of every finding they raise.</p>
         <div class="cta">
-          <a href="#spec" class="btn p">Explore the specification →</a>
-          <a href="#vectors" class="btn g">Jump to test vectors</a>
+          <a href="#introduction" class="btn p">Introduction →</a>
+          <a href="#downloads" class="btn g">Downloads</a>
+          <a href="#analysis" class="btn g">Third-party analysis</a>
         </div>
         <div class="chips">
-          <span class="chip"><b>Revision</b> 2026-09-29</span>
+          <span class="chip"><b>Revision</b> v1.0.1 · 2026-10-08</span>
           <span class="chip"><b>Designation</b> hash-10</span>
           <span class="chip"><b>Digest</b> 512 / 768 / 1024</span>
           <span class="chip"><b>State</b> 1024-bit</span>
+          <span class="chip"><b>Independent reviews</b> 3</span>
         </div>
       </div>
       <div class="panel">
@@ -257,27 +251,21 @@
 <!-- ================= NAV ================= -->
 <nav class="toc" id="toc">
   <div class="wrap">
-    <a href="#overview">Overview</a>
-    <a href="#spec">Specification</a>
-    <a href="#arch">Pipeline</a>
-    <a href="#iv">IV &amp; Constants</a>
-    <a href="#vectors">Test Vectors</a>
-    <a href="#security">Security</a>
-    <a href="#perf">Performance</a>
-    <a href="#apps">Applications</a>
-    <a href="#component">Components</a>
+    <a href="#introduction">Introduction</a>
     <a href="#downloads">Downloads</a>
-    <a href="#refs">References</a>
+    <a href="#analysis">Third-party analysis</a>
+    <a href="#erratum">Erratum</a>
+    <a href="#sources">Sources</a>
   </div>
 </nav>
 
 <div class="wrap">
 
-<!-- ================= OVERVIEW ================= -->
-<section id="overview">
-  <p class="eyebrow rv">01 — Overview</p>
+<!-- ================= INTRODUCTION ================= -->
+<section id="introduction">
+  <p class="eyebrow rv">01 — Introduction</p>
   <h2 class="rv">What FEILIAN is</h2>
-  <p class="lead rv">FEILIAN is a candidate submitted to the Next-generation Commercial Cryptographic Algorithms programme (NGCC-CH). It runs a 1024-bit chaining state with a 1024-bit message block; the compression function is a tweakable ARX permutation under a Davies–Meyer feed-forward. All three digest lengths reuse the same 1024-bit internal state — only the output is truncated, so one core implementation serves the whole family.</p>
+  <p class="lead rv">FEILIAN is a candidate submitted to the Next-generation Commercial Cryptographic Algorithms programme (NGCC-CH) under the designation <span class="mono">hash-10</span>. It runs a 1024-bit chaining state with a 1024-bit message block; the compression function is a tweakable ARX permutation under a Davies–Meyer feed-forward. All three digest lengths reuse the same 1024-bit internal state — only the output is truncated — so one core implementation serves the whole family.</p>
 
   <div class="grid4">
     <div class="card stat lift rv d1"><div class="v" data-count="1024" data-suffix="-bit">0</div><div class="l">Chaining state &amp; message block</div></div>
@@ -290,64 +278,27 @@
     <div class="card lift rv">
       <h3 style="margin-top:0">Design highlights</h3>
       <ul class="tight">
-        <li>HAIFA-style iteration with a public tweak (§3.1, §4.3)</li>
-        <li>Davies–Meyer: <span class="mono">h′ = v₀ ⊕ v₅ = E(h) ⊕ h</span> (§2.2.4)</li>
-        <li>Permutation <span class="mono">E</span>: 20 rounds / 5 phases, 2 SubColumn layers per round</li>
-        <li>Strictly ARX — no message-word re-ordering, no linear expansion (§3.1)</li>
-        <li>Six rotation constants in total: 5, 48, 8 and 11, 40, 63 (§3.1)</li>
+        <li>HAIFA-style iteration with a public tweak</li>
+        <li>Davies–Meyer feed-forward: <span class="mono">h′ = v₀ ⊕ v₅ = E(h) ⊕ h</span></li>
+        <li>Permutation <span class="mono">E</span>: 20 rounds in 5 phases, two SubColumn layers per round</li>
+        <li>Strictly ARX — additions, rotations and XORs only; no message-word re-ordering, no linear expansion</li>
+        <li>Six rotation constants in total: 5, 48, 8 and 11, 40, 63</li>
       </ul>
     </div>
     <div class="card lift rv d1">
-      <h3 style="margin-top:0">Public tweak <span class="mono" style="font-weight:400">tw=(ver,flag,t₀,t₁)</span></h3>
+      <h3 style="margin-top:0">Public tweak <span class="mono" style="font-weight:400">tw = (ver, flag, t₀, t₁)</span></h3>
       <ul class="tight">
-        <li>Version <span class="mono">ver</span> — 64-bit: <span class="mono">0x200/0x300/0x400</span> for 512/768/1024</li>
-        <li>Final-call flag <span class="mono">flag</span> — 64-bit, <span class="mono">0</span> or all-ones</li>
-        <li>Counter <span class="mono">t</span> — 128-bit message-bit count, split <span class="mono">t₀‖t₁</span></li>
-        <li>Loaded into state row 3 by <span class="mono">AC</span> (§2.2.2)</li>
+        <li><b>Version</b> <span class="mono">ver</span> — 64-bit: <span class="mono">0x200 / 0x300 / 0x400</span> for 512 / 768 / 1024</li>
+        <li><b>Final-call flag</b> <span class="mono">flag</span> — 64-bit, <span class="mono">0</span> or all-ones, distinguishing the last block of a message</li>
+        <li><b>Counter</b> <span class="mono">t</span> — 128-bit message-bit count, split <span class="mono">t₀‖t₁</span></li>
       </ul>
+      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Version, flag and counter are folded into every compression, so the same block processed at a different position in a different variant is a different computation. The counter is what binds the true message length under zero-only padding.</p>
     </div>
   </div>
 
-</section>
-
-<!-- ================= SPEC ================= -->
-<section id="spec">
-  <p class="eyebrow rv">02 — Specification</p>
-  <h2 class="rv">Official parameters</h2>
-  <p class="lead rv">Parameters below are taken verbatim from the specification text; chapter and section references are given for each.</p>
-  <div class="card rv">
-    <table>
-      <tbody>
-        <tr><td class="k">Chaining state</td><td>1024 bit — the only internal state width; the 512/768 digests reuse it and truncate the output (§2.2.1, §2.3)</td></tr>
-        <tr><td class="k">Message block</td><td>1024 bit (128 bytes) (§2.2.1)</td></tr>
-        <tr><td class="k">Digest lengths</td><td>512 / 768 / 1024 bit; the digest is the state prefix <span class="mono">h₀…h₇</span> / <span class="mono">h₀…h₁₁</span> / <span class="mono">h₀…h₁₅</span> (§2.3)</td></tr>
-        <tr><td class="k">Version word</td><td><span class="mono">ver = 0x200</span> (512) · <span class="mono">0x300</span> (768) · <span class="mono">0x400</span> (1024) (§2.3)</td></tr>
-        <tr><td class="k">Total rounds</td><td>20 rounds, organised into 5 phases; a phase is one message-bearing round <span class="mono">R⊕</span> followed by three <span class="mono">R</span> (§2.2.3, §2.2.4)</td></tr>
-        <tr><td class="k">Message injection</td><td>Once per phase — rounds 1, 5, 9, 13, 17 — each injection absorbing the block <em>half by half</em> (§2.2.3)</td></tr>
-        <tr><td class="k">SubColumn / ShiftRow</td><td>2 layers per full round; 8 per phase; 40 layers in the whole permutation (§2.2.3)</td></tr>
-        <tr><td class="k">ShiftRow</td><td>Row <span class="mono">i</span> is rotated left by <span class="mono">i</span> positions, <span class="mono">i∈{0,1,2,3}</span> (§2.2.2)</td></tr>
-        <tr><td class="k">AddConstant</td><td>Row 1 ← XOR with the cyclically shifted constants <span class="mono">(C′₀…C′₃)</span>; row 3 ← XOR with <span class="mono">(ver,flag,t₀,t₁)</span> (§2.2.2)</td></tr>
-        <tr><td class="k">Phase constants</td><td>At phase <span class="mono">i</span>: <span class="mono">(C′₀,C′₁,C′₂,C′₃)=(C_{i%4},C_{(i+1)%4},C_{(i+2)%4},C_{(i+3)%4})</span> (§2.2.3)</td></tr>
-        <tr><td class="k">Compression mode</td><td>Davies–Meyer feed-forward: <span class="mono">h′ ← v₀ ⊕ v₅</span> (§2.2.4, discussed §4.4)</td></tr>
-        <tr><td class="k">Padding</td><td>Zero bits appended <em>only if</em> the last block is short; if the message length is a multiple of 1024 no padding is added — the final-call flag carries that role (§2.3, §4.3)</td></tr>
-        <tr><td class="k">Iteration counter</td><td><span class="mono">t</span> accumulates 1024 per non-final block; the final call carries <span class="mono">t</span> = true message bit length (§2.3)</td></tr>
-        <tr><td class="k">SubColumn (ARX)</td><td><span class="mono">Σ₀(z)=z⊕(z≫5)⊕(z≫48)</span>, <span class="mono">Σ₁(z)=z⊕(z≫11)⊕(z≫40)</span>; inner rotations <span class="mono">≫8</span> and <span class="mono">≫63</span> (§2.2.2)</td></tr>
-        <tr><td class="k">Initial vector</td><td>First 256 hexadecimal fractional digits of π (§2.1)</td></tr>
-        <tr><td class="k">Round constants</td><td>First 64 bits of the fractional parts of √2, √3, √5, √7 (§2.1)</td></tr>
-        <tr><td class="k">Byte order</td><td>Little-endian (§3.2)</td></tr>
-        <tr><td class="k">Message space</td><td>Bit length &lt; 2¹²⁸ (§2.3)</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- ================= ARCH ================= -->
-<section id="arch">
-  <p class="eyebrow rv">03 — Pipeline</p>
-  <h2 class="rv">Compression, step by step</h2>
-  <p class="lead rv">Step through the five phases of the permutation <span class="mono">E</span>. Each phase holds four rounds: one message-bearing round (dark) and three message-free rounds (light). Message blocks are injected at the first round of every phase, so the last injection is round 17.</p>
-
-  <div class="card rv">
+  <div class="card rv" style="margin-top:18px">
+    <h3 style="margin-top:0">The design in one picture</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 12px">Each of the five phases holds four rounds: one message-bearing round <span class="mono">R⊕</span> followed by three message-free rounds <span class="mono">R</span>. Message halves are absorbed at rounds 1, 5, 9, 13 and 17, so the last injection is round 17.</p>
     <div class="steps">
       <button class="stepbtn" id="prev" aria-label="previous phase">‹</button>
       <button class="stepbtn play" id="play">▶ Play</button>
@@ -368,365 +319,299 @@
         <text class="pnum" x="30" y="203">round 1</text>
         <text class="pnum" x="636" y="203">round 20</text>
       </svg>
-      <figcaption>Figure 1 · Permutation E — 5 phases × 4 rounds; the message-bearing round of each phase is shown dark (§2.2.3–§2.2.4).</figcaption>
+      <figcaption>Figure 1 · Permutation E — 5 phases × 4 rounds; the message-bearing round of each phase is shown dark.</figcaption>
     </figure>
   </div>
 
-  <div class="grid2" style="margin-top:18px">
-    <div class="card rv">
-      <h3 style="margin-top:0">Compression wrapper</h3>
-      <p style="color:var(--ink-soft);margin:6px 0 0">The chain value <span class="mono">h</span> and message block <span class="mono">m</span> drive five phase calls <span class="mono">v₁=P₀(v₀,m) … v₅=P₄(v₄,m)</span>; the output is <span class="mono">h′ ← v₀ ⊕ v₅</span>. The tweak binds version, final-block flag and the 128-bit counter into every compression, so the same block processed at a different position is a different computation (§2.2.4, §4.3.2).</p>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Why the counter matters</h3>
-      <p style="color:var(--ink-soft);margin:6px 0 0">Under zero-only padding there is no in-block length delimiter, so the processed-bit count carried in the tweak <span class="mono">t</span> is what makes the message-to-transcript encoding injective. Encoding the number of processed bits invalidates the expandable-message structures behind Kelsey–Schneier second-preimage attacks (§4.3.2).</p>
-    </div>
-  </div>
-
-  <div class="grid3" style="margin-top:18px">
-    <div class="card rv">
-      <h3 style="margin-top:0">Round <span class="mono">R⊕</span></h3>
-      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">v ← v ⊕̂ m₀…m₇<br>v ← SC(v); v ← SR(v)<br>v ← v ⊕̂ m₈…m₁₅<br>v ← SC(v); v ← SR(v)<br>v ← AC(v)</p>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Round <span class="mono">R</span></h3>
-      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">v ← SC(v); v ← SR(v)<br>v ← SC(v); v ← SR(v)<br>v ← AC(v)</p>
-      <p style="color:var(--ink-soft);font-size:13px;margin:8px 0 0">Same layer sequence without absorbing a message half.</p>
-    </div>
-    <div class="card rv d2">
-      <h3 style="margin-top:0">SubColumn <span class="mono">SC</span></h3>
-      <p class="mono" style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">a₁ ← a₁+b₁; s₀ ← a₁<br>a₀ ← a₀+b₀; b₀ ← b₀⊕s₀<br>b₀′ ← b₀≫8; a₀′ ← a₀+Σ₀(b₀′)<br>s₁ ← a₀′; b₁ ← b₁⊕s₁<br>b₁′ ← b₁≫63; a₁′ ← a₁+Σ₁(b₁′)</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= IV ================= -->
-<section id="iv">
-  <p class="eyebrow rv">04 — IV &amp; Constants</p>
-  <h2 class="rv">Initial vector and round constants</h2>
-  <p class="lead rv">The 1024-bit initial chaining value, shared by all three digest variants, is the first 256 hexadecimal fractional digits of π. The four round constants are the first 64 bits of the fractional parts of √2, √3, √5 and √7.</p>
-  <div class="grid2">
-    <div class="card vecbox rv">
-      <button class="copy" data-target="ivblock">Copy</button>
-      <h3 style="margin-top:0">IV (4×4, row-major — as printed)</h3>
-<pre id="ivblock"><span class="lbl">row0  </span>243f6a8885a308d3 13198a2e03707344 a4093822299f31d0 082efa98ec4e6c89
-<span class="lbl">row1  </span>452821e638d01377 be5466cf34e90c6c c0ac29b7c97c50dd 3f84d5b5b5470917
-<span class="lbl">row2  </span>9216d5d98979fb1b d1310ba698dfb5ac 2ffd72dbd01adfb7 b8e1afed6a267e96
-<span class="lbl">row3  </span>ba7c9045f12c7f99 24a19947b3916cf7 0801f2e2858efc16 636920d871574e69</pre>
-    </div>
-    <div class="card vecbox rv d1">
-      <button class="copy" data-target="rcblock">Copy</button>
-      <h3 style="margin-top:0">Round constants (4 words)</h3>
-<pre id="rcblock">6a09e667f3bcc908   C0  =  frac(√2)
-bb67ae8584caa73b   C1  =  frac(√3)
-3c6ef372fe94f82b   C2  =  frac(√5)
-a54ff53a5f1d36f1   C3  =  frac(√7)</pre>
-      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">One <span class="mono">Σ₀</span> + one <span class="mono">Σ₁</span> per SubColumn; the three inner rotations plus the three Σ rotations make the six constants the only dedicated parameters to memorise (§3.1).</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= VECTORS ================= -->
-<section id="vectors">
-  <p class="eyebrow rv">05 — Test Vectors</p>
-  <h2 class="rv">Appendix B vectors</h2>
-  <p class="lead rv">Appendix B of the specification gives, for each digest size, the intermediate states after rounds 1, 2, 5, 10 and 20 of every compression call plus the final digest. Appendix B states that values are printed left to right, top to bottom, so the first four words of a state are <span class="mono">m₀ m₁ m₂ m₃</span> and <span class="mono">h₀ h₁ h₂ h₃</span>. Under §2.3 the counter reaches the true message bit length at the final call — 24 for <span class="mono">"abc"</span>, 1032 for <span class="mono">"aaa…a"</span> — with <span class="mono">flag = 0xFFFF…FF</span>.</p>
-
-  <div class="rv" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px">
-    <div class="seg" id="vecseg">
-      <button data-v="1024" class="on">FEILIAN-1024</button>
-      <button data-v="768">FEILIAN-768</button>
-      <button data-v="512">FEILIAN-512</button>
-    </div>
-    <span class="stepcap" id="vechint">Output width: <b>1024 bit</b> · 16 words</span>
-  </div>
-
-  <div class="card vecbox rv">
-    <button class="copy" data-target="vpanel-cur">Copy</button>
-    <div class="vec-panel on" data-v="1024">
-      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
-<pre>0507e4b1ef75d025 dfa303ea0a8e2c47 f9c7c5503dc12be4 d38615f0b1e1ed2b
-0ec6527ec29778a4 36be43cd599500fd fe2718a07ba9ca85 c94271df47351109
-dc73a8ec672ba113 296b155e56052dd6 39a0e0a636afea48 88db3739e2f282cc
-da0d93dfbeefde73 902c89d42803b6cb 7944717688ebc3b2 ad2955c31ee6c681</pre>
-      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
-<pre>e3383d3260ea32ed 8fe316f8b27cd6be a25969c43aacdc01 360c94861cd190ff
-95a82f04ebf95e95 19eef7c969bb0f0b ee439de8851ce6bf be21ba160f55884d
-af4263785f6b6d1e 7713350145ba5fcd eb63e5e2e376161b 5dfa8ef11f09e285
-ab8ebb5cb6de1b60 517922e7d3ffabf2 537a269f70f25f5a 117484183bc76ee5</pre>
-    </div>
-    <div class="vec-panel" data-v="768">
-      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
-<pre>ea0a78e8fd68db09 af5ad1d5755311e6 073e2742f9c9f79f cb9966dc869e1454
-bac2495ca9bfe8ea 2f331638ccd98a3f 6ecdb42b952889b0 ec054a26e934fe94
-f46b8b5fd6c4bb34 b5bfb869028e76f7 8bbc0c99f1c276be cb1adc2739a5abe1</pre>
-      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
-<pre>5fc94695955a87e9 defaaf83a7460733 ded961a12b7c5507 3af1611c8f524339
-af4000edb802c443 32b24a4187525040 e12f4e530c633797 c2283313a832445c
-b62f926c28f0e45f 7ccb8b9c22780964 46141c07e46f78a0 14ab284f37e6d4fd</pre>
-    </div>
-    <div class="vec-panel" data-v="512">
-      <p class="mono" style="margin:2px 0 6px;color:var(--ink-soft)">"abc" (24-bit) → final digest</p>
-<pre>fc7320c565f60ec6 a6ea26585f7c7d1f 50931119a1d1fb6c a06a71bed9bce094
-7e22171373e48e0c 9bb1ef36808ef3e5 fa56c50ff5838213 b54a0750c6ae1270</pre>
-      <p class="mono" style="margin:12px 0 6px;color:var(--ink-soft)">"aaa…a" (1032-bit) → final digest</p>
-<pre>a2189955d155788c e69ab2a6db9b5a94 3eff5d5924876f96 ba46d3944947238e
-3f0f29ea4c15bddd a8dd238876b0d693 3d6f17a7eb6e166b 5e4afb38519b803a</pre>
-    </div>
-  </div>
-</section>
-
-<!-- ================= SECURITY ================= -->
-<section id="security">
-  <p class="eyebrow rv">06 — Security</p>
-  <h2 class="rv">Claims and analyses</h2>
-  <p class="lead rv">Table 4.1 states the security claims of the family in the classical setting; §4.2 reports NIST SP 800-22 statistical results and §4.5.3 an avalanche table. The mode and component arguments follow in §4.3–§4.6.</p>
-
-  <div class="card rv">
+  <div class="card rv" style="margin-top:18px">
+    <h3 style="margin-top:0">At a glance</h3>
     <table>
-      <thead><tr><th>Instance</th><th class="num">Collision</th><th class="num">Second-preimage</th><th class="num">Preimage</th></tr></thead>
       <tbody>
-        <tr data-size="1024"><td class="k">FEILIAN-1024</td><td class="num">512</td><td class="num">1024</td><td class="num">1024</td></tr>
-        <tr data-size="768"><td class="k">FEILIAN-768</td><td class="num">384</td><td class="num">768</td><td class="num">768</td></tr>
-        <tr data-size="512"><td class="k">FEILIAN-512</td><td class="num">256</td><td class="num">512</td><td class="num">512</td></tr>
+        <tr><td class="k">Chaining state</td><td>1024 bit — the only internal state width; the 512/768 digests reuse it and truncate the output</td></tr>
+        <tr><td class="k">Message block</td><td>1024 bit (128 bytes)</td></tr>
+        <tr><td class="k">Digest lengths</td><td>512 / 768 / 1024 bit — the state prefix <span class="mono">h₀…h₇</span> / <span class="mono">h₀…h₁₁</span> / <span class="mono">h₀…h₁₅</span></td></tr>
+        <tr><td class="k">Version word</td><td><span class="mono">ver = 0x200</span> (512) · <span class="mono">0x300</span> (768) · <span class="mono">0x400</span> (1024)</td></tr>
+        <tr><td class="k">Permutation E</td><td>20 rounds in 5 phases; a phase is one message-bearing round followed by three message-free rounds</td></tr>
+        <tr><td class="k">Layer sequence</td><td>SubColumn → ShiftRow, twice per round; 40 layers in the whole permutation</td></tr>
+        <tr><td class="k">ShiftRow</td><td>Row <span class="mono">i</span> rotated left by <span class="mono">i</span> positions, <span class="mono">i ∈ {0,1,2,3}</span></td></tr>
+        <tr><td class="k">Compression mode</td><td>Davies–Meyer feed-forward: <span class="mono">h′ ← v₀ ⊕ v₅</span></td></tr>
+        <tr><td class="k">Tweak</td><td><span class="mono">tw = (ver, flag, t₀‖t₁)</span> — version, final-call flag, 128-bit message-bit counter</td></tr>
+        <tr><td class="k">Constants</td><td>IV — first 256 hexadecimal fractional digits of π; four round constants — first 64 bits of the fractional parts of √2, √3, √5, √7</td></tr>
+        <tr><td class="k">Padding</td><td>Zero bits appended only if the last block is short; the final-call flag carries the role padding would otherwise play</td></tr>
+        <tr><td class="k">Byte order · message space</td><td>Little-endian · bit length &lt; 2¹²⁸</td></tr>
       </tbody>
     </table>
-    <p class="tblcap">Specification Table 4.1 — security claims in bits, classical setting. §4.1 additionally claims <em>no dedicated quantum attack</em> on collision, second-preimage or preimage resistance with complexity below the corresponding generic quantum attack; no separate quantum exponents are tabulated in the specification.</p>
+    <p class="tblcap">A summary only. The full parameter tables, the round-by-round definition, the IV and round-constant words, the canonical Appendix B test vectors and the Chapter 5 measurements are in the specification — <a href="#downloads">download it below</a>.</p>
   </div>
 
-  <div class="grid2" style="margin-top:18px">
-    <div class="card rv">
-      <h3 style="margin-top:0">NIST SP 800-22 (§4.2)</h3>
-      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Messages from an 8-byte big-endian counter, digests concatenated in counter order and truncated to exactly 100,000,000 bits, split into 100 sequences of 1,000,000 bits, tested with all 15 tests at default parameters. Selected rows, reporting proportion of passing sequences:</p>
-      <table style="font-size:13px">
-        <thead><tr><th>Statistical test</th><th class="num">P-value</th><th class="num">Proportion</th></tr></thead>
-        <tbody>
-          <tr><td>Frequency</td><td class="num">0.574903</td><td class="num">98/100</td></tr>
-          <tr><td>BlockFrequency</td><td class="num">0.719747</td><td class="num">97/100</td></tr>
-          <tr><td>Runs</td><td class="num">0.678686</td><td class="num">99/100</td></tr>
-          <tr><td>FFT</td><td class="num">0.122325</td><td class="num">99/100</td></tr>
-          <tr><td>ApproximateEntropy</td><td class="num">0.383827</td><td class="num">100/100</td></tr>
-          <tr><td>RandomExcursions</td><td class="num">0.534146</td><td class="num">58/58</td></tr>
-          <tr><td>LinearComplexity</td><td class="num">0.437274</td><td class="num">99/100</td></tr>
-        </tbody>
-      </table>
-      <p class="tblcap">Seven of the rows printed in Table 4.2 (the specification elides the remainder). Pass proportions sit at or near 100% of the eligible sequences.</p>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Structure and diffusion (§4.3–§4.6)</h3>
-      <ul class="tight">
-        <li><b>Mode.</b> A HAIFA variant using a counter but no salt; the final-block flag replaces traditional padding's role, giving resistance to length extension and long-message second preimages (§4.3.2).</li>
-        <li><b>Indifferentiability.</b> §4.3.1 gives a simulator proof with distinguishing advantage <span class="mono">O(q²/2ⁿ)</span>, arguing that <span class="mono">flag</span> makes message processing prefix-free.</li>
-        <li><b>Davies–Meyer.</b> Collision and preimage resistance from the ideal-cipher assumption; a fixed-point property exists but the designers judge it without real impact (§4.4).</li>
-        <li><b>Diffusion.</b> Best one-round differential trail <span class="mono">2⁻³</span>; average flipped bits per word after three rounds <span class="mono">31.7–32.4</span> out of 64 (§4.5.3, Table 4.3).</li>
-        <li><b>Dedicated attacks.</b> Rotational, slide, rotational-slide, meet-in-the-middle and boomerang analysis (§4.6); four phases are argued sufficient against sliding, because aligning <span class="mono">P₀</span> with <span class="mono">P₄</span> requires sliding over four phases.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PERFORMANCE ================= -->
-<section id="perf">
-  <p class="eyebrow rv">07 — Performance</p>
-  <h2 class="rv">Implementation and reported performance</h2>
-  <p class="lead rv">Chapter 5 of the specification reports the operation counts, memory footprint, software timings and FPGA synthesis results of the family.</p>
-
-  <div class="grid2">
-    <div class="card rv">
-      <h3 style="margin-top:0">One compression function, counted (§5.1.1)</h3>
-      <div class="bar-row"><span>Additions</span><div class="bar-track"><div class="bar-fill" data-w="52.6"></div></div><span class="bar-val">640</span></div>
-      <div class="bar-row"><span>XORs</span><div class="bar-track"><div class="bar-fill alt" data-w="100"></div></div><span class="bar-val">1216</span></div>
-      <div class="bar-row"><span>Rotations</span><div class="bar-track"><div class="bar-fill alt" data-w="78.9"></div></div><span class="bar-val">960</span></div>
-      <p class="tblcap">Excluding padding, block loading and state copying, which the specification says are memory moves with negligible arithmetic overhead.</p>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Memory (§5.1.2)</h3>
-      <table style="font-size:13.5px">
-        <tbody>
-          <tr><td class="k">ROM — IV</td><td class="num">128 bytes</td></tr>
-          <tr><td class="k">ROM — phase constants</td><td class="num">128 bytes</td></tr>
-          <tr><td class="k">RAM — full working set</td><td class="num">528 bytes</td></tr>
-          <tr><td class="k">RAM — minimum stated</td><td class="num">400 bytes</td></tr>
-        </tbody>
-      </table>
-      <p class="tblcap">No permutation tables are stored. The specification notes a further 96-byte ROM saving is possible by storing one constant group and index-shifting, at four modular-index operations per round, and that streaming the message block can cut a further 128 bytes of RAM.</p>
-    </div>
-  </div>
-
-  <div class="card rv" style="margin-top:18px">
-    <h3 style="margin-top:0">Software benchmarks (§5.3)</h3>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Platform (§5.3, Table 5.1)</th><th>ISA</th><th>OS / compiler</th><th class="num">10 B</th><th class="num">100 B</th><th class="num">1 kB</th><th class="num">10 kB</th></tr></thead>
-      <tbody>
-        <tr><td class="k">Intel i7-10750H @2.60 GHz</td><td>AVX2</td><td>Windows 11 · GCC 16.1.0</td><td class="num">56.98</td><td class="num">5.77</td><td class="num">3.65</td><td class="num">3.57</td></tr>
-        <tr><td class="k">AMD Ryzen 9 8945HX @2.50 GHz</td><td>AVX2</td><td>Windows 11 · GCC 15.2.0</td><td class="num">44.15</td><td class="num">4.71</td><td class="num">3.09</td><td class="num">3.05</td></tr>
-        <tr><td class="k">Apple M2 Pro @3.50 GHz</td><td>NEON</td><td>macOS 26 · Clang 17.0.0</td><td class="num">55.76</td><td class="num">5.64</td><td class="num">4.19</td><td class="num">4.09</td></tr>
-      </tbody>
-    </table>
-    <p class="tblcap">Specification Table 5.2, FEILIAN-1024, built with <span class="mono">-O3 -march=native</span>, median over thousands of trials. The values scale with message length as cycles per byte.</p>
-  </div>
-
-  <figure class="rv">
-    <div id="cpbchart"></div>
-    <figcaption>Figure 2 · Cycles per byte, FEILIAN-1024 against BLAKE-64, SHA-512 and SHA-3-512 (specification Table 5.3, SUPERCOP/eBACS harness).</figcaption>
-  </figure>
-
-  <div class="grid2" style="margin-top:6px">
-    <div class="card rv">
-      <h3 style="margin-top:0">Vectorisation techniques (§5.2)</h3>
-      <ul class="tight">
-        <li>Each 4-word row packed into one 256-bit AVX2 register — four lanes per instruction.</li>
-        <li>Byte-granularity rotations via <span class="mono">VPSHUFB</span> with static masks, replacing shift/shift/or.</li>
-        <li><span class="mono">ROT63(x) = (x≫63) ⊕ (x+x)</span>, using the add unit instead of the shift unit.</li>
-        <li>All 20 rounds explicitly unrolled as five blocks of four.</li>
-        <li>Feed-forward from registers holding the initial state; no reload from memory.</li>
-        <li>Dual state buffers with pointer swapping, plus two-block-ahead non-temporal prefetch.</li>
-      </ul>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Parallelism (§5.1.3)</h3>
-      <ul class="tight">
-        <li>Four independent SubColumn calls per SubMatrix — 4-way column parallelism, with no cross-column dependency until ShiftRow.</li>
-        <li>Within a SubColumn the first two additions are independent, as are the two rotations inside each Σ.</li>
-        <li>A column is 256 bits wide, so it maps exactly onto one AVX2 register; 512-bit units are not twice as column-efficient but can hash two messages in lockstep.</li>
-        <li>ShiftRow needs cross-register shuffling, which the specification flags as a potential latency cost on some microarchitectures.</li>
-      </ul>
-    </div>
-  </div>
-
-  <figure class="rv">
-    <div id="fpgachart"></div>
-    <figcaption>Figure 3 · FPGA throughput of FEILIAN-f by architecture (§5.5, Table 5.5): 1SC / 2SC / 4SC / 8SC SubColumn units, on Xilinx Virtex-5 xc5vlx110 and AMD Zynq-7000 xc7z100.</figcaption>
-  </figure>
-
-  <div class="grid2">
-    <div class="card rv">
-      <h3 style="margin-top:0">FPGA synthesis results (§5.5, Table 5.5)</h3>
-      <table style="font-size:13px">
-        <thead><tr><th>Arch</th><th class="num">LUTs</th><th class="num">FFs</th><th class="num">MHz</th><th class="num">Lat. µs</th><th class="num">Mbps</th></tr></thead>
-        <tbody>
-          <tr><td class="k" colspan="6" style="background:#f2f5fb">Xilinx Virtex-5 xc5vlx110</td></tr>
-          <tr><td>8SC</td><td class="num">5226</td><td class="num">3419</td><td class="num">60.0</td><td class="num">0.35</td><td class="num">2925.7</td></tr>
-          <tr><td>4SC</td><td class="num">3585</td><td class="num">1057</td><td class="num">84.3</td><td class="num">0.48</td><td class="num">2105.4</td></tr>
-          <tr><td>2SC</td><td class="num">5189</td><td class="num">1561</td><td class="num">78.0</td><td class="num">1.04</td><td class="num">986.1</td></tr>
-          <tr><td>1SC</td><td class="num">3964</td><td class="num">2075</td><td class="num">101.0</td><td class="num">1.58</td><td class="num">644.3</td></tr>
-          <tr><td class="k" colspan="6" style="background:#f2f5fb">AMD Zynq-7000 xc7z100</td></tr>
-          <tr><td>8SC</td><td class="num">5249</td><td class="num">3429</td><td class="num">85.0</td><td class="num">0.24</td><td class="num">4139.8</td></tr>
-          <tr><td>4SC</td><td class="num">3343</td><td class="num">1142</td><td class="num">142.8</td><td class="num">0.28</td><td class="num">3566.5</td></tr>
-          <tr><td>2SC</td><td class="num">5079</td><td class="num">1558</td><td class="num">114.2</td><td class="num">0.71</td><td class="num">1443.7</td></tr>
-          <tr><td>1SC</td><td class="num">3973</td><td class="num">2083</td><td class="num">139.3</td><td class="num">1.16</td><td class="num">886.0</td></tr>
-        </tbody>
-      </table>
-      <p class="tblcap">Synplify Elite W-2024.09, base strategy. Message buffering, padding, bit counters and output registers are outside the measured block; constants and message selection are hard-wired, not in block RAM.</p>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Against the baselines (§5.5, Table 5.6)</h3>
-      <table style="font-size:13.5px">
-        <thead><tr><th>Core on Virtex-5</th><th class="num">Slices</th><th class="num">Mbps</th><th class="num">Mbps/slice</th></tr></thead>
-        <tbody>
-          <tr><td class="k">BLAKE-512</td><td class="num">406</td><td class="num">563</td><td class="num">1.39</td></tr>
-          <tr><td class="k">SHA-512</td><td class="num">818</td><td class="num">2267</td><td class="num">2.77</td></tr>
-          <tr><td class="k">Keccak-512</td><td class="num">1498</td><td class="num">8056</td><td class="num">5.38</td></tr>
-          <tr><td class="k">FEILIAN-1024 ([4SC])</td><td class="num">897</td><td class="num">2105</td><td class="num">2.35</td></tr>
-        </tbody>
-      </table>
-      <p class="tblcap">Slice counts for the baselines are estimated as <span class="mono">max(⌈LUTs/4⌉, ⌈FFs/4⌉)</span> for the platform's slice configuration. Software-wise §5.3 describes FEILIAN-1024 as roughly equivalent to SHA-512 in cycles per byte.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= APPLICATIONS ================= -->
-<section id="apps">
-  <p class="eyebrow rv">08 — Applications</p>
-  <h2 class="rv">MAC, KDF and XOF</h2>
-  <p class="lead rv">Chapter 6 builds three standard constructions on the indifferentiability claim, exploiting the built-in counter and final-block flag.</p>
-
-  <div class="grid3">
-    <div class="card lift rv">
-      <h3 style="margin-top:0">MAC (§6.1)</h3>
-      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Because the flag and counter make length extension infeasible, a prefix-key MAC is available without HMAC's nested hashing:</p>
-      <p class="mono" style="margin:0">MAC_K(M) = FEILIAN(K‖M)</p>
-      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Secure up to 512-bit, the birthday bound of the 1024-bit state; the specification says it suits FEILIAN-512 in particular. HMAC over FEILIAN is the alternative given wide HMAC deployment.</p>
-    </div>
-    <div class="card lift rv d1">
-      <h3 style="margin-top:0">KDF (§6.2)</h3>
-      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">An extract-then-expand fit for HKDF-style constructions:</p>
-      <p class="mono" style="margin:0">PRK = FEILIAN(IKM)<br>K_i = FEILIAN(PRK‖info‖i)</p>
-      <p style="color:var(--ink-soft);font-size:13px;margin:10px 0 0">Each <span class="mono">K_i</span> is a fresh oracle output on a distinct input, so the derived keys are pseudorandom and mutually independent; output length is unbounded in <span class="mono">i</span>.</p>
-    </div>
-    <div class="card lift rv d2">
-      <h3 style="margin-top:0">XOF (§6.3)</h3>
-      <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 10px">Absorb and squeeze are separated by the <span class="mono">ver</span> and <span class="mono">flag</span> words, with the counter re-initialised to 0:</p>
-      <p class="mono" style="margin:0">Out₀ = f(h_root, empty, t=0)<br>Out₁ = f(h_root, empty, t=1)<br>XOF(M) = Out₀‖Out₁‖…</p>
-    </div>
-  </div>
-
-  <div class="card rv" style="margin-top:18px">
-    <h3 style="margin-top:0">Squeeze parameters (§6.3, Table 6.1)</h3>
-    <table style="font-size:13.5px">
-      <thead><tr><th>Instance</th><th>absorbing <span class="mono">ver</span></th><th>squeezing <span class="mono">ver</span></th></tr></thead>
-      <tbody>
-        <tr><td class="k">FEILIAN-512</td><td class="mono">0x0000000000000200</td><td class="mono">0xFF00000000000200</td></tr>
-        <tr><td class="k">FEILIAN-768</td><td class="mono">0x0000000000000300</td><td class="mono">0xFF00000000000300</td></tr>
-        <tr><td class="k">FEILIAN-1024</td><td class="mono">0x0000000000000400</td><td class="mono">0xFF00000000000400</td></tr>
-      </tbody>
-    </table>
-    <p class="tblcap">Absorbing uses <span class="mono">flag = 0</span>; squeezing uses <span class="mono">flag = 0xFFFF…FF</span>. The empty squeeze block is padded under the normal rules, and the counter keeps each squeeze a distinct compression query.</p>
-  </div>
-</section>
-
-<!-- ================= COMPONENT ================= -->
-<section id="component">
-  <p class="eyebrow rv">09 — Components</p>
-  <h2 class="rv">Component-level linear-structure analysis</h2>
-  <p class="lead rv">A companion paper (Cryptology ePrint 2026/2236, CC BY 4.0) gives a <strong>complete classification</strong> of the whole-output linear structures of the 64-bit SubColumn. The paper states plainly that its results are component-level and establish <strong>no hash attack and no bound on the hash's security margin</strong>.</p>
-
-  <div class="grid2">
-    <div class="card rv">
-      <h3 style="margin-top:0">Result for FEILIAN</h3>
-      <ul class="tight">
-        <li>For w=64, r=8, s=63: <span class="mono">LD(F) = S</span>, dimension 2.</li>
-        <li>Exactly three nonzero members (<span class="mono">M=2⁶³</span>):
-          <br><span class="mono">(0,M,0,M)→(M,0,M,0)</span>
-          <br><span class="mono">(M,0,M,M)→(M,0,0,0)</span>
-          <br><span class="mono">(M,M,M,0)→(0,0,M,0)</span></li>
-        <li>Beyond the two SubColumn boundaries the family dies: <span class="mono">LD(A∘R∘A)∩LD(A)={0}</span>.</li>
-        <li>Real FEILIAN (ShiftRow <span class="mono">B=I</span>) lands in the first census row (8→0) — the family is cleared at the second boundary.</li>
-      </ul>
-    </div>
-    <div class="card rv d1">
-      <h3 style="margin-top:0">Row-mixer census (Theorem 8)</h3>
-      <div class="bar-row"><span>8 → 0</span><div class="bar-track"><div class="bar-fill" data-w="45.7"></div></div><span class="bar-val">9,216</span></div>
-      <div class="bar-row"><span>8 → 4 (→0)</span><div class="bar-track"><div class="bar-fill" data-w="34.3"></div></div><span class="bar-val">6,912</span></div>
-      <div class="bar-row"><span>8 → 4 → 2</span><div class="bar-track"><div class="bar-fill keep" data-w="5.7"></div></div><span class="bar-val">1,152</span></div>
-      <div class="bar-row"><span>8 → 4 → 4</span><div class="bar-track"><div class="bar-fill keep" data-w="11.4"></div></div><span class="bar-val">2,304</span></div>
-      <div class="bar-row"><span>8 → 8</span><div class="bar-track"><div class="bar-fill keep" data-w="2.9"></div></div><span class="bar-val">576</span></div>
-      <p class="mono" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">20,160 mixers total; 4,032 (20%, red) permanently retain the nonzero family. The paper notes this is a structural property, not a security ranking of mixers.</p>
-    </div>
+  <div class="callout rv">
+    Security claims (specification Table 4.1) and the arguments behind them are <b>not</b> reproduced here — their status is exactly what the third-party analyses in §03 discuss. Continue to <a href="#analysis">Third-party analysis →</a>.
   </div>
 </section>
 
 <!-- ================= DOWNLOADS ================= -->
 <section id="downloads">
-  <p class="eyebrow rv">10 — Downloads</p>
-  <h2 class="rv">Artifacts</h2>
-  <p class="lead rv">The submitted documents and the reference implementations, as filed. Each artifact publishes its SHA-256 so a download can be verified end to end.</p>
+  <p class="eyebrow rv">02 — Downloads</p>
+  <h2 class="rv">Artifacts and update log</h2>
+  <p class="lead rv">The documents and implementations as filed — specification <b>v1.0.1</b> (8 October 2026), the two-page erratum recording every change from v1.0, and the v1.0.1 reference, optimized and RTL code — plus the update log of the material distributed here. Each artifact publishes its SHA-256 so a download can be verified end to end.</p>
   <div id="dlgrid" class="grid3 rv"></div>
   <p class="tblcap rv" id="dlnote"></p>
+
+  <div class="grid2" style="margin-top:22px">
+    <div class="card rv">
+      <h3 style="margin-top:0">Update log</h3>
+      <ul class="tl">
+        <li><span class="d">2026-10-09</span>Compendium <b>v1.2.0</b> — the artifacts distributed here move to specification <b>v1.0.1</b> and its erratum, and a section recording every change from v1.0 to v1.0.1 is added.</li>
+        <li><span class="d">2026-10-09</span>Compendium <b>v1.1.0</b> — restructured around the introduction, the artifacts and the third-party analyses; the detailed specification tables moved out of the page and into the PDF.</li>
+        <li><span class="d">2026-10-08</span>Specification <b>v1.0.1</b> (69 pp.), released with the erratum. Corrects the typographical errors of v1.0, reprints the 512/768 vectors of Appendix B, and refines the software and hardware implementations.</li>
+        <li><span class="d">2026-10-08</span>Compendium <b>v1.0.0</b> — first public release.</li>
+        <li><span class="d">2026-09-29</span>Specification <b>revision distributed previously</b> (70 pp.). Corrected the IV word 7 to <span class="mono">0x3F84D5B5B5470917</span>, fixed the AddConstant row placement, and reprinted Appendix B under true message-length counts.</li>
+        <li><span class="d">2026-09-27</span>M. Idrassi, <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, v1.0.2 (14 pp., CC BY 4.0). Same day: ePrint 2026/2236 submitted, approved 28 September.</li>
+        <li><span class="d">2026-09-26 · 09-23</span>M.-J. O. Saarinen publishes his FEILIAN (hash-10) report on ngcc.dev — entries <span class="mono">hash-10-1 … hash-10-5</span>.</li>
+        <li class="mute"><span class="d">2026-06-30</span>Original submission (68 pp.) — the revision examined by the third-party assessment.</li>
+      </ul>
+    </div>
+    <div class="card rv d1">
+      <h3 style="margin-top:0">Which revision is which</h3>
+      <table style="font-size:13.5px">
+        <thead><tr><th>Revision</th><th class="num">Pages</th><th>SHA-256 (prefix)</th></tr></thead>
+        <tbody>
+          <tr><td>Examined by the assessment (§03, R1–R8)</td><td class="num">68</td><td class="mono">8e3a9a109f3188ab…</td></tr>
+          <tr><td><b>Distributed here — v1.0.1</b></td><td class="num">69</td><td class="mono">2d14bcf877eb9fbd…</td></tr>
+        </tbody>
+      </table>
+      <p class="tblcap">The third-party assessment of §03 reviewed the 30 June 2026 text. The copy published in this repository is version 1.0.1 (8 October 2026); every check in §03 compares against the revision distributed here, and the differences that matter are stated in the status column.</p>
+      <div class="note" style="margin-bottom:0"><b>Read this first.</b> Download the specification before quoting any parameter: the tables on this page are a summary, and where the page and the specification disagree, the specification prevails.</div>
+    </div>
+  </div>
 </section>
 
-<!-- ================= REFS ================= -->
-<section id="refs">
-  <p class="eyebrow rv">11 — References</p>
-  <h2 class="rv">Sources</h2>
+<!-- ================= THIRD-PARTY ANALYSIS ================= -->
+<section id="analysis">
+  <p class="eyebrow rv">03 — Third-party analysis</p>
+  <h2 class="rv">Independent reviews and their status</h2>
+  <p class="lead rv">Three independent sources have analysed this submission. None of them establishes a full-round cryptanalytic break of the correctly encoded software hash. What follows is what each one found, and the current status of every finding against the material distributed here.</p>
+
+  <div class="grid3">
+    <div class="card revcard lift rv">
+      <h3 style="margin-top:0">Mounir Idrassi — technical assessment</h3>
+      <p class="who">v1.0.2 · 27 September 2026 · 14 pp. · AM Crypto, Japan · CC BY 4.0</p>
+      <blockquote>“Withhold a positive security assessment and integration approval for this submission… These are sufficient grounds to request a corrected submission and renewed review.”</blockquote>
+      <p>Eight findings, R1–R8, spanning the RTL wrappers, the C sources, the mathematical argument and the shared test infrastructure. It states plainly that it does <b>not</b> establish a full-round break of the hash defined by the written compression algorithm, or of the normally operating C implementations.</p>
+      <p>The hardware conclusions are <b>source-level</b>: no RTL simulation was performed, so the assessment itself calls for end-to-end validation of any corrected implementation.</p>
+    </div>
+    <div class="card revcard lift rv d1">
+      <h3 style="margin-top:0">Markku-Juhani O. Saarinen — ngcc.dev</h3>
+      <p class="who">23 &amp; 26 September 2026 · personal report · unaffiliated with NICCS</p>
+      <blockquote>Reference C implementations return success with an all-zero digest when the padding allocation fails.</blockquote>
+      <p>This is the earlier, source-level finding on which the assessment's R5 builds: the assessment extends the observation to the optimized SIMD implementations and credits the original report.</p>
+      <p>The site publishes follow-up RTL simulations and reference-C partial-byte checks. The assessment attributes those to that venue and does not rerun them; this page does the same, and cites them as reports rather than as reproduced results.</p>
+    </div>
+    <div class="card revcard lift rv d2">
+      <h3 style="margin-top:0">Mounir Idrassi — ePrint 2026/2236</h3>
+      <p class="who">submitted 27 September 2026 · approved 28 September · CC BY 4.0</p>
+      <blockquote>“The component results establish no hash attack or bound on the hash's security margin.”</blockquote>
+      <p>A complete classification of the whole-output linear structures of the 64-bit SubColumn. For FEILIAN's parameters the structure space is exactly the two-dimensional MSB family, with three nonzero members, and no nonzero member survives the second SubColumn boundary.</p>
+      <p>It is a component-level structural property — not a security ranking of any hash construction, and not a claim about FEILIAN as a whole.</p>
+    </div>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">Findings and current status</h3>
+    <table style="font-size:13.5px">
+      <thead><tr><th style="width:44px">#</th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status in the material distributed here</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">R1</td>
+          <td>The 1SC, 4SC and 8SC hardware wrappers omit the current block's length from the compression input, so their message encoding is not injective. The 2SC core contains a different, corrected counter path.</td>
+          <td><span class="badge b-high">High</span> — for those hardware implementations</td>
+          <td><span class="badge b-ok">Addressed</span> Fixed in v1.0.1 for all four architectures: the current block length is part of the compression input, and the block, final flag and cumulative length are transaction-consistent (&sect;04).</td>
+        </tr>
+        <tr>
+          <td class="k">R2</td>
+          <td>Chapter 2, the C sources and the RTL do not define one consistent algorithm — IV word 7, the AddConstant row placement, the counter word order and the hardware variant labels disagree.</td>
+          <td><span class="badge b-med">Conformance</span> — blocks transfer of security conclusions</td>
+          <td><span class="badge b-ok">Addressed</span> The revision distributed here designates the conventions: IV₇ <span class="mono">0x3F84D5B5B5470917</span>, constants in state row 1 and the tweak in row 3, counter split <span class="mono">t₀‖t₁</span>. The hardware variant labels are unchanged — v1.0.1 fixes the README wording that explains them (&sect;04).</td>
+        </tr>
+        <tr>
+          <td class="k">R3</td>
+          <td>Appendix B printed cumulative <i>padded-block</i> counts for the 512- and 768-bit examples while the C code and KATs use true message lengths.</td>
+          <td><span class="badge b-med">Security-relevant encoding</span></td>
+          <td><span class="badge b-ok">Addressed</span> Appendix B is reprinted under true message-length binding — 24 sections changed in the revision distributed here, and the 512/768 digests now agree with the C reference.</td>
+        </tr>
+        <tr>
+          <td class="k">R4</td>
+          <td>The C bit-input and length contracts are incomplete: the unused low bits of a partial final byte are not masked, one padding addition can wrap, and an <span class="mono">unsigned long long</span> bit length is cast to <span class="mono">size_t</span> unchecked.</td>
+          <td><span class="badge b-med">Correctness</span> — platform-dependent severity</td>
+          <td><span class="badge b-ok">Addressed</span> In v1.0.1 <span class="mono">pad_message()</span> masks the final partial byte and guards both additions, and the length cast is rejected where it cannot be represented — in all six C variants, reference and optimized.</td>
+        </tr>
+        <tr>
+          <td class="k">R5</td>
+          <td>Padding-allocation failure is silently accepted: the reference and optimized C return success and an all-zero digest.</td>
+          <td><span class="badge b-med">Implementation</span></td>
+          <td><span class="badge b-ok">Addressed</span> In v1.0.1 the failure is detected and propagated through <span class="mono">CryptHash()</span>'s return code, so a failed call no longer yields a well-formed digest; v1.0.1 also returns an error when the requested digest length does not match the configured version.</td>
+        </tr>
+        <tr>
+          <td class="k">R6</td>
+          <td>The mode proof is written for a different interface — salt and length-encoding padding — than the construction it is applied to, and the claimed margins are not established for the actual composition.</td>
+          <td><span class="badge b-med">Assurance gap</span> — not a demonstrated break</td>
+          <td><span class="badge b-med">Open — text-level</span> Recorded as an unresolved argument in the specification. No full-round break is claimed by the assessment or found here.</td>
+        </tr>
+        <tr>
+          <td class="k">R7</td>
+          <td>The MAC, KDF and XOF recommendations exceed what the indifferentiability argument licenses; each needs its own specification and bounds.</td>
+          <td><span class="badge b-med">Assurance gap</span> — separate review needed</td>
+          <td><span class="badge b-med">Open — text-level</span> Recorded as requiring specifications and bounds of their own. No implementations or KATs for these modes are distributed.</td>
+        </tr>
+        <tr>
+          <td class="k">R8</td>
+          <td>The shared DRNG and KAT driver contain portability and error-propagation defects — including a shift-by-width case in the SM3 rotation macro and ignored return values.</td>
+          <td><span class="badge b-info">Test-generation reliability</span> — vectors unaffected</td>
+          <td><span class="badge b-info">Reported, not applied</span> These files are marked <span class="mono">SHALL NOT be modified</span> and are byte-identical to the submission. A defect report and a patch are prepared for coordination with ICCS; the fixed message/digest pairs are unaffected.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="tblcap">Findings are numbered as in the assessment; its verdict is quoted above. The right-hand column records the state of the material distributed in <i>this</i> repository — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
+    <div class="note"><b>One residual wording issue.</b> The revision still describes the IV as “the first decimal digits of π” (§2.1); the printed words are hexadecimal. The digests are unaffected, and the page above states the values in hexadecimal. Noted for the next revision.</div>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">What the component analysis does and does not say</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The ePrint 2026/2236 result, in the paper's own terms. Like the assessment, the paper states its boundary explicitly: this is a property of a component, not a hash attack and not a bound on the hash's security margin.</p>
+    <div class="grid2">
+      <div>
+        <h4 style="margin:0 0 6px">Result for FEILIAN</h4>
+        <ul class="tight">
+          <li>For <span class="mono">w=64, r=8, s=63</span>: <span class="mono">LD(F) = S</span>, dimension 2.</li>
+          <li>Exactly three nonzero members (<span class="mono">M = 2⁶³</span>):
+            <br><span class="mono">(0,M,0,M) → (M,0,M,0)</span>
+            <br><span class="mono">(M,0,M,M) → (M,0,0,0)</span>
+            <br><span class="mono">(M,M,M,0) → (0,0,M,0)</span></li>
+          <li>Beyond the two SubColumn boundaries the family dies: <span class="mono">LD(A∘R∘A) ∩ LD(A) = {0}</span>.</li>
+          <li>Real FEILIAN (ShiftRow <span class="mono">B = I</span>) lands in the first census row — the family is cleared at the second boundary.</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="margin:0 0 6px">Row-mixer census (Theorem 8)</h4>
+        <div class="bar-row"><span>8 → 0</span><div class="bar-track"><div class="bar-fill" data-w="45.7"></div></div><span class="bar-val">9,216</span></div>
+        <div class="bar-row"><span>8 → 4 (→0)</span><div class="bar-track"><div class="bar-fill" data-w="34.3"></div></div><span class="bar-val">6,912</span></div>
+        <div class="bar-row"><span>8 → 4 → 2</span><div class="bar-track"><div class="bar-fill keep" data-w="5.7"></div></div><span class="bar-val">1,152</span></div>
+        <div class="bar-row"><span>8 → 4 → 4</span><div class="bar-track"><div class="bar-fill keep" data-w="11.4"></div></div><span class="bar-val">2,304</span></div>
+        <div class="bar-row"><span>8 → 8</span><div class="bar-track"><div class="bar-fill keep" data-w="2.9"></div></div><span class="bar-val">576</span></div>
+        <p class="mono" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">20,160 mixers total; 4,032 (20%, red) permanently retain the nonzero family. A structural property, not a security ranking of mixers.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok rv">
+    <h4>What none of these analyses claim</h4>
+    <p style="margin:0 0 8px">None of the three establishes a full-round cryptanalytic break of the hash defined by the written compression algorithm, or of the correctly encoded software implementations. The assessment says so in as many words; the component paper says so in as many words.</p>
+    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§04). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
+  </div>
+</section>
+
+<!-- ================= ERRATUM ================= -->
+<section id="erratum">
+  <p class="eyebrow rv">04 — Erratum</p>
+  <h2 class="rv">The designers' erratum: v1.0 &rarr; v1.0.1</h2>
+  <p class="lead rv">On 8 October 2026 the designers released <b>specification version 1.0.1</b> together with a two-page <b>erratum</b> that records every change made to the June 2026 text. The erratum is reproduced below in full. Its opening note is the single most important sentence in it, and it is quoted verbatim: <i>&ldquo;The design of hash function FEILIAN does not change. All details should refer to the reference code that illustrates FEILIAN correctly and fully.&rdquo;</i></p>
+
+  <div class="callout ok rv">
+    <h4>Design unchanged &mdash; typographies, not structure</h4>
+    <p style="margin:0 0 8px">No round, constant, counter rule or iteration count is altered by v1.0.1. Four <b>typographical errors</b> are corrected in the specification (Table 1 of the erratum). The implementations are <b>refined towards the full-fledged version</b>, not repaired: the erratum states plainly that <i>&ldquo;the software implementation (both reference and optimized codes) are correct&rdquo;</i>. Its own summary of the software changes is that they (1) handle exceptional execution situations properly, (2) handle non-full-byte strings properly, and (3) correct some inconsistency in program comments.</p>
+    <p style="margin:0">The distinction matters for reading &sect;03: the compression function, the IV, the round constants and the counter conventions are what the third-party analyses examined, and none of them moves here.</p>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">1 &middot; Typos corrected in the specification</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Table 1 of the erratum, with the location it cites for each correction.</p>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Location</th><th>As printed in v1.0</th><th>Corrected in v1.0.1</th></tr></thead>
+      <tbody>
+        <tr><td>p. 3, &sect;2.1 &mdash; the initial vector</td><td class="mono">IV<sub>7</sub> = 0x3D84D5B5B5470917</td><td class="mono">IV<sub>7</sub> = 0x3F84D5B5B5470917</td></tr>
+        <tr><td>p. 9, &sect;2.2.2 &mdash; the round constant</td><td class="mono">(0, tw, 0, Const)</td><td class="mono">(0, Const, 0, tw)</td></tr>
+        <tr><td>p. 61, bibliography &mdash; &ldquo;Second preimage attacks on dithered hash functions&rdquo;</td><td class="mono">[IKD+08]</td><td class="mono">[ABF+08]</td></tr>
+        <tr><td>pp. 59&ndash;68, Appendix B.2/B.3 &mdash; printed test vectors for FEILIAN-768/512</td><td>wrong historical version</td><td>correct version</td></tr>
+      </tbody>
+    </table>
+    <p class="tblcap">Both design-affecting corrections were already what the reference code did; the printed text carried the older value. v1.0.1 now prints <span class="mono">0x3F84D5B5B5470917</span> for the seventh IV word and places the round constant in the second word of the AddConstant row.</p>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">2 &middot; Corrections to the implementations</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Table 2 of the erratum, grouped as the erratum groups it into software and hardware.</p>
+
+    <h4 style="margin:0 0 6px">Software</h4>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Issue</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td>Allocation failure</td><td><span class="mono">pad_message()</span> returns <span class="mono">0</span> if allocation fails; the internal hash function detects this and returns <span class="mono">&minus;1</span>; <span class="mono">CryptHash()</span> propagates the error.</td></tr>
+        <tr><td>Non-full-byte string</td><td>After copying the input, <span class="mono">pad_message()</span> masks the unused low-order bits of the final byte when <span class="mono">msg_bits % 8 != 0</span>. Those bits are cleared before compression.</td></tr>
+        <tr><td>Length representability</td><td>Before converting the input length to <span class="mono">size_t</span>, <span class="mono">CryptHash()</span> checks whether it is representable. <span class="mono">pad_message()</span> computes the rounded-up byte and block counts by division and remainder, then checks <span class="mono">num_blocks &gt; SIZE_MAX / BLOCK_BYTES</span> before computing the allocation size.</td></tr>
+        <tr><td>Non-compliant usage</td><td>The requested digest length is checked against the current version (512/768/1024) and an error is returned when it does not match.</td></tr>
+        <tr><td>Counter-word comments</td><td><span class="mono">hash_bits[0]</span> holds the high word; <span class="mono">hash_bits[1]</span> holds the low word.</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="margin:22px 0 6px">Hardware</h4>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Issue</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td>Current block length omitted in 1SC/4SC/8SC</td><td>The 1SC/4SC/8SC cores are revised so that the current block length is included in the compression input.</td></tr>
+        <tr><td>Block / final flag / cumulative length made transaction-consistent</td><td>The message block, the tweak (including the final flag and the cumulative bit count) and the initial chaining state are latched when a compression transaction is accepted, and preserved throughout compression.</td></tr>
+        <tr><td>Counter-word ordering</td><td>All RTL implementations use the same ordering: domain word 2 carries the upper 64 bits, domain word 3 the lower 64 bits.</td></tr>
+        <tr><td>Digest variants</td><td>All four architectures support 512/768/1024 configurations.</td></tr>
+        <tr><td>Parameter propagation</td><td>The top-level <span class="mono">DIGEST_BITS</span> parameter is forwarded to the core, which derives the version value and the output-word count; digest selection and MMIO address bounds now follow the configured output length.</td></tr>
+        <tr><td>Intermediate state exposure and clearing</td><td>The 1SC/2SC/4SC cores restrict the digest output to completed hashes; the top-level MMIO read path is restricted the same way.</td></tr>
+        <tr><td>README typo</td><td>Fixed so the README states that the four RTL architectures support three instances, and that the architecture names indicate SubColumn parallelism.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">3 &middot; Further text changes made in response to the assessment [2]</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">Beyond the typos, the erratum lists four additions the designers made after reading the community assessment.</p>
+    <ul class="tight">
+      <li>p. 18, &sect;4.2 &mdash; more detailed NIST SP 800-22 test results are provided.</li>
+      <li>p. 19, &sect;4.3.1 &mdash; the notations in the indifferentiability proof are unified to be fully consistent with FEILIAN, while sketching and adapting the HAIFA proof.</li>
+      <li>p. 37, &sect;6.2 &mdash; a footnote is added to emphasise the necessity of an unambiguous encoding of context and counter.</li>
+      <li>pp. 37&ndash;38, &sect;6.3 &mdash; a note is added clarifying that the XOF should be regarded as a <b>variable-output-length hash function</b>, leveraging the same FEILIAN-<i>f</i> compression function.</li>
+    </ul>
+  </div>
+
+  <div class="card rv" style="margin-top:22px">
+    <h3 style="margin-top:0">How this maps onto the findings of &sect;03</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The erratum is the designers' response to the assessment. Read against the R-numbers of &sect;03, the corrections above fall out as follows.</p>
+    <table style="font-size:13.5px">
+      <thead><tr><th>Finding</th><th>Status after v1.0.1</th></tr></thead>
+      <tbody>
+        <tr><td>R1 &mdash; hardware length-binding defect</td><td><b>Addressed.</b> The current block length is now included in the compression input for all four architectures, and the block, final flag and cumulative length are transaction-consistent.</td></tr>
+        <tr><td>R2 &mdash; specification/implementation divergences</td><td><b>Addressed.</b> The two typo corrections (IV<sub>7</sub>, AddConstant order) remove the printed discrepancies; the reference code was already the correct side.</td></tr>
+        <tr><td>R3 &mdash; Appendix B vector inconsistencies</td><td><b>Addressed.</b> Appendix B.2/B.3 are reprinted with the correct vectors under true message-length counts.</td></tr>
+        <tr><td>R4 &mdash; non-full-byte message handling</td><td><b>Addressed.</b> Unused low-order bits of the final byte are now masked before compression.</td></tr>
+        <tr><td>R5 &mdash; exceptional paths and digest-length validation</td><td><b>Addressed.</b> Allocation failure is propagated, length representability is checked, and a mismatched digest length now returns an error.</td></tr>
+        <tr><td>R6, R7 &mdash; scope and modelling of the security argument</td><td><b>Partly clarified.</b> The notation of the proof is unified (&sect;4.3.1) and the encoding/XOF footnotes (&sect;6.2&ndash;6.3) are added; the argument still has to be read against its stated interface, as &sect;03 sets out.</td></tr>
+        <tr><td>R8 &mdash; test-infrastructure defects</td><td><b>Not covered by this erratum.</b> The erratum makes no claim about the shared KAT/DRNG tooling; see &sect;03.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= SOURCES ================= -->
+<section id="sources">
+  <p class="eyebrow rv">Sources</p>
+  <h2 class="rv">Documents referenced</h2>
   <div class="card rv">
-    <div class="ref">[1] Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal — submitted to the Next-generation Cryptographic Algorithms Program, China</i>. Revision 29 September 2026, 70 pages. SHA-256 <span class="mono">7f498f6c4830f78d5f40c1c21b9ad41e0c33dc4d20a91c7277c3add8c4144255</span>.</div>
-    <div class="ref">[2] Mounir IDRASSI. <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
-    <div class="ref">[3] E. Biham, O. Dunkelman. <i>A Framework for Iterative Hash Functions — HAIFA</i>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
-    <div class="ref">[4] J. Black, P. Rogaway, T. Shrimpton. <i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i>, CRYPTO 2002, LNCS 2442.</div>
-    <div class="ref">[5] J. Kelsey, B. Schneier. <i>Second Preimages on n-Bit Hash Functions for Much Less than 2ⁿ Work</i>, EUROCRYPT 2005, LNCS 3494 — the attack class that the tweak counter is designed to defeat.</div>
-    <div class="ref">[6] NIST. <i>SP 800-22 Rev. 1a — A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</i>.</div>
-    <div class="ref">[7] Markku-Juhani O. Saarinen. <i>FEILIAN (hash-10)</i>, personal report, ngcc.dev, 23 &amp; 26 September 2026.</div>
+    <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download</a>. A two-page erratum recording every change from v1.0 is distributed with it (§04).</div>
+    <div class="ref"><b>[2]</b> Mounir Idrassi (AM Crypto, Japan). <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, version 1.0.2, 27 September 2026, 14 pp. CC BY 4.0. Findings R1–R8.</div>
+    <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <i>FEILIAN (hash-10)</i>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site.</div>
+    <div class="ref"><b>[4]</b> Mounir Idrassi. <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
+    <div class="ref"><b>[5]</b> E. Biham, O. Dunkelman. <i>A Framework for Iterative Hash Functions — HAIFA</i>, IACR Cryptology ePrint Archive, Report 2007/278.</div>
+    <div class="ref"><b>[6]</b> J. Black, P. Rogaway, T. Shrimpton. <i>Black-Box Analysis of the Block-Cipher-Based Hash-Function Constructions from PGV</i>, CRYPTO 2002, LNCS 2442.</div>
+    <div class="ref"><b>[7]</b> T. Ristenpart, H. Shacham, T. Shrimpton. <i>Careful with Composition: Limitations of the Indifferentiability Framework</i>, EUROCRYPT 2011, LNCS 6632.</div>
+    <div class="ref"><b>[8]</b> J. Kelsey, B. Schneier. <i>Second Preimages on n-Bit Hash Functions for Much Less than 2ⁿ Work</i>, EUROCRYPT 2005, LNCS 3494.</div>
+    <div class="ref"><b>[9]</b> NIST. <i>SP 800-22 Rev. 1a — A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</i>.</div>
+    <div class="ref"><b>[10]</b> H. Krawczyk, P. Eronen. <i>HMAC-based Extract-and-Expand Key Derivation Function (HKDF)</i>, RFC 5869, May 2010.</div>
   </div>
 </section>
 
@@ -734,10 +619,10 @@ b62f926c28f0e45f 7ccb8b9c22780964 46141c07e46f78a0 14ab284f37e6d4fd</pre>
 
 <footer>
   <div class="wrap">
-    <p><b>FEILIAN — Specification Compendium</b> · release v1.0.0 · 8 October 2026</p>
-    <p>Sources: <i>FEILIAN: A Hash Function Proposal</i>, submitted to the NGCC-CH programme of the Institute of Commercial Cryptography Standards, China — revision 2026-09-29, 70 pp.; and M. Idrassi, <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236. Every parameter, test vector and measurement is transcribed from these documents; the performance figures are the values reported in Chapter 5 of the specification and were not remeasured here.</p>
+    <p><b>FEILIAN — Submission Overview</b> · release v1.2.0 · 9 October 2026</p>
+    <p>An unofficial compendium. It presents published material — the specification, the independent assessment [2], the ngcc.dev report [3] and the ePrint paper [4] — and makes no claim of its own about the algorithm. Where this page and an authoritative document disagree, the specification and the original papers prevail. The performance and security figures of the specification are reproduced nowhere on this page by design; consult the PDF.</p>
     <p>Compendium text and figures: <a href="LICENSE">CC BY 4.0</a>. The specification PDF and the implementations remain © their authors and are redistributed as filed — see <a href="NOTICE.md">NOTICE</a>.</p>
-    <p>Specification SHA-256 <span class="mono">7f498f6c4830f78d5f40c1c21b9ad41e0c33dc4d20a91c7277c3add8c4144255</span> · <a href="files/SHA256SUMS.txt">checksums</a> · <a href="https://github.com/PENNYBENNY/FEILIAN">source repository</a></p>
+    <p>Specification SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span> · <a href="files/SHA256SUMS.txt">checksums</a> · <a href="https://github.com/PENNYBENNY/FEILIAN">source repository</a></p>
   </div>
 </footer>
 
@@ -750,14 +635,17 @@ b62f926c28f0e45f 7ccb8b9c22780964 46141c07e46f78a0 14ab284f37e6d4fd</pre>
 /* DOWNLOADS:BEGIN */
 var DOWNLOADS = [
   {id:"spec", title:"Specification",
-   sub:"PDF · revision 2026-09-29 · 70 pp.",
-   file:"files/specification.pdf", size:"649.1 KB", sha:"7f498f6c4830f78d…", ready:true},
+   sub:"PDF · version 1.0.1 · 8 October 2026 · 69 pp.",
+   file:"files/specification.pdf", size:"649.8 KB", sha:"2d14bcf877eb9fbd…", ready:true},
+  {id:"erratum", title:"Erratum",
+   sub:"PDF · corrections from v1.0 to v1.0.1 · October 2026",
+   file:"files/FEILIAN_Erratum.pdf", size:"123.9 KB", sha:"04969502772e3d2f…", ready:true},
   {id:"code", title:"Reference code",
-   sub:"C (reference + AVX2/SIMD) and SystemVerilog cores",
-   file:"files/feilian-code.zip", size:"106.6 KB", sha:"fcb148478f5e06b1…", ready:true},
+   sub:"C (reference + AVX2/SIMD) and SystemVerilog cores · v1.0.1",
+   file:"files/feilian-code.zip", size:"107.9 KB", sha:"c9962a89df794f45…", ready:true},
   {id:"archive", title:"Full archive",
    sub:"Implementations, KAT vectors, Appendix B data and verification tooling",
-   file:"files/feilian-archive.zip", size:"9.94 MB", sha:"60a587d284415c79…", ready:true}
+   file:"files/feilian-archive.zip", size:"9.94 MB", sha:"c76e8fa4f3cc0970…", ready:true}
 ];
 var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
 /* DOWNLOADS:END */
@@ -799,7 +687,7 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
       ? 'SHA-256 values are those of the files exactly as served. Verify each download against '+
         '<a href="files/SHA256SUMS.txt">files/SHA256SUMS.txt</a> '+
         '<span class="mono">(sha256sum -c SHA256SUMS.txt)</span>.'
-      : 'No artifacts are published yet. Run FEILIAN_deploy/make_downloads.py to assemble and enable them.';
+      : 'No artifacts are published yet. Run tools/make_downloads.py to assemble and enable them.';
   }
 
   /* ---------- reveal on scroll ---------- */
@@ -842,18 +730,6 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
     });
   },{rootMargin:'-45% 0px -50% 0px'});
   sections.forEach(function(s){if(s)nio.observe(s);});
-
-  /* ---------- copy buttons ---------- */
-  document.querySelectorAll('.copy').forEach(function(b){
-    b.addEventListener('click',function(){
-      var tgt=b.getAttribute('data-target');
-      var node = (tgt==='vpanel-cur') ? document.querySelector('.vec-panel.on') : document.getElementById(tgt);
-      if(!node)return;
-      var txt=node.innerText;
-      var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};
-      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){});}
-    });
-  });
 
   /* ---------- hero hex ticker (IV, row-major) ---------- */
   var hexObj=document.getElementById('ticker');
@@ -926,98 +802,6 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
       timer=setInterval(function(){ cur=(cur+1)%5; paint(); },1000);
     }
   });
-
-  /* ---------- digest size switcher ---------- */
-  var seg=document.getElementById('vecseg'), hint=document.getElementById('vechint');
-  seg.querySelectorAll('button').forEach(function(b){
-    b.addEventListener('click',function(){
-      var v=b.getAttribute('data-v');
-      seg.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
-      document.querySelectorAll('.vec-panel').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-v')===v);});
-      hint.innerHTML='Output width: <b>'+v+' bit</b> · '+(v==='1024'?16:v==='768'?12:8)+' words';
-      document.querySelectorAll('#security tr[data-size]').forEach(function(tr){tr.classList.toggle('hl',tr.getAttribute('data-size')===v);});
-    });
-  });
-
-  /* ---------- Figure 2: cycles/byte line chart (spec Table 5.3) ---------- */
-  (function(){
-    var host=document.getElementById('cpbchart'); if(!host)return;
-    var LEN=[64,128,576,1024,1536,4096,64576];
-    var SERIES=[
-      {name:'FEILIAN-1024', color:'#4338ca', w:3,   d:[8.6875,4.34375,4.210069,3.735352,3.694661,3.669678,3.63632]},
-      {name:'SHA-512',      color:'#12805c', w:2,   d:[10.453125,8.640625,4.177083,4.077148,3.873698,3.591797,3.44004]},
-      {name:'BLAKE-64',     color:'#0ea5e9', w:2,   d:[6.640625,6.054688,3.255208,3.252930,3.108724,2.743408,2.661205]},
-      {name:'SHA-3-512',    color:'#b06a00', w:2,   d:[15.140625,10.742188,7.508681,6.689453,6.363932,5.970703,5.831408]}
-    ];
-    var W=900,H=430,ML=62,MR=150,MT=28,MB=54;
-    var pw=W-ML-MR, ph=H-MT-MB, YMAX=16, TICKS=8;
-    var xs=function(i){return ML+pw*i/(LEN.length-1);};
-    var ys=function(v){return MT+ph*(1-v/YMAX);};
-    var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cycles per byte by message length">'];
-    s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5a6478}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#8a94a8}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
-    for(var t=0;t<=TICKS;t++){
-      var v=YMAX*t/TICKS, y=ys(v);
-      s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#c8d2e6':'#eef2f9')+'" stroke-width="1"/>');
-      s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v.toFixed(1)+'</text>');
-    }
-    LEN.forEach(function(L,i){
-      s.push('<line x1="'+xs(i)+'" y1="'+(MT+ph)+'" x2="'+xs(i)+'" y2="'+(MT+ph+5)+'" stroke="#c8d2e6"/>');
-      s.push('<text class="ax" x="'+xs(i)+'" y="'+(MT+ph+21)+'" text-anchor="middle">'+L+'</text>');
-    });
-    s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-12)+'" text-anchor="middle">message length [bytes]</text>');
-    s.push('<text class="ax" transform="translate(16,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">cycles / byte</text>');
-    SERIES.forEach(function(se){
-      var pts=se.d.map(function(v,i){return xs(i)+','+ys(v);}).join(' ');
-      s.push('<polyline points="'+pts+'" fill="none" stroke="'+se.color+'" stroke-width="'+se.w+
-             '" stroke-linejoin="round" stroke-linecap="round"'+(se.w===3?'':' stroke-dasharray="5 4"')+'/>');
-      se.d.forEach(function(v,i){ s.push('<circle cx="'+xs(i)+'" cy="'+ys(v)+'" r="'+(se.w===3?4:2.8)+'" fill="#fff" stroke="'+se.color+'" stroke-width="2"/>'); });
-    });
-    SERIES.forEach(function(se,i){
-      var y=MT+14+i*24;
-      s.push('<line x1="'+(ML+pw+18)+'" y1="'+y+'" x2="'+(ML+pw+40)+'" y2="'+y+'" stroke="'+se.color+'" stroke-width="'+(se.w===3?3:2.4)+'"/>');
-      s.push('<text class="lg" x="'+(ML+pw+47)+'" y="'+(y+4)+'" fill="'+(se.w===3?'#4338ca':'#5a6478')+'">'+se.name+'</text>');
-    });
-    s.push('</svg>');
-    host.innerHTML=s.join('');
-  })();
-
-  /* ---------- Figure 3: FPGA throughput grouped bars (spec Table 5.5) ---------- */
-  (function(){
-    var host=document.getElementById('fpgachart'); if(!host)return;
-    var CAT=['[8SC]','[4SC]','[2SC]','[1SC]'];
-    var SER=[
-      {name:'Virtex-5 xc5vlx110', color:'#4338ca', d:[2925.7,2105.4,986.1,644.3]},
-      {name:'Zynq-7000 xc7z100',  color:'#0ea5e9', d:[4139.8,3566.5,1443.7,886.0]}
-    ];
-    var W=900,H=380,ML=70,MR=190,MT=26,MB=58, pw=W-ML-MR, ph=H-MT-MB, YMAX=4500, TICKS=5;
-    var slot=pw/CAT.length, bw=Math.min(74,(slot-42)/2);
-    var ys=function(v){return MT+ph*(1-v/YMAX);};
-    var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="FPGA throughput by architecture">'];
-    s.push('<style>.ax{font-family:Inter,Segoe UI,Arial;font-size:12px;fill:#5a6478}.tk{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#8a94a8}.vl{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;fill:#3b4660}.lg{font-family:Inter,Arial;font-size:12.5px;font-weight:600}</style>');
-    for(var t=0;t<=TICKS;t++){
-      var v=YMAX*t/TICKS, y=ys(v);
-      s.push('<line x1="'+ML+'" y1="'+y+'" x2="'+(ML+pw)+'" y2="'+y+'" stroke="'+(t===0?'#c8d2e6':'#eef2f9')+'"/>');
-      s.push('<text class="tk" x="'+(ML-9)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>');
-    }
-    CAT.forEach(function(c,i){
-      var cx=ML+slot*i+slot/2;
-      SER.forEach(function(se,j){
-        var x=cx-slot/2+21+j*(bw+8), v=se.d[i], y=ys(v), h=MT+ph-y;
-        s.push('<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h)+'" rx="5" fill="'+se.color+'"/>');
-        s.push('<text class="vl" x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle">'+v.toFixed(1)+'</text>');
-      });
-      s.push('<text class="ax" x="'+cx+'" y="'+(MT+ph+22)+'" text-anchor="middle">'+c+'</text>');
-    });
-    s.push('<text class="ax" x="'+(ML+pw/2)+'" y="'+(H-8)+'" text-anchor="middle">architectures: number of SubColumn units instantiated</text>');
-    s.push('<text class="ax" transform="translate(18,'+(MT+ph/2)+') rotate(-90)" text-anchor="middle">throughput [Mbps]</text>');
-    SER.forEach(function(se,i){
-      var y=MT+18+i*24;
-      s.push('<rect x="'+(ML+pw+18)+'" y="'+(y-7)+'" width="12" height="12" rx="3" fill="'+se.color+'"/>');
-      s.push('<text class="lg" x="'+(ML+pw+37)+'" y="'+(y+4)+'" fill="#5a6478">'+se.name+'</text>');
-    });
-    s.push('</svg>');
-    host.innerHTML=s.join('');
-  })();
 })();
 </script>
 </body>
