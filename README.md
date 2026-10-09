@@ -1,17 +1,16 @@
-# FEILIAN — Specification Compendium
+# FEILIAN — Submission Overview
 
-**A structured, self-contained presentation of the FEILIAN hash function**, submitted to the
-NGCC-CH programme of the Institute of Commercial Cryptography Standards (ICCS), China, under the
-designation `hash-10`.
+**The overview page for FEILIAN**, the hash function submitted to the NGCC-CH programme of the
+Institute of Commercial Cryptography Standards (ICCS), China, under the designation `hash-10`.
 
 **Live site — <https://pennybenny.github.io/FEILIAN/>**
 
-The page is organised around four things: an **introduction** to the design, the **artifacts** —
-downloadable, checksummed, with the update log of the material distributed — the **independent
-third-party analyses**, each finding listed with its current status, and the **erratum** in which the
-designers record every change from v1.0 to v1.0.1. Detailed specification tables are deliberately
-kept out of the page and left to the PDF; the page carries a one-screen summary and a single
-interactive figure.
+The page is organised as five chapters: an **introduction** to the design, a **live demonstration**
+that computes digests in the browser, the **artifacts** — downloadable and checksummed, with the
+revision history of the submission — the **independent third-party analyses**, each finding listed
+with its current status, and the **erratum** in which the designers record every change from v1.0 to
+v1.0.1. Detailed specification tables are deliberately kept out of the page and left to the PDF; the
+page carries a one-screen summary and a single interactive figure.
 
 The third-party material presented is the technical assessment by Mounir Idrassi (findings R1–R8),
 the ngcc.dev report by Markku-Juhani O. Saarinen, and the component-level analysis in Cryptology
@@ -19,8 +18,8 @@ ePrint 2026/2236. None of them establishes a full-round cryptanalytic break, and
 that boundary as plainly as they do.
 
 It is one HTML file with **no build step, no framework and no external dependencies**. Every figure
-is inline SVG or plain JavaScript, so it renders identically offline, from `file://`, and from any
-static host.
+is inline SVG or plain JavaScript, and the live demo's hash core is inlined into the same file, so
+the page renders and the demo runs identically offline, from `file://`, and from any static host.
 
 ---
 
@@ -29,9 +28,10 @@ static host.
 | § | Section | What it covers |
 |---|---|---|
 | 1 | Introduction | The design in brief — 1024-bit state and block, the tweakable ARX permutation, Davies–Meyer, the public tweak — with an interactive five-phase figure and a one-table parameter summary. Detail beyond that is in the PDF |
-| 2 | Downloads | The specification, the implementations and the full archive, each with its SHA-256, plus the update log and a note on which revision is which |
-| 3 | Third-party analysis | The three independent sources, the R1–R8 findings table with the status of each against the material distributed here, and the ePrint 2026/2236 component result |
-| 4 | Erratum | The designers' erratum from v1.0 to v1.0.1 reproduced in full — the specification typo corrections, the software and hardware implementation corrections, the further text changes made in response to the assessment, and how each maps onto R1–R8 |
+| 2 | Live demonstration | A JavaScript port of the compression function running in the page: text / hex / bit-string input, 512 / 768 / 1024 output, a known-answer self-test against the Appendix B vectors, and the timings it measures itself |
+| 3 | Downloads | The specification, the erratum, the implementations and the full archive, each with its SHA-256, plus the revision history of the submission and a note on which revision is which |
+| 4 | Third-party analysis | The three independent sources, the R1–R8 findings table with the status of each against the material released here, and the ePrint 2026/2236 component result |
+| 5 | Erratum | The designers' erratum from v1.0 to v1.0.1 reproduced in full — the specification typo corrections, the software and hardware implementation corrections, the further text changes made in response to the assessment, and how each maps onto R1–R8 |
 | — | Sources | Documents referenced |
 
 ---
@@ -121,16 +121,16 @@ disabled button rather than a dead link.
 
 ## Provenance, authorship and licensing
 
-The compendium is **unofficial**. It is a presentation of published material, it is not part of the
-submission, and it is not endorsed by the designers. Every parameter, test vector and measurement
-on the page is transcribed from the sources listed above; where the compendium and an authoritative
-document disagree, the specification and the original papers prevail.
+This page is **part of the submission**. It is the entry point published for the hash-10 submission:
+the specification and the erratum as released, the implementations, and the third-party analyses the
+submission has received. Every parameter, test vector and measurement on the page is taken from the
+sources listed above; where the page and the specification disagree, the specification prevails.
 
 **The specification is by** Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi and Xin Yi
 (Shanghai Jiao Tong University; Jinan University; Xiamen University).
 
-**The component analysis of §3 is by** Mounir Idrassi (AM Crypto, Japan), Cryptology ePrint Archive,
-Report 2026/2236, distributed under CC BY 4.0. **The technical assessment of §3 is by** the same
+**The component analysis of §4 is by** Mounir Idrassi (AM Crypto, Japan), Cryptology ePrint Archive,
+Report 2026/2236, distributed under CC BY 4.0. **The technical assessment of §4 is by** the same
 author, version 1.0.2, 27 September 2026, also CC BY 4.0. **The ngcc.dev report** is by
 Markku-Juhani O. Saarinen; ngcc.dev is his personal site and states that it is unaffiliated with
 NICCS — its identifiers and editorial labels belong to that site and are not official competition
@@ -140,8 +140,8 @@ Licensing is split, because the repository contains two kinds of material:
 
 | Material | Terms |
 |---|---|
-| The compendium — `index.html`, the documentation, `tools/` | **CC BY 4.0** — see [`LICENSE`](LICENSE) |
-| `files/specification.pdf`, `files/FEILIAN_Erratum.pdf`, `files/feilian-code.zip`, `files/feilian-archive.zip` | redistributed as filed; all rights remain with the authors; **no licence granted** |
+| This page — `index.html`, the documentation, `tools/` | **CC BY 4.0** — see [`LICENSE`](LICENSE) |
+| `files/specification.pdf`, `files/FEILIAN_Erratum.pdf`, `files/feilian-code.zip`, `files/feilian-archive.zip` | the submission material, released here as filed; all rights remain with the designers; **no licence granted** |
 | `files/SHA256SUMS.txt` | checksums — copy freely |
 
 See [`NOTICE.md`](NOTICE.md) for the full statement. If you are a rights holder and want any file
@@ -164,19 +164,19 @@ The component analysis:
 > Components.* Cryptology ePrint Archive, Report 2026/2236, 2026.
 > <https://eprint.iacr.org/2026/2236>
 
-This compendium, if you need to point at it:
+The submission's overview page, if you need to point at it:
 
-> *FEILIAN Specification Compendium* (v1.2.0), <https://pennybenny.github.io/FEILIAN/>
+> *FEILIAN (hash-10) — Submission Overview* (v1.3.0), <https://pennybenny.github.io/FEILIAN/>
 
 ---
 
 ## Corrections
 
-Errors in the transcription or presentation are the responsibility of this repository, not of the
-FEILIAN designers. Please open an issue for any discrepancy — a wrong constant, a mistyped vector,
-a misattributed figure — and it will be fixed and recorded in [`CHANGELOG.md`](CHANGELOG.md).
+Errors in the presentation are the responsibility of this repository. Please open an issue for any
+discrepancy — a wrong constant, a mistyped vector, a misattributed figure — and it will be fixed and
+recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Release history
 
-See [`CHANGELOG.md`](CHANGELOG.md). Current release: **v1.2.0** (9 October 2026), tracking
+See [`CHANGELOG.md`](CHANGELOG.md). Current release: **v1.3.0** (9 October 2026), tracking
 specification **v1.0.1** (8 October 2026).

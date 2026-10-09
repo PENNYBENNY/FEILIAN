@@ -1,7 +1,7 @@
 # Deployment and maintenance
 
 Operational notes for this repository. Nothing here is needed to *read* the
-compendium — it is the maintenance manual for whoever publishes it.
+page — it is the maintenance manual for whoever publishes it.
 
 - Live site: <https://pennybenny.github.io/FEILIAN/>
 - Repository: <https://github.com/PENNYBENNY/FEILIAN>
@@ -18,6 +18,14 @@ tracked; use `git push -u origin main` the first time.
 
 There is no build step. `index.html` is the whole site — one file, no external
 dependencies, no bundler, no CDN. What you commit is what is served.
+
+The live demonstration in §2 is inlined into that same file, so the page stays
+self-contained: its stylesheet is scoped under `#demo` and its script is wrapped
+in an IIFE, so neither can reach the rest of the page. The block is generated
+from the standalone demo (`feilian-live-demo.html`) kept alongside the submission
+workspace. Regenerate the whole `<section id="demo">` element together with its
+inlined `<style>` and `<script>` if the demo core ever changes — the three are a
+matched set, and hand-patching one in isolation will desynchronise them.
 
 ## Enabling Pages for the first time
 

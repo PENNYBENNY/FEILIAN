@@ -4,14 +4,14 @@ Provenance, authorship and rights for everything in this repository.
 
 ## What this repository is
 
-An **unofficial compendium** of the FEILIAN hash function, submitted to the
-NGCC-CH programme of the Institute of Commercial Cryptography Standards (ICCS),
-China, under the designation `hash-10`.
+The **overview page of the FEILIAN submission** — the hash function submitted to the NGCC-CH
+programme of the Institute of Commercial Cryptography Standards (ICCS), China, under the designation
+`hash-10`.
 
-The compendium is a *presentation* of published material. It is not part of the
-submission, it is not endorsed by the designers, and it makes no claim of its
-own about the algorithm. Where the compendium and an authoritative document
-disagree, the specification and the original papers prevail.
+The page is **part of the submission**. It is the entry point published for the submission: the
+specification and the erratum as released, the implementations, and the third-party analyses the
+submission has received. Every parameter, test vector and measurement on the page is taken from the
+sources below; where the page and the specification disagree, the specification prevails.
 
 ## The specification
 
@@ -20,8 +20,8 @@ disagree, the specification and the original papers prevail.
 > Version 1.0.1, 8 October 2026, 69 pp.
 
 The designers released a two-page **erratum** together with version 1.0.1,
-recording every change from the June 2026 text. It is redistributed in `files/`
-and reproduced in the compendium's section 4.
+recording every change from the June 2026 text. It is published in `files/` and
+reproduced in section 5 of the page.
 
 Designers / submitters, as printed on the specification's title page:
 
@@ -34,13 +34,14 @@ Designers / submitters, as printed on the specification's title page:
 | Zicheng Shi | Shanghai Jiao Tong University, Shanghai, China |
 | Xin Yi | Shanghai Jiao Tong University, Shanghai, China |
 
-An English translation of the compendium's own summary of the design, and the
-specification's Chapters 1–6, are the source of every parameter, test vector and
-measurement reproduced in `index.html`.
+The specification's Chapters 1–6 are the source of every parameter, test vector
+and measurement reproduced in `index.html`. The live demonstration of section 2
+runs a JavaScript port of the reference compression function; its self-test
+checks that port against the canonical Appendix B vectors at load time.
 
 ## Third-party analyses
 
-Three independent sources are presented in the compendium's section 3.
+Three independent sources are presented in section 4 of the page.
 
 > Mounir Idrassi (AM Crypto, Japan). *A Complete Classification of Whole-Output
 > Linear Structures in FEILIAN-Type Components*, Cryptology ePrint Archive,
@@ -69,9 +70,10 @@ labels — including the entry names `hash-10-1` … `hash-10-5` — belong to t
 site and are not official competition assessments. The compendium cites it as
 prior work and as a publication venue, not as an authority.
 
-The **status column** of the findings table records the state of the material
-distributed in this repository. It is not a statement by any reviewer, and where
-it and a reviewer's document disagree, the reviewer's document prevails.
+The **status column** of the findings table records the status of each finding
+against the material released here, as assessed by the submission. It is not a
+statement by any reviewer, and where it and a reviewer's document disagree, the
+reviewer's document prevails.
 
 ## Rights in the files under `files/`
 
@@ -80,12 +82,11 @@ and `files/feilian-archive.zip` are **submission material**. Copyright in the
 specification, in the erratum and in the implementations remains with their
 designers and submitters.
 
-They are redistributed here, as filed, so that the compendium's figures can be
-checked against their sources and so that reviewers and implementers can work
-from the same bytes. **No licence to this material is granted or implied.**
-The CC BY 4.0 licence in `LICENSE` applies to the compendium only, and explicitly
-excludes these files. `files/SHA256SUMS.txt`, being a list of checksums, may be
-copied freely.
+They are published here, as released, as part of the submission itself.
+**No licence to this material is granted or implied** beyond that publication.
+The CC BY 4.0 licence in `LICENSE` applies to the page text and figures only, and
+explicitly excludes these files. `files/SHA256SUMS.txt`, being a list of
+checksums, may be copied freely.
 
 If you are a rights holder and want any of these files removed, open an issue in
 this repository or contact the repository owner and it will be withdrawn
@@ -93,7 +94,7 @@ promptly.
 
 ## Integrity
 
-The specification and the erratum are redistributed byte-for-byte as received.
+The specification and the erratum are published byte-for-byte as released.
 Their SHA-256 digests are
 
 ```
@@ -113,7 +114,7 @@ reproduces the same digests.
 
 ## Corrections
 
-Errors in the compendium's transcription or presentation are the responsibility
-of the repository owner, not of the FEILIAN designers. Please open an issue for
-any discrepancy found — a wrong constant, a mistyped vector, a misattributed
-figure — and it will be corrected and noted in `CHANGELOG.md`.
+Errors in the page's transcription or presentation are the responsibility of the
+repository owner. Please open an issue for any discrepancy found — a wrong
+constant, a mistyped vector, a misattributed figure — and it will be corrected and
+noted in `CHANGELOG.md`.

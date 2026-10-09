@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FEILIAN — Introduction, Artifacts and Third-Party Analysis</title>
-<meta name="description" content="FEILIAN (hash-10), a candidate hash function submitted to the NGCC-CH programme: what the design is, the documents and reference code distributed with it, and the independent third-party security analyses with the current status of each finding.">
+<title>FEILIAN (hash-10) — Introduction, Live Demo, Artifacts and Analysis</title>
+<meta name="description" content="FEILIAN (hash-10), the hash function submitted to the NGCC-CH programme: the design, a live in-browser digest demo, the documents and implementations released with it, and the independent third-party security analyses with the current status of each finding.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FEILIAN — Submission Overview">
-<meta property="og:title" content="FEILIAN — Introduction, Artifacts and Third-Party Analysis">
-<meta property="og:description" content="An introduction to the FEILIAN hash function (NGCC-CH, hash-10), the artifacts that document it, and the independent third-party analyses with the status of each finding.">
+<meta property="og:title" content="FEILIAN (hash-10) — Introduction, Live Demo, Artifacts and Analysis">
+<meta property="og:description" content="An introduction to the FEILIAN hash function (NGCC-CH, hash-10), a live in-browser digest demo, the artifacts that document it, and the independent third-party analyses with the status of each finding.">
 <meta property="og:url" content="https://pennybenny.github.io/FEILIAN/">
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="FEILIAN — Introduction, Artifacts and Third-Party Analysis">
-<meta name="twitter:description" content="Introduction, downloadable artifacts, and the third-party security analyses of the FEILIAN hash function (hash-10).">
+<meta name="twitter:title" content="FEILIAN (hash-10) — Introduction, Live Demo, Artifacts and Analysis">
+<meta name="twitter:description" content="Introduction, a live in-browser hash demo, downloadable artifacts, and the third-party security analyses of the FEILIAN hash function (hash-10).">
 <!-- Scholarly indexing metadata for the underlying specification. -->
 <meta name="citation_title" content="FEILIAN: A Hash Function Proposal (submitted specification, version 1.0.1, 8 October 2026)">
 <meta name="citation_author" content="Lei Wang">
@@ -63,8 +63,6 @@
                       linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
      background-size:44px 44px;mask-image:radial-gradient(700px 400px at 30% 20%,#000,transparent 75%)}
   header.hero .wrap{position:relative;z-index:2}
-  .herogrid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
-  @media(max-width:860px){.herogrid{grid-template-columns:1fr;gap:26px}}
   .kicker{display:inline-flex;align-items:center;gap:8px;letter-spacing:.16em;text-transform:uppercase;
           font-size:11px;font-weight:600;color:#c7d2fe;
           border:1px solid rgba(199,210,254,.3);background:rgba(199,210,254,.08);
@@ -91,18 +89,6 @@
   .dl-btn.off{border-color:var(--line2);background:transparent;color:var(--ink-soft);cursor:not-allowed}
   .dl-btn.off:hover{transform:none;background:transparent}
 
-  .panel{background:rgba(10,14,40,.5);border:1px solid rgba(160,180,255,.25);border-radius:16px;
-         padding:16px 16px 14px;backdrop-filter:blur(8px);box-shadow:0 20px 50px -20px rgba(0,0,0,.6)}
-  .panel .bar{display:flex;gap:6px;margin-bottom:12px}
-  .panel .bar i{width:10px;height:10px;border-radius:50%;background:#3b4a7a;display:block}
-  .panel .bar i:nth-child(1){background:#ff5f57}.panel .bar i:nth-child(2){background:#febc2e}.panel .bar i:nth-child(3){background:#28c840}
-  .panel .ttl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#93a3d6;margin:0 0 8px}
-  .panel .hex{font-family:var(--mono);font-size:12.5px;color:#9ff0e0;word-break:break-all;min-height:52px;line-height:1.8}
-  .panel .hex b{color:#67e8f9;font-weight:600}
-  .panel .caret{display:inline-block;width:8px;height:15px;background:#9ff0e0;vertical-align:-2px;animation:blink 1s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-  .panel .foot{margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,180,255,.2);
-               font-size:11.5px;color:#93a3d6;display:flex;justify-content:space-between;font-family:var(--mono)}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
   .chip{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:8px;
         padding:6px 11px;font-size:12px;font-family:var(--mono);color:#e6ebfa}
@@ -212,6 +198,129 @@
            box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s}
   .toplink.show{opacity:1;pointer-events:auto}
   .toplink:hover{transform:translateY(-3px);text-decoration:none}
+
+#demo{--bg:#f7f8fb; --bg2:#eef1f8; --card:#ffffff; --ink:#161c28; --ink-soft:#5a6478;
+  --line:#e4e8f0; --line2:#d6dcea;
+  --p1:#4338ca; --p2:#0ea5e9; --accent:#4338ca; --accent-soft:#eef1fe;
+  --high:#c0271b; --med:#b06a00; --info:#0e6ba8; --ok:#12805c;
+  --grad:linear-gradient(120deg,#4338ca 0%,#5b53e0 42%,#0ea5e9 100%);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang SC",sans-serif;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);}
+#demo *{box-sizing:border-box}
+#demo .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+#demo h1,#demo h2,#demo h3{line-height:1.25;margin:0}
+#demo code,#demo .mono{font-family:var(--mono)}
+#demo .demo-head{color:#fff;padding:26px 0 24px;
+  background:radial-gradient(900px 380px at 12% -20%,#6d5ff0 0%,transparent 58%),
+             radial-gradient(700px 380px at 100% 0%,#19b6e8 0%,transparent 52%),
+             linear-gradient(150deg,#1b1f4b 0%,#2a2e6e 55%,#123a63 100%)}
+#demo .demo-head{display:flex;gap:28px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#demo .brand{display:flex;gap:15px;align-items:center}
+#demo .logo{width:46px;height:46px;flex:0 0 46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+      font-weight:800;font-size:22px;background:rgba(255,255,255,.12);border:1px solid rgba(199,210,254,.34);color:#c7d2fe}
+#demo .brand h3{font-size:27px;font-weight:800;letter-spacing:-.02em}
+#demo .brand h3 em{font-style:normal;font-weight:500;color:#a5b4fc}
+#demo .tag{margin:3px 0 0;font-size:13px;color:#d6ddf3;max-width:560px}
+#demo .stamp{display:flex;flex-direction:column;gap:7px;font-family:var(--mono);font-size:12px}
+#demo .stamp-row{display:flex;gap:10px;align-items:center}
+#demo .stamp .k{color:#93a3d6;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;width:74px}
+#demo .stamp .v{color:#e8ecfb}
+#demo .pill{border-radius:20px;padding:1px 9px;font-size:11px}
+#demo .pill.ok{background:rgba(40,200,120,.16);border:1px solid rgba(40,200,120,.4);color:#7ee2ac}
+#demo .pill.bad{background:rgba(255,90,80,.16);border:1px solid rgba(255,90,80,.42);color:#ff9b93}
+#demo .pill.run{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#cfd7ef}
+#demo .ctl{position:relative;z-index:1;background:rgba(247,248,251,.92);backdrop-filter:blur(10px);
+        border-bottom:1px solid var(--line)}
+#demo .ctl-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:11px 22px}
+#demo .grp{display:flex;gap:9px;align-items:center}
+#demo .grp .lbl{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+#demo .seg{display:inline-flex;background:#eef1f8;border:1px solid var(--line2);border-radius:9px;padding:3px;gap:3px}
+#demo .seg button{border:0;background:transparent;font-family:var(--sans);font-weight:600;font-size:13px;
+            color:var(--ink-soft);padding:6px 15px;border-radius:6px;cursor:pointer;transition:.16s}
+#demo .seg button:hover{color:var(--accent)}
+#demo .seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(20,30,60,.15)}
+#demo #bitlen{font-family:var(--mono);font-size:12.5px;width:112px;padding:7px 10px;border-radius:8px;
+        border:1px solid var(--line2);background:#fff;color:var(--ink)}
+#demo #bitlen:disabled{background:#f1f4fa;color:#98a2b8}
+#demo .btn{border:1px solid var(--line2);background:#fff;color:var(--ink);border-radius:8px;cursor:pointer;
+     font-family:var(--sans);font-size:12.5px;font-weight:600;padding:7px 14px;transition:.16s}
+#demo .btn:hover{border-color:var(--accent);color:var(--accent)}
+#demo .btn.solid{background:var(--accent);border-color:var(--accent);color:#fff}
+#demo .btn.solid:hover{background:#3129a8;color:#fff}
+#demo .demo-body{padding:22px 0 60px}
+#demo .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:960px){#demo .cols{grid-template-columns:1fr}}
+#demo .pane{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+      padding:18px 20px 16px;display:flex;flex-direction:column;min-height:330px}
+#demo .pane-hd{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+#demo .pane-hd h4{font-size:15px;font-weight:700;letter-spacing:.01em}
+#demo .hint{font-size:11.5px;color:var(--ink-soft);font-family:var(--mono);text-align:right}
+#demo textarea#inp{flex:1;width:100%;min-height:196px;resize:vertical;border:1px solid var(--line2);border-radius:10px;
+  padding:13px 14px;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--ink);
+  background:#fdfdff;outline:none;transition:border-color .16s}
+#demo textarea#inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+#demo textarea#inp::placeholder{color:#9aa4ba}
+#demo .digest{flex:1;min-height:196px;font-family:var(--mono);font-size:13.5px;display:flex;flex-direction:column;gap:6px}
+#demo .digest .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+@media(max-width:620px){#demo .digest .row{grid-template-columns:repeat(2,1fr)}}
+#demo .digest .w{background:#f4f7fd;border:1px solid var(--line);border-radius:6px;padding:5px 6px;text-align:center;
+           letter-spacing:.02em;transition:background .3s,color .3s}
+#demo .digest .w.fresh{background:#eaf0ff;border-color:#c3cef7;color:#2a2e6e}
+#demo .digest .ph{color:#9aa4ba;font-style:italic;font-family:var(--sans);font-size:13px}
+#demo .digest .wrap-any{word-break:break-all;color:var(--ink-soft);font-size:12.5px;line-height:1.7}
+#demo .stats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:13px;padding-top:11px;border-top:1px solid var(--line);
+       font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+#demo .stats b{color:var(--ink);font-weight:600}
+#demo .stats .sep{color:var(--line2)}
+#demo .verdict{margin:0 0 16px;border-radius:11px;padding:11px 16px;font-size:13.5px;display:flex;gap:11px;align-items:flex-start;
+         border:1px solid var(--line);background:#fff;color:var(--ink-soft)}
+#demo .verdict .badge{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;
+                text-transform:uppercase;padding:2px 9px;border-radius:20px;margin-top:2px}
+#demo .verdict.ok{background:#e8f6f0;border-color:#b7e2d0;color:#0f5c43}
+#demo .verdict.ok .badge{background:#12805c;color:#fff}
+#demo .verdict.info{background:var(--accent-soft);border-color:#ccd7fb;color:#33307e}
+#demo .verdict.info .badge{background:var(--accent);color:#fff}
+#demo .verdict.warn{background:#fdf6e8;border-color:#f1dcae;color:#7a4a00}
+#demo .verdict.warn .badge{background:#b06a00;color:#fff}
+#demo .verdict.err{background:#fdeeec;border-color:#f3bab4;color:#8c1e14}
+#demo .verdict.err .badge{background:#c0271b;color:#fff}
+#demo .verdict .msg{font-family:var(--mono);font-size:12.5px;word-break:break-word}
+#demo .verdict .msg .lead{font-family:var(--sans);font-size:13.5px;font-weight:600}
+#demo .verdict .msg .why{display:block;font-family:var(--sans);font-size:12.5px;opacity:.85;margin-top:3px}
+#demo .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+@media(max-width:900px){#demo .grid3{grid-template-columns:1fr}}
+#demo .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:17px 19px;box-shadow:var(--shadow)}
+#demo .card h3{font-size:13px;font-weight:700;letter-spacing:.02em;margin-bottom:9px}
+#demo .card p{font-size:12.8px;color:var(--ink-soft);margin:0 0 8px}
+#demo .card ul{margin:0;padding-left:17px;font-size:12.7px;color:var(--ink-soft)}
+#demo .card li{margin:5px 0}
+#demo .card li code{font-size:12px;color:var(--ink);background:#f2f5fb;padding:1px 5px;border-radius:4px}
+#demo table{border-collapse:collapse;width:100%;font-size:12.6px;margin:2px 0}
+#demo th,#demo td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+#demo th{background:#f2f5fb;font-weight:600}
+#demo tbody tr:nth-child(even){background:#fafbfe}
+#demo td.m{font-family:var(--mono);font-size:12px}
+#demo .tagline{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap}
+#demo .t-ok{background:#e5f5ee;color:#12805c}
+#demo .t-ui{background:#e7f2fb;color:#0e6ba8}
+#demo .t-sp{background:#fdecea;color:#c0271b}
+#demo .t-po{background:#fdf3e2;color:#b06a00}
+#demo .kats{font-family:var(--mono);font-size:11.5px}
+#demo .kats td{word-break:break-all}
+#demo .kats .pass{color:#12805c;font-weight:700}
+#demo .kats .fail{color:#c0271b;font-weight:700}
+#demo .demo-src{border-top:1px solid var(--line);background:var(--bg2);padding:22px 0 40px;color:var(--ink-soft);font-size:12.5px}
+#demo .src{font-family:var(--mono);font-size:11.5px;word-break:break-all}
+/* ============ live demonstration (#demo) ============ */
+#demo .demo{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+#demo .demo-head{padding:20px 22px}
+#demo .ctl-row{padding:11px 22px}
+#demo .demo-body{padding:20px 22px 22px}
+#demo .demo-src{border-top:1px solid var(--line);background:var(--bg2);padding:12px 22px}
+#demo .wrap{max-width:none;margin:0;padding:0}
+#demo .logo{background:rgba(255,255,255,.14)}
+#demo > h2{margin:0 0 10px}   /* the demo's own h1-h3 reset must not flatten the section title */
 </style>
 </head>
 <body>
@@ -220,30 +329,21 @@
 <!-- ================= HERO ================= -->
 <header class="hero">
   <div class="wrap">
-    <div class="herogrid">
-      <div>
-        <p class="kicker"><span class="dot"></span> NGCC-CH Submission · hash-10</p>
-        <h1><span>FEILIAN</span></h1>
-        <p class="sub">A 1024-bit ARX hash function submitted to the Next-generation Commercial Cryptographic Algorithms programme. This page is the front door to the submission: what the design is, the documents and reference code distributed with it, and the independent third-party analyses — with the current status of every finding they raise.</p>
-        <div class="cta">
-          <a href="#introduction" class="btn p">Introduction →</a>
-          <a href="#downloads" class="btn g">Downloads</a>
-          <a href="#analysis" class="btn g">Third-party analysis</a>
-        </div>
-        <div class="chips">
-          <span class="chip"><b>Revision</b> v1.0.1 · 2026-10-08</span>
-          <span class="chip"><b>Designation</b> hash-10</span>
-          <span class="chip"><b>Digest</b> 512 / 768 / 1024</span>
-          <span class="chip"><b>State</b> 1024-bit</span>
-          <span class="chip"><b>Independent reviews</b> 3</span>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="bar"><i></i><i></i><i></i></div>
-        <p class="ttl">live · initial vector (π-derived)</p>
-        <div class="hex" id="ticker"></div>
-        <div class="foot"><span>IV[0..15]</span><span id="tickmeta">1024-bit</span></div>
-      </div>
+    <p class="kicker"><span class="dot"></span> NGCC-CH Submission · hash-10</p>
+    <h1><span>FEILIAN</span></h1>
+    <p class="sub">A 1024-bit ARX hash function submitted to the Next-generation Commercial Cryptographic Algorithms programme. This is the submission's own overview: what the design is, the documents and implementations released with it, and the independent third-party analyses — each finding with its current status.</p>
+    <div class="cta">
+      <a href="#introduction" class="btn p">Introduction →</a>
+      <a href="#demo" class="btn g">Live demo</a>
+      <a href="#downloads" class="btn g">Downloads</a>
+      <a href="#analysis" class="btn g">Third-party analysis</a>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>Revision</b> v1.0.1 · 2026-10-08</span>
+      <span class="chip"><b>Designation</b> hash-10</span>
+      <span class="chip"><b>Digest</b> 512 / 768 / 1024</span>
+      <span class="chip"><b>State</b> 1024-bit</span>
+      <span class="chip"><b>Independent reviews</b> 3</span>
     </div>
   </div>
 </header>
@@ -252,6 +352,7 @@
 <nav class="toc" id="toc">
   <div class="wrap">
     <a href="#introduction">Introduction</a>
+    <a href="#demo">Live demo</a>
     <a href="#downloads">Downloads</a>
     <a href="#analysis">Third-party analysis</a>
     <a href="#erratum">Erratum</a>
@@ -345,30 +446,149 @@
   </div>
 
   <div class="callout rv">
-    Security claims (specification Table 4.1) and the arguments behind them are <b>not</b> reproduced here — their status is exactly what the third-party analyses in §03 discuss. Continue to <a href="#analysis">Third-party analysis →</a>.
+    Security claims (specification Table 4.1) and the arguments behind them are <b>not</b> reproduced here — their status is exactly what the third-party analyses in §04 discuss. Continue to <a href="#analysis">Third-party analysis →</a>.
+  </div>
+</section>
+
+<!-- ================= LIVE DEMO ================= -->
+<section id="demo">
+  <p class="eyebrow rv">02 — Live demonstration</p>
+  <h2 class="rv">Hash it yourself, in this page</h2>
+  <p class="lead rv">Every digest below is computed in your browser by a JavaScript port of the compression function, locked to the reference-code convention and self-tested against the canonical Appendix&nbsp;B vectors before any input is hashed. There is no server, no network call and no build step — the whole implementation is in the page source.</p>
+
+  <div class="demo">
+    <div class="demo-head">
+      <div class="brand">
+        <div class="logo">F</div>
+        <div>
+          <h3>FEILIAN <em>live hash</em></h3>
+          <p class="tag">Digests are computed in this page, in your browser. No server, no network, no build step.</p>
+        </div>
+      </div>
+      <div class="stamp">
+        <div class="stamp-row"><span class="k">core</span><span class="v">locked to the C reference convention</span></div>
+        <div class="stamp-row"><span class="k">self-test</span><span class="v" id="stampTest"><span class="pill run">running&hellip;</span></span></div>
+      </div>
+    </div>
+
+    <div class="ctl">
+      <div class="ctl-row">
+        <div class="grp">
+          <span class="lbl">digest</span>
+          <span class="seg" id="segBits">
+            <button data-v="512">512</button><button data-v="768">768</button><button data-v="1024" class="on">1024</button>
+          </span>
+        </div>
+        <div class="grp">
+          <span class="lbl">input</span>
+          <span class="seg" id="segMode">
+            <button data-v="text" class="on">text</button><button data-v="hex">hex</button><button data-v="bits">bits</button>
+          </span>
+        </div>
+        <div class="grp">
+          <span class="lbl">message bits</span>
+          <input id="bitlen" type="text" inputmode="numeric" placeholder="auto" disabled>
+        </div>
+        <div class="grp" style="margin-left:auto">
+          <button class="btn" id="btnSample">insert sample</button>
+          <button class="btn" id="btnCopy">copy digest</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-body">
+      <div class="verdict" id="verdict"><span class="badge">init</span><span class="msg">Starting the core&hellip;</span></div>
+
+      <div class="cols">
+        <div class="pane">
+          <div class="pane-hd">
+            <h4>Input</h4>
+            <span class="hint" id="inHint">UTF-8 text, byte-aligned</span>
+          </div>
+          <textarea id="inp" spellcheck="false" autocomplete="off"
+            placeholder="Type anything &mdash; the digest updates as you type."></textarea>
+          <div class="stats" id="inStats"></div>
+        </div>
+
+        <div class="pane">
+          <div class="pane-hd">
+            <h4>Digest</h4>
+            <span class="hint" id="outHint">FEILIAN-1024</span>
+          </div>
+          <div class="digest" id="out"></div>
+          <div class="stats" id="outStats"></div>
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <h3>Convention frozen in this core</h3>
+          <p>The core follows the reference implementation in every detail. The four points below are where the June&nbsp;2026 specification text and that implementation diverged; all four are reconciled in version&nbsp;1.0.1 (&sect;05), and this demo has always taken the implementation's reading.</p>
+          <ul>
+            <li>IV word at row&nbsp;1, col&nbsp;3 = <code>0x3F84D5B5B5470917</code> (v1.0 printed <code>0x3D&hellip;</code>; corrected in v1.0.1)</li>
+            <li>Round constants injected into row&nbsp;1 (v1.0 printed row&nbsp;3; corrected in v1.0.1)</li>
+            <li>Counter words, high 64 bits first</li>
+            <li>Final block counter = true message length, not a full 1024</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>What this accepts</h3>
+          <table>
+            <thead><tr><th>input</th><th>outcome</th><th>layer</th></tr></thead>
+            <tbody>
+              <tr><td class="m">text / hex / bit string</td><td>digest</td><td><span class="tagline t-ok">hashed</span></td></tr>
+              <tr><td class="m">hex, odd nibble count</td><td>rejected before decoding</td><td><span class="tagline t-ui">input</span></td></tr>
+              <tr><td class="m">hex, non-hex char</td><td>rejected before decoding</td><td><span class="tagline t-ui">input</span></td></tr>
+              <tr><td class="m">bit length &gt; supplied bits</td><td><span class="m">message too short: &hellip;</span></td><td><span class="tagline t-sp">spec</span></td></tr>
+              <tr><td class="m">bit length &ge; 2<sup>128</sup></td><td><span class="m">must fit the 128-bit counter</span></td><td><span class="tagline t-sp">spec</span></td></tr>
+              <tr><td class="m">input &gt; 8&nbsp;KiB</td><td>manual trigger, not automatic</td><td><span class="tagline t-po">policy</span></td></tr>
+              <tr><td class="m">input &gt; 1&nbsp;MiB</td><td>refused</td><td><span class="tagline t-po">policy</span></td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:9px">The <em>spec</em> layer is the ported core speaking; the <em>policy</em> layer is this page, and is not a specification limit.</p>
+        </div>
+
+        <div class="card">
+          <h3>Known-answer self-test</h3>
+          <p>Run on load against the canonical Appendix&nbsp;B vectors and the bit-level cases, before any user input is hashed.</p>
+          <table class="kats" id="katTable"><tbody><tr><td>running&hellip;</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Cost of one digest</h3>
+        <p>This core is a straightforward BigInt port: correct and portable, not fast. Measured in this tab:
+          roughly <b>190&ndash;260&nbsp;&micro;s per 1024-bit block</b>, i.e. about <b>0.5&nbsp;MB/s</b>. For comparison the supplied AVX2 C code
+          runs the same 20 rounds at roughly 730&nbsp;MB/s, and a 32-bit word-pair port measured about 17&nbsp;MB/s in the same engine.
+          Timings below are an average over repeated calls, so they are stable enough to compare, but they are a JavaScript
+          measurement and say nothing about the algorithm's own performance.</p>
+      </div>
+    </div>
+
+    <div class="demo-src">
+      <div class="src">core: feilian_bigint.js &nbsp;&middot;&nbsp; inlined at build time &nbsp;&middot;&nbsp; dadd22e5cdb176b684f3591bc42fbf6f5429a93f3d19502a202c0eabc5f29c1d<br>
+      engine: <span id="uaStamp"></span></div>
+    </div>
   </div>
 </section>
 
 <!-- ================= DOWNLOADS ================= -->
 <section id="downloads">
-  <p class="eyebrow rv">02 — Downloads</p>
-  <h2 class="rv">Artifacts and update log</h2>
-  <p class="lead rv">The documents and implementations as filed — specification <b>v1.0.1</b> (8 October 2026), the two-page erratum recording every change from v1.0, and the v1.0.1 reference, optimized and RTL code — plus the update log of the material distributed here. Each artifact publishes its SHA-256 so a download can be verified end to end.</p>
+  <p class="eyebrow rv">03 — Downloads</p>
+  <h2 class="rv">Artifacts and revision history</h2>
+  <p class="lead rv">The documents and implementations as released — specification <b>v1.0.1</b> (8 October 2026), the two-page erratum recording every change from v1.0, and the v1.0.1 reference, optimized and RTL code — plus the revision history of the submission itself. Each artifact publishes its SHA-256 so a download can be verified end to end.</p>
   <div id="dlgrid" class="grid3 rv"></div>
   <p class="tblcap rv" id="dlnote"></p>
 
   <div class="grid2" style="margin-top:22px">
     <div class="card rv">
-      <h3 style="margin-top:0">Update log</h3>
+      <h3 style="margin-top:0">Revision history of the submission</h3>
       <ul class="tl">
-        <li><span class="d">2026-10-09</span>Compendium <b>v1.2.0</b> — the artifacts distributed here move to specification <b>v1.0.1</b> and its erratum, and a section recording every change from v1.0 to v1.0.1 is added.</li>
-        <li><span class="d">2026-10-09</span>Compendium <b>v1.1.0</b> — restructured around the introduction, the artifacts and the third-party analyses; the detailed specification tables moved out of the page and into the PDF.</li>
-        <li><span class="d">2026-10-08</span>Specification <b>v1.0.1</b> (69 pp.), released with the erratum. Corrects the typographical errors of v1.0, reprints the 512/768 vectors of Appendix B, and refines the software and hardware implementations.</li>
-        <li><span class="d">2026-10-08</span>Compendium <b>v1.0.0</b> — first public release.</li>
-        <li><span class="d">2026-09-29</span>Specification <b>revision distributed previously</b> (70 pp.). Corrected the IV word 7 to <span class="mono">0x3F84D5B5B5470917</span>, fixed the AddConstant row placement, and reprinted Appendix B under true message-length counts.</li>
-        <li><span class="d">2026-09-27</span>M. Idrassi, <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, v1.0.2 (14 pp., CC BY 4.0). Same day: ePrint 2026/2236 submitted, approved 28 September.</li>
+        <li><span class="d">2026-10-08</span><b>Specification v1.0.1</b> (69 pp.) and the two-page <b>erratum</b>, released together. The erratum records the four typographical corrections of its Table 1, the software and hardware corrections of its Table 2, and four further text changes made in response to the assessment.</li>
+        <li><span class="d">2026-09-27</span>M. Idrassi, <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, v1.0.2 (14 pp., CC BY 4.0). The same day, ePrint 2026/2236 was submitted and approved on 28 September.</li>
         <li><span class="d">2026-09-26 · 09-23</span>M.-J. O. Saarinen publishes his FEILIAN (hash-10) report on ngcc.dev — entries <span class="mono">hash-10-1 … hash-10-5</span>.</li>
-        <li class="mute"><span class="d">2026-06-30</span>Original submission (68 pp.) — the revision examined by the third-party assessment.</li>
+        <li class="mute"><span class="d">2026-06-30</span><b>Original submission v1.0</b> (68 pp.) — the revision examined by the third-party assessment.</li>
       </ul>
     </div>
     <div class="card rv d1">
@@ -376,11 +596,11 @@
       <table style="font-size:13.5px">
         <thead><tr><th>Revision</th><th class="num">Pages</th><th>SHA-256 (prefix)</th></tr></thead>
         <tbody>
-          <tr><td>Examined by the assessment (§03, R1–R8)</td><td class="num">68</td><td class="mono">8e3a9a109f3188ab…</td></tr>
+          <tr><td>Examined by the assessment (§04, R1–R8)</td><td class="num">68</td><td class="mono">8e3a9a109f3188ab…</td></tr>
           <tr><td><b>Distributed here — v1.0.1</b></td><td class="num">69</td><td class="mono">2d14bcf877eb9fbd…</td></tr>
         </tbody>
       </table>
-      <p class="tblcap">The third-party assessment of §03 reviewed the 30 June 2026 text. The copy published in this repository is version 1.0.1 (8 October 2026); every check in §03 compares against the revision distributed here, and the differences that matter are stated in the status column.</p>
+      <p class="tblcap">The third-party assessment of §04 reviewed the 30 June 2026 text. The copy released here is version 1.0.1 (8 October 2026); every check in §04 compares against the released version, and the differences that matter are stated in the status column.</p>
       <div class="note" style="margin-bottom:0"><b>Read this first.</b> Download the specification before quoting any parameter: the tables on this page are a summary, and where the page and the specification disagree, the specification prevails.</div>
     </div>
   </div>
@@ -388,9 +608,9 @@
 
 <!-- ================= THIRD-PARTY ANALYSIS ================= -->
 <section id="analysis">
-  <p class="eyebrow rv">03 — Third-party analysis</p>
+  <p class="eyebrow rv">04 — Third-party analysis</p>
   <h2 class="rv">Independent reviews and their status</h2>
-  <p class="lead rv">Three independent sources have analysed this submission. None of them establishes a full-round cryptanalytic break of the correctly encoded software hash. What follows is what each one found, and the current status of every finding against the material distributed here.</p>
+  <p class="lead rv">Three independent sources have analysed this submission. None of them establishes a full-round cryptanalytic break of the correctly encoded software hash. What follows is what each one found, and the current status of every finding against the material released here.</p>
 
   <div class="grid3">
     <div class="card revcard lift rv">
@@ -419,19 +639,19 @@
   <div class="card rv" style="margin-top:22px">
     <h3 style="margin-top:0">Findings and current status</h3>
     <table style="font-size:13.5px">
-      <thead><tr><th style="width:44px">#</th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status in the material distributed here</th></tr></thead>
+      <thead><tr><th style="width:44px">#</th><th>Finding (as assessed)</th><th style="width:170px">Assessed severity</th><th style="width:190px">Status against the material released here</th></tr></thead>
       <tbody>
         <tr>
           <td class="k">R1</td>
           <td>The 1SC, 4SC and 8SC hardware wrappers omit the current block's length from the compression input, so their message encoding is not injective. The 2SC core contains a different, corrected counter path.</td>
           <td><span class="badge b-high">High</span> — for those hardware implementations</td>
-          <td><span class="badge b-ok">Addressed</span> Fixed in v1.0.1 for all four architectures: the current block length is part of the compression input, and the block, final flag and cumulative length are transaction-consistent (&sect;04).</td>
+          <td><span class="badge b-ok">Addressed</span> Fixed in v1.0.1 for all four architectures: the current block length is part of the compression input, and the block, final flag and cumulative length are transaction-consistent (&sect;05).</td>
         </tr>
         <tr>
           <td class="k">R2</td>
           <td>Chapter 2, the C sources and the RTL do not define one consistent algorithm — IV word 7, the AddConstant row placement, the counter word order and the hardware variant labels disagree.</td>
           <td><span class="badge b-med">Conformance</span> — blocks transfer of security conclusions</td>
-          <td><span class="badge b-ok">Addressed</span> The revision distributed here designates the conventions: IV₇ <span class="mono">0x3F84D5B5B5470917</span>, constants in state row 1 and the tweak in row 3, counter split <span class="mono">t₀‖t₁</span>. The hardware variant labels are unchanged — v1.0.1 fixes the README wording that explains them (&sect;04).</td>
+          <td><span class="badge b-ok">Addressed</span> The revision distributed here designates the conventions: IV₇ <span class="mono">0x3F84D5B5B5470917</span>, constants in state row 1 and the tweak in row 3, counter split <span class="mono">t₀‖t₁</span>. The hardware variant labels are unchanged — v1.0.1 fixes the README wording that explains them (&sect;05).</td>
         </tr>
         <tr>
           <td class="k">R3</td>
@@ -471,7 +691,7 @@
         </tr>
       </tbody>
     </table>
-    <p class="tblcap">Findings are numbered as in the assessment; its verdict is quoted above. The right-hand column records the state of the material distributed in <i>this</i> repository — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
+    <p class="tblcap">Findings are numbered as in the assessment; its verdict is quoted above. The right-hand column records the status of each finding against the material released here, as assessed by the submission — it is not a statement by either reviewer, and where the two disagree, the reviewers' own documents prevail.</p>
     <div class="note"><b>One residual wording issue.</b> The revision still describes the IV as “the first decimal digits of π” (§2.1); the printed words are hexadecimal. The digests are unaffected, and the page above states the values in hexadecimal. Noted for the next revision.</div>
   </div>
 
@@ -506,20 +726,20 @@
   <div class="callout ok rv">
     <h4>What none of these analyses claim</h4>
     <p style="margin:0 0 8px">None of the three establishes a full-round cryptanalytic break of the hash defined by the written compression algorithm, or of the correctly encoded software implementations. The assessment says so in as many words; the component paper says so in as many words.</p>
-    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§04). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
+    <p style="margin:0">The strongest concrete finding was the hardware length-binding defect (R1); the recommended remedy was to stop using the affected RTL implementations, and v1.0.1 corrects them (§05). Separately, all six supplied C implementations pass every entry of their KAT files — 24,582 comparisons — and the reproducibility of those vectors is what R8's test-infrastructure defects do not touch.</p>
   </div>
 </section>
 
 <!-- ================= ERRATUM ================= -->
 <section id="erratum">
-  <p class="eyebrow rv">04 — Erratum</p>
+  <p class="eyebrow rv">05 — Erratum</p>
   <h2 class="rv">The designers' erratum: v1.0 &rarr; v1.0.1</h2>
   <p class="lead rv">On 8 October 2026 the designers released <b>specification version 1.0.1</b> together with a two-page <b>erratum</b> that records every change made to the June 2026 text. The erratum is reproduced below in full. Its opening note is the single most important sentence in it, and it is quoted verbatim: <i>&ldquo;The design of hash function FEILIAN does not change. All details should refer to the reference code that illustrates FEILIAN correctly and fully.&rdquo;</i></p>
 
   <div class="callout ok rv">
     <h4>Design unchanged &mdash; typographies, not structure</h4>
     <p style="margin:0 0 8px">No round, constant, counter rule or iteration count is altered by v1.0.1. Four <b>typographical errors</b> are corrected in the specification (Table 1 of the erratum). The implementations are <b>refined towards the full-fledged version</b>, not repaired: the erratum states plainly that <i>&ldquo;the software implementation (both reference and optimized codes) are correct&rdquo;</i>. Its own summary of the software changes is that they (1) handle exceptional execution situations properly, (2) handle non-full-byte strings properly, and (3) correct some inconsistency in program comments.</p>
-    <p style="margin:0">The distinction matters for reading &sect;03: the compression function, the IV, the round constants and the counter conventions are what the third-party analyses examined, and none of them moves here.</p>
+    <p style="margin:0">The distinction matters for reading &sect;04: the compression function, the IV, the round constants and the counter conventions are what the third-party analyses examined, and none of them moves here.</p>
   </div>
 
   <div class="card rv" style="margin-top:22px">
@@ -580,8 +800,8 @@
   </div>
 
   <div class="card rv" style="margin-top:22px">
-    <h3 style="margin-top:0">How this maps onto the findings of &sect;03</h3>
-    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The erratum is the designers' response to the assessment. Read against the R-numbers of &sect;03, the corrections above fall out as follows.</p>
+    <h3 style="margin-top:0">How this maps onto the findings of &sect;04</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:6px 0 14px">The erratum is the designers' response to the assessment. Read against the R-numbers of &sect;04, the corrections above fall out as follows.</p>
     <table style="font-size:13.5px">
       <thead><tr><th>Finding</th><th>Status after v1.0.1</th></tr></thead>
       <tbody>
@@ -590,8 +810,8 @@
         <tr><td>R3 &mdash; Appendix B vector inconsistencies</td><td><b>Addressed.</b> Appendix B.2/B.3 are reprinted with the correct vectors under true message-length counts.</td></tr>
         <tr><td>R4 &mdash; non-full-byte message handling</td><td><b>Addressed.</b> Unused low-order bits of the final byte are now masked before compression.</td></tr>
         <tr><td>R5 &mdash; exceptional paths and digest-length validation</td><td><b>Addressed.</b> Allocation failure is propagated, length representability is checked, and a mismatched digest length now returns an error.</td></tr>
-        <tr><td>R6, R7 &mdash; scope and modelling of the security argument</td><td><b>Partly clarified.</b> The notation of the proof is unified (&sect;4.3.1) and the encoding/XOF footnotes (&sect;6.2&ndash;6.3) are added; the argument still has to be read against its stated interface, as &sect;03 sets out.</td></tr>
-        <tr><td>R8 &mdash; test-infrastructure defects</td><td><b>Not covered by this erratum.</b> The erratum makes no claim about the shared KAT/DRNG tooling; see &sect;03.</td></tr>
+        <tr><td>R6, R7 &mdash; scope and modelling of the security argument</td><td><b>Partly clarified.</b> The notation of the proof is unified (&sect;4.3.1) and the encoding/XOF footnotes (&sect;6.2&ndash;6.3) are added; the argument still has to be read against its stated interface, as &sect;04 sets out.</td></tr>
+        <tr><td>R8 &mdash; test-infrastructure defects</td><td><b>Not covered by this erratum.</b> The erratum makes no claim about the shared KAT/DRNG tooling; see &sect;04.</td></tr>
       </tbody>
     </table>
   </div>
@@ -602,7 +822,7 @@
   <p class="eyebrow rv">Sources</p>
   <h2 class="rv">Documents referenced</h2>
   <div class="card rv">
-    <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download</a>. A two-page erratum recording every change from v1.0 is distributed with it (§04).</div>
+    <div class="ref"><b>[1]</b> Lei Wang, Ling Song, Yaobin Shen, Kaixuan Wang, Zicheng Shi, Xin Yi. <i>FEILIAN: A Hash Function Proposal</i> — submitted to the Next-generation Cryptographic Algorithms Program, China. Version 1.0.1, 8 October 2026, 69 pp. SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span>. <a href="#downloads">Download</a>. A two-page erratum recording every change from v1.0 is distributed with it (§05).</div>
     <div class="ref"><b>[2]</b> Mounir Idrassi (AM Crypto, Japan). <i>FEILIAN: technical assessment of the submitted specification and implementations</i>, version 1.0.2, 27 September 2026, 14 pp. CC BY 4.0. Findings R1–R8.</div>
     <div class="ref"><b>[3]</b> Markku-Juhani O. Saarinen. <i>FEILIAN (hash-10)</i>, personal report, ngcc.dev, entries dated 23 and 26 September 2026. Unaffiliated with NICCS; identifiers and editorial labels belong to that site.</div>
     <div class="ref"><b>[4]</b> Mounir Idrassi. <i>A Complete Classification of Whole-Output Linear Structures in FEILIAN-Type Components</i>, Cryptology ePrint Archive, Report 2026/2236, 2026. CC BY 4.0.</div>
@@ -619,9 +839,9 @@
 
 <footer>
   <div class="wrap">
-    <p><b>FEILIAN — Submission Overview</b> · release v1.2.0 · 9 October 2026</p>
-    <p>An unofficial compendium. It presents published material — the specification, the independent assessment [2], the ngcc.dev report [3] and the ePrint paper [4] — and makes no claim of its own about the algorithm. Where this page and an authoritative document disagree, the specification and the original papers prevail. The performance and security figures of the specification are reproduced nowhere on this page by design; consult the PDF.</p>
-    <p>Compendium text and figures: <a href="LICENSE">CC BY 4.0</a>. The specification PDF and the implementations remain © their authors and are redistributed as filed — see <a href="NOTICE.md">NOTICE</a>.</p>
+    <p><b>FEILIAN — Submission Overview</b> · release v1.3.0 · 9 October 2026 · designation hash-10</p>
+    <p>Published for the FEILIAN submission to the NGCC-CH programme: the specification and its erratum as released, the reference, optimized and RTL implementations, and the independent third-party analyses the submission has received — each finding listed with its status. Where this page and the specification disagree, the specification prevails. Timings reported by the live demo are JavaScript measurements taken in your browser and say nothing about the implementations themselves.</p>
+    <p>Page text and figures: <a href="LICENSE">CC BY 4.0</a>. The specification PDF, the erratum and the implementation archives are submission material, © their designers, redistributed as released — see <a href="NOTICE.md">NOTICE</a>.</p>
     <p>Specification SHA-256 <span class="mono">2d14bcf877eb9fbdb79fe573be078923445aec373270a16676ebd494ffabf0db</span> · <a href="files/SHA256SUMS.txt">checksums</a> · <a href="https://github.com/PENNYBENNY/FEILIAN">source repository</a></p>
   </div>
 </footer>
@@ -731,23 +951,6 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
   },{rootMargin:'-45% 0px -50% 0px'});
   sections.forEach(function(s){if(s)nio.observe(s);});
 
-  /* ---------- hero hex ticker (IV, row-major) ---------- */
-  var hexObj=document.getElementById('ticker');
-  if(hexObj){
-    var words=["243f6a8885a308d3","13198a2e03707344","a4093822299f31d0","082efa98ec4e6c89",
-               "452821e638d01377","be5466cf34e90c6c","c0ac29b7c97c50dd","3f84d5b5b5470917",
-               "9216d5d98979fb1b","d1310ba698dfb5ac","2ffd72dbd01adfb7","b8e1afed6a267e96",
-               "ba7c9045f12c7f99","24a19947b3916cf7","0801f2e2858efc16","636920d871574e69"];
-    var idx=0, metaEl=document.getElementById('tickmeta');
-    function render(){
-      var a=words[idx%16], b=words[(idx+1)%16];
-      hexObj.innerHTML='<b>'+a+'</b> '+b+'<span class="caret"></span>';
-      metaEl.textContent='word '+(idx%16)+' / 15';
-      idx++;
-    }
-    render(); setInterval(render,900);
-  }
-
   /* ---------- pipeline stepper ---------- */
   var phg=document.getElementById('phg');
   var PH=5, CW=22, CH=34, GAP=5, PW=CW*4+GAP*3, PGAP=19, X0=(700-(PW*5+PGAP*4))/2;
@@ -802,6 +1005,765 @@ var DL_RELEASE = "";   /* optional mirror base, e.g. a release CDN prefix */
       timer=setInterval(function(){ cur=(cur+1)%5; paint(); },1000);
     }
   });
+})();
+</script>
+
+<!-- ================= LIVE DEMO — core + UI =================
+     Inlined from _repro/demo/feilian-live-demo.html. Wrapped in an IIFE so
+     none of its names reach the page's own script. -->
+<script>
+(function(){
+/* ==========================================================================
+ * Inlined FEILIAN core — generated. Do not edit here.
+ * Source: _repro/feilian_bigint.js  (sha256 dadd22e5cdb176b684f3591bc42fbf6f5429a93f3d19502a202c0eabc5f29c1d)
+ * ========================================================================== */
+/* __CORE_BEGIN__ */
+/* ==========================================================================
+ * FEILIAN hash family — JavaScript (BigInt) prototype
+ * ==========================================================================
+ *
+ * Locked to the convention used by the supplied C implementations and the
+ * official KAT material.  Nothing is switchable: the four points where the
+ * specification text and the implementations diverge are frozen here to the
+ * implementation reading.
+ *
+ *   IV word at row 1, col 3 : 0x3F84D5B5B5470917   (spec p.3 prints 0x3D...)
+ *   round-constant row      : 1                    (spec p.9 prints 3)
+ *   counter word order      : high word first      (t0 = high 64 bits)
+ *   final block counter     : true message length  (not a full 1024)
+ *
+ * Structure mirrors Implementations/Reference_Implementation/FEILIAN{512,768,1024}
+ * --------------------------------------------------------------
+ *   state   4 x 4 matrix of 64-bit words, row-major
+ *   rounds  20, grouped as 5 phases of 4 rounds
+ *           round r injects message words iff r % 4 == 0
+ *           every round = two (SubColumn + ShiftRow) half-rounds, then
+ *           AddConstant (constants -> row 1, tweak -> row 3)
+ *   tweak   [version, flag, t0, t1]   flag = all-ones on the final call
+ *   feed    h' = E(h, m) XOR h        (Davies-Meyer)
+ *   output  rows 0 .. hashRows-1, little-endian bytes within each word
+ *
+ * Arithmetic cost per compression call, for reference:
+ *   640 additions, 1216 XORs, 960 rotations  (matches specification Table 5.x)
+ * ========================================================================== */
+
+'use strict';
+
+const MASK64 = 0xffffffffffffffffn;
+const BLOCK_BYTES = 128;
+const BLOCK_BITS = 1024;
+const TOTAL_ROUNDS = 20;
+
+/* -------------------------------------------------------------------------- */
+/* Errors                                                                      */
+/* -------------------------------------------------------------------------- */
+
+class FeilianError extends Error {
+  constructor(message) { super(message); this.name = 'FeilianError'; }
+}
+class FeilianLengthError extends FeilianError {
+  constructor(message) { super(message); this.name = 'FeilianLengthError'; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Instances: digest width, version word, number of output rows                 */
+/* -------------------------------------------------------------------------- */
+
+const WIDTHS = {
+  512:  { name: 'FEILIAN-512',  version: 0x200n, hashRows: 2 },
+  768:  { name: 'FEILIAN-768',  version: 0x300n, hashRows: 3 },
+  1024: { name: 'FEILIAN-1024', version: 0x400n, hashRows: 4 },
+};
+
+/* -------------------------------------------------------------------------- */
+/* IV: the first 256 hexadecimal fractional digits of pi, as 16 words           */
+/* -------------------------------------------------------------------------- */
+
+const IV_ROWS = [
+  [0x243F6A8885A308D3n, 0x13198A2E03707344n, 0xA4093822299F31D0n, 0x082EFA98EC4E6C89n],
+  [0x452821E638D01377n, 0xBE5466CF34E90C6Cn, 0xC0AC29B7C97C50DDn, 0x3F84D5B5B5470917n],
+  [0x9216D5D98979FB1Bn, 0xD1310BA698DFB5ACn, 0x2FFD72DBD01ADFB7n, 0xB8E1AFED6A267E96n],
+  [0xBA7C9045F12C7F99n, 0x24A19947B3916CF7n, 0x0801F2E2858EFC16n, 0x636920D871574E69n],
+];
+/* flat, row-major: index = row * 4 + column */
+const IV_FLAT = [].concat(...IV_ROWS);
+
+/* -------------------------------------------------------------------------- */
+/* Round constants: fractional parts of sqrt(2), sqrt(3), sqrt(5), sqrt(7)      */
+/* Four groups, rotated left by one each group; the 20 rounds consume five      */
+/* phase constants in the order RC1 RC2 RC3 RC4 RC1.                            */
+/* -------------------------------------------------------------------------- */
+
+const RC0 = [0x6A09E667F3BCC908n, 0xBB67AE8584CAA73Bn,
+             0x3C6EF372FE94F82Bn, 0xA54FF53A5F1D36F1n];
+const RC_GROUPS = [0, 1, 2, 3].map((i) => [0, 1, 2, 3].map((k) => RC0[(i + k) % 4]));
+const RC_SCHEDULE = [0, 1, 2, 3, 0].map((i) => RC_GROUPS[i]);
+
+/* -------------------------------------------------------------------------- */
+/* 64-bit primitives                                                            */
+/* -------------------------------------------------------------------------- */
+
+/* Rotation amounts are module-level BigInt literals: converting a Number to
+   BigInt inside the hot path allocates, and the round function rotates 960
+   times per compression call. */
+const R5n = 5n, R5r = 59n;
+const R8n = 8n, R8r = 56n;
+const R11n = 11n, R11r = 53n;
+const R40n = 40n, R40r = 24n;
+const R48n = 48n, R48r = 16n;
+const R63n = 63n, R63r = 1n;
+
+function rotr64(x, n, r) {
+  return ((x >> n) | (x << r)) & MASK64;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Round layers — flat 16-word state, index = row * 4 + column                  */
+/* -------------------------------------------------------------------------- */
+
+/* SubColumn on one column: the four words are s[c], s[4+c], s[8+c], s[12+c],
+   playing the roles a, b, c, d of the specification. */
+function subColumn(s, c) {
+  let a = s[c], b = s[4 + c], cc = s[8 + c], d = s[12 + c];
+
+  a = (a + b) & MASK64;
+  cc = (cc + d) & MASK64;
+  d = d ^ a;
+  d = rotr64(d, R8n, R8r);
+  cc = (cc + (d ^ rotr64(d, R5n, R5r) ^ rotr64(d, R48n, R48r))) & MASK64;
+  b = b ^ cc;
+  b = rotr64(b, R63n, R63r);
+  a = (a + (b ^ rotr64(b, R11n, R11r) ^ rotr64(b, R40n, R40r))) & MASK64;
+
+  s[c] = a; s[4 + c] = b; s[8 + c] = cc; s[12 + c] = d;
+}
+
+function subColumnLayer(s) {
+  subColumn(s, 0); subColumn(s, 1); subColumn(s, 2); subColumn(s, 3);
+}
+
+/* ShiftRow: rotate row i left by i positions. */
+function shiftRows(s) {
+  let t;
+  t = s[4]; s[4] = s[5]; s[5] = s[6]; s[6] = s[7]; s[7] = t;
+  t = s[8]; const u = s[9];
+  s[8] = s[10]; s[9] = s[11]; s[10] = t; s[11] = u;
+  t = s[15]; s[15] = s[14]; s[14] = s[13]; s[13] = s[12]; s[12] = t;
+}
+
+/* AddConstant: round constants into row 1, tweak into row 3. */
+function addConstant(s, rc, tweak) {
+  s[4] = s[4] ^ rc[0]; s[5] = s[5] ^ rc[1];
+  s[6] = s[6] ^ rc[2]; s[7] = s[7] ^ rc[3];
+  s[12] = s[12] ^ tweak[0]; s[13] = s[13] ^ tweak[1];
+  s[14] = s[14] ^ tweak[2]; s[15] = s[15] ^ tweak[3];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Compression function                                                         */
+/* -------------------------------------------------------------------------- */
+
+function compress(hIn, words, isLast, counterWords, version) {
+  const t0 = counterWords[0], t1 = counterWords[1];
+  const s = hIn.slice();
+
+  for (let rnd = 0; rnd < TOTAL_ROUNDS; rnd++) {
+    const rc = RC_SCHEDULE[rnd >> 2];
+    const w = words;
+
+    if (rnd % 4 === 0) {
+      /* Message-bearing round: inject the first half, one half-round, inject
+         the second half, a second half-round, then the constants. */
+      s[0] = s[0] ^ w[0]; s[1] = s[1] ^ w[1];
+      s[2] = s[2] ^ w[2]; s[3] = s[3] ^ w[3];
+      s[8] = s[8] ^ w[4]; s[9] = s[9] ^ w[5];
+      s[10] = s[10] ^ w[6]; s[11] = s[11] ^ w[7];
+      subColumnLayer(s); shiftRows(s);
+      s[0] = s[0] ^ w[8]; s[1] = s[1] ^ w[9];
+      s[2] = s[2] ^ w[10]; s[3] = s[3] ^ w[11];
+      s[8] = s[8] ^ w[12]; s[9] = s[9] ^ w[13];
+      s[10] = s[10] ^ w[14]; s[11] = s[11] ^ w[15];
+      subColumnLayer(s); shiftRows(s);
+    } else {
+      subColumnLayer(s); shiftRows(s);
+      subColumnLayer(s); shiftRows(s);
+    }
+
+    s[4] = s[4] ^ rc[0]; s[5] = s[5] ^ rc[1];
+    s[6] = s[6] ^ rc[2]; s[7] = s[7] ^ rc[3];
+    s[12] = s[12] ^ version; s[13] = s[13] ^ (isLast ? MASK64 : 0n);
+    s[14] = s[14] ^ t0; s[15] = s[15] ^ t1;
+  }
+
+  /* Davies-Meyer feed-forward. */
+  for (let i = 0; i < 16; i++) s[i] = s[i] ^ hIn[i];
+  return s;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Message handling                                                             */
+/* -------------------------------------------------------------------------- */
+
+function loadWords(block, off) {
+  const w = new Array(16);
+  for (let j = 0; j < 16; j++) {
+    let v = 0n;
+    const base = off + j * 8;
+    for (let k = 7; k >= 0; k--) v = (v << 8n) | BigInt(block[base + k]);
+    w[j] = v;
+  }
+  return w;
+}
+
+/* Zero padding only, with no in-block length field.  Bits past msgBits in the
+   final byte are cleared so the digest depends only on the declared bit
+   string.  Returns the padded byte array. */
+function pad(msg, msgBits) {
+  if (msgBits === 0) return new Uint8Array(BLOCK_BYTES);
+
+  const msgBytes = Math.ceil(msgBits / 8);
+  const rem = msgBits % BLOCK_BITS;
+  const padBits = rem === 0 ? 0 : BLOCK_BITS - rem;
+  const len = msgBytes + Math.ceil(padBits / 8);
+
+  const buf = new Uint8Array(len);
+  buf.set(msg.subarray(0, Math.min(msgBytes, msg.length)), 0);
+  if (msgBits % 8 !== 0) {
+    buf[msgBytes - 1] &= (0xFF << (8 - (msgBits % 8))) & 0xFF;
+  }
+  return buf;
+}
+
+/* Counter words, high 64 bits first. */
+function counterWords(total) {
+  return [(total >> 64n) & MASK64, total & MASK64];
+}
+
+function serialise(state, hashRows) {
+  const out = new Uint8Array(hashRows * 32);
+  let p = 0;
+  for (let i = 0; i < hashRows * 4; i++) {
+    let v = state[i];
+    for (let k = 0; k < 8; k++) { out[p++] = Number(v & 0xFFn); v >>= 8n; }
+  }
+  return out;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public API                                                                   */
+/* -------------------------------------------------------------------------- */
+
+function toBytes(message) {
+  if (typeof message === 'string') return new TextEncoder().encode(message);
+  if (message instanceof Uint8Array) return message;
+  if (Array.isArray(message)) return Uint8Array.from(message);
+  throw new FeilianError('message must be a string, Uint8Array or byte array');
+}
+
+/* Hash the first msgBits bits of message. */
+function feilianFromBitString(message, msgBits, digestBits = 1024) {
+  const width = WIDTHS[digestBits];
+  /* Check order is part of the contract: width, sign, short, counter. */
+  if (!width) {
+    /* Message text matches the Python oracle verbatim. */
+    throw new FeilianError(`unsupported digest width ${digestBits}; `
+      + `expected one of [512, 768, 1024]`);
+  }
+  if (!Number.isInteger(msgBits)) {
+    throw new FeilianError('msg_bits must be an integer');
+  }
+  if (msgBits < 0) {
+    throw new FeilianError('msg_bits must be non-negative');
+  }
+
+  const bytes = toBytes(message);
+  /* Exact decimal text and exact byte count, so the message matches the
+     oracle even for lengths beyond 2**53. */
+  const needed = (BigInt(msgBits) + 7n) / 8n;
+  if (BigInt(bytes.length) < needed) {
+    throw new FeilianError(`message too short: need ${needed} bytes for `
+      + `${BigInt(msgBits)} bits, got ${bytes.length}`);
+  }
+  if (msgBits >= 2 ** 128) {
+    throw new FeilianLengthError('message length must fit the 128-bit counter (2**128 - 1 bits)');
+  }
+
+  const padded = pad(bytes, msgBits);
+  const numBlocks = Math.floor(padded.length / BLOCK_BYTES);
+
+  let state = IV_FLAT.slice();
+
+  for (let i = 0; i < numBlocks; i++) {
+    const isLast = i === numBlocks - 1;
+    const total = BigInt(Math.min((i + 1) * BLOCK_BITS, msgBits));
+    const words = loadWords(padded, i * BLOCK_BYTES);
+    state = compress(state, words, isLast, counterWords(total), width.version);
+  }
+  return serialise(state, width.hashRows);
+}
+
+/* Hash a whole, byte-aligned message. */
+function feilian(message, digestBits = 1024) {
+  const bytes = toBytes(message);
+  return feilianFromBitString(bytes, bytes.length * 8, digestBits);
+}
+
+function toHex(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i++) s += bytes[i].toString(16).padStart(2, '0');
+  return s;
+}
+
+const feilianHex = (message, digestBits = 1024) => toHex(feilian(message, digestBits));
+
+const __FEILIAN_API = {
+  FeilianError, FeilianLengthError,
+  feilian, feilianHex, feilianFromBitString, toHex,
+  WIDTHS, MASK64,
+};
+
+/* page handle */
+globalThis.__FEILIAN_API = __FEILIAN_API;
+
+/* __CORE_END__ */
+/* ========================================================================== */
+
+(function () {
+'use strict';
+
+var F = globalThis.__FEILIAN_API;
+var WIDTHS = F.WIDTHS;
+
+var AUTO_CAP = 8192;              /* bytes: above this, compute on demand  */
+var HARD_CAP = 1048576;           /* bytes: policy limit, not a spec limit */
+
+var state = { bits: 1024, mode: 'text' };
+
+var $ = function (id) { return document.getElementById(id); };
+var inp = $('inp'), bitlen = $('bitlen'), out = $('out');
+var verdict = $('verdict'), inStats = $('inStats'), outStats = $('outStats');
+
+/* ------------------------------------------------------------------ *
+ * Known-answer vectors.
+ *  - 'spec' rows are the canonical Appendix B digests.
+ *  - 'bits' rows exercise msg_bits % 8 != 0 through the same path the
+ *    bit-string mode uses.
+ * ------------------------------------------------------------------ */
+var KAT = [
+  { label: 'empty, 1024',        bits: 1024, kind: 'text', val: '',          hex: '050d49c1ec846087e39b3d33df18b36e657aedace23e834994e5020951a1b8f12fe1aa19b4d0963cacb763a62591504da946bf965c02d2690f4de4fa1e50d3c39d47ad5a8f5022809c47dc39c4be67a1f7a83b026e2677b02f33850667420a0f7f226089911b677471fa791f90b0e6fe750e5365679ddf6b6081b4174663d9b9' },
+  { label: '"abc", 512',         bits: 512,  kind: 'text', val: 'abc',       hex: 'fc7320c565f60ec6a6ea26585f7c7d1f50931119a1d1fb6ca06a71bed9bce0947e22171373e48e0c9bb1ef36808ef3e5fa56c50ff5838213b54a0750c6ae1270' },
+  { label: '"abc", 768',         bits: 768,  kind: 'text', val: 'abc',       hex: 'ea0a78e8fd68db09af5ad1d5755311e6073e2742f9c9f79fcb9966dc869e1454bac2495ca9bfe8ea2f331638ccd98a3f6ecdb42b952889b0ec054a26e934fe94f46b8b5fd6c4bb34b5bfb869028e76f78bbc0c99f1c276becb1adc2739a5abe1' },
+  { label: '"abc", 1024',        bits: 1024, kind: 'text', val: 'abc',       hex: '0507e4b1ef75d025dfa303ea0a8e2c47f9c7c5503dc12be4d38615f0b1e1ed2b0ec6527ec29778a436be43cd599500fdfe2718a07ba9ca85c94271df47351109dc73a8ec672ba113296b155e56052dd639a0e0a636afea4888db3739e2f282ccda0d93dfbeefde73902c89d42803b6cb7944717688ebc3b2ad2955c31ee6c681' },
+  { label: '"abc" 19-bit prefix',bits: 1024, kind: 'bits', val: '0110000101100010011', nbits: 19,
+    hex: '301e5bc5ed45dfff3727e1ee28d2e5f6736783f621973c24f831aa25886628e6b45bd2fc1716c231f548c8399253e047a01427797651a155d113f9cb1ef6ceba7ff9f7ea170c1d3b2f9f22f71cd817b34a5dc917a7bb8dde6b4b9e50fcca4af6946fa208632ec0d0267b8c7f410f565d2f07f767498df610f68beac04acef2a0' },
+  { label: '"abc" 23-bit prefix',bits: 1024, kind: 'bits', val: '01100001011000100110001', nbits: 23,
+    hex: 'b5f96f612c05b2f64f11802f1edf9bb00b6df6fa32af86b74af4eff4c44abf65b71683038edbb58c7bd3865e24a496446a98ac7fd16686353f8efdfffe98adfff6a47377b55ac91dd8b02ab6375f3a1e00945cf3717724fa3c17004142bd604b81b7c68ec43606a9fcab412aa4fd6b3541c8f266ab7dcc8fce50e81c6fd85a6d' },
+  { label: '129 × "a", 512',     bits: 512,  kind: 'text', val: null,        hex: 'a2189955d155788ce69ab2a6db9b5a943eff5d5924876f96ba46d3944947238e3f0f29ea4c15bddda8dd238876b0d6933d6f17a7eb6e166b5e4afb38519b803a', rep: 'a', n: 129 },
+  { label: '129 × "a", 768',     bits: 768,  kind: 'text', val: null,        hex: '5fc94695955a87e9defaaf83a7460733ded961a12b7c55073af1611c8f524339af4000edb802c44332b24a4187525040e12f4e530c633797c2283313a832445cb62f926c28f0e45f7ccb8b9c2278096446141c07e46f78a014ab284f37e6d4fd', rep: 'a', n: 129 },
+  { label: '129 × "a", 1024',    bits: 1024, kind: 'text', val: null,        hex: 'e3383d3260ea32ed8fe316f8b27cd6bea25969c43aacdc01360c94861cd190ff95a82f04ebf95e9519eef7c969bb0f0bee439de8851ce6bfbe21ba160f55884daf4263785f6b6d1e7713350145ba5fcdeb63e5e2e376161b5dfa8ef11f09e285ab8ebb5cb6de1b60517922e7d3ffabf2537a269f70f25f5a117484183bc76ee5', rep: 'a', n: 129 }
+];
+
+/* ------------------------------------------------------------------ *
+ * Input parsing.  Two rejection layers, kept apart on purpose:
+ *   'input'  — this page refuses to hand the bytes to the core at all
+ *   'spec'   — the core itself rejects (message text mirrors the port)
+ * ------------------------------------------------------------------ */
+function InputError(message) { this.name = 'InputError'; this.message = message; }
+InputError.prototype = Object.create(Error.prototype);
+
+function parseHex(text) {
+  var cleaned = text.replace(/[\s:_,]/g, '');
+  var m = cleaned.match(/[^0-9a-fA-F]/);
+  if (m) {
+    throw new InputError('hex input: "' + m[0] + '" at offset ' + cleaned.indexOf(m[0])
+      + ' is not a hexadecimal digit');
+  }
+  if (cleaned.length % 2 !== 0) {
+    throw new InputError('hex input: odd nibble count (' + cleaned.length
+      + '); a whole number of bytes is required');
+  }
+  var bytes = new Uint8Array(cleaned.length / 2);
+  for (var i = 0; i < bytes.length; i++) bytes[i] = parseInt(cleaned.substr(i * 2, 2), 16);
+  return bytes;
+}
+
+function parseBits(text) {
+  var cleaned = text.replace(/\s/g, '');
+  var m = cleaned.match(/[^01]/);
+  if (m) {
+    throw new InputError('bit input: "' + m[0] + '" at offset ' + cleaned.indexOf(m[0])
+      + ' is not a bit; only 0, 1 and whitespace are accepted');
+  }
+  var bytes = new Uint8Array(Math.ceil(cleaned.length / 8));
+  for (var i = 0; i < cleaned.length; i++) {
+    if (cleaned.charCodeAt(i) === 49) bytes[i >> 3] |= 0x80 >> (i & 7);
+  }
+  return { bytes: bytes, nbits: cleaned.length };
+}
+
+function parseBitLength(raw, suppliedBits) {
+  var t = String(raw).trim();
+  if (t === '') return suppliedBits;
+  if (!/^[0-9]+$/.test(t)) {
+    throw new InputError('message bits: "' + t + '" is not a non-negative integer');
+  }
+  if (BigInt(t) >= (1n << 128n)) {
+    throw new InputError('message bits: must fit the 128-bit counter (below 2^128)');
+  }
+  if (Number(t) > Number.MAX_SAFE_INTEGER) {
+    throw new InputError('message bits: beyond 2^53, which this page cannot address exactly');
+  }
+  return Number(t);
+}
+
+/* bytes + declared bit length for the current mode */
+function prepare(text, mode, rawBitLen) {
+  if (mode === 'hex') {
+    var bytes = parseHex(text);
+    return { bytes: bytes, msgBits: bytes.length * 8, suppliedBits: bytes.length * 8 };
+  }
+  if (mode === 'bits') {
+    var p = parseBits(text);
+    return { bytes: p.bytes, msgBits: p.nbits, suppliedBits: p.nbits };
+  }
+  var enc = new TextEncoder().encode(text);
+  return { bytes: enc, msgBits: enc.length * 8, suppliedBits: enc.length * 8 };
+}
+
+function paddedBlocks(msgBits) {
+  if (msgBits === 0) return 1;
+  var rem = msgBits % 1024;
+  var padBits = rem === 0 ? 0 : 1024 - rem;
+  return Math.max(1, Math.floor((Math.ceil(msgBits / 8) + Math.ceil(padBits / 8)) / 128));
+}
+
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(n < 10240 ? 2 : 1) + ' KiB';
+  return (n / 1048576).toFixed(2) + ' MiB';
+}
+function fmtBits(n) {
+  if (typeof n === 'string') return n + ' bit';
+  if (n < 100000) return n + ' bit';
+  return n.toLocaleString('en-US') + ' bit';
+}
+
+/* ------------------------------------------------------------------ *
+ * The one and only call into the core, plus stable timing.
+ * ------------------------------------------------------------------ */
+function runCore(bytes, msgBits, digestBits) {
+  var r = F.feilianFromBitString(bytes, msgBits, digestBits);
+  return F.toHex(r);
+}
+
+function timedRun(bytes, msgBits, digestBits) {
+  var t0 = performance.now();
+  var digest = runCore(bytes, msgBits, digestBits);
+  var t1 = performance.now();
+  var single = t1 - t0;
+  var n = single < 0.4 ? 24 : Math.max(1, Math.min(24, Math.round(24 / single)));
+  var sum = 0, best = single;
+  for (var i = 0; i < n; i++) {
+    var a = performance.now();
+    runCore(bytes, msgBits, digestBits);
+    var b = performance.now();
+    sum += b - a;
+    if (b - a < best) best = b - a;
+  }
+  return {
+    digest: digest,
+    avg: (single + sum) / (n + 1),   /* every sample, warm-up included */
+    best: best,
+    samples: n + 1
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Rendering
+ * ------------------------------------------------------------------ */
+function renderDigest(hex, fresh) {
+  out.innerHTML = '';
+  if (hex == null) {
+    var ph = document.createElement('div');
+    ph.className = 'ph';
+    ph.textContent = 'not computed';
+    out.appendChild(ph);
+    return;
+  }
+  var words = [];
+  for (var i = 0; i < hex.length; i += 16) words.push(hex.substr(i, 16));
+  if (hex.length <= 256) {
+    for (var w = 0; w < words.length; w += 4) {
+      var row = document.createElement('div');
+      row.className = 'row';
+      for (var k = w; k < Math.min(w + 4, words.length); k++) {
+        var cell = document.createElement('div');
+        cell.className = 'w' + (fresh ? ' fresh' : '');
+        cell.textContent = words[k];
+        row.appendChild(cell);
+      }
+      out.appendChild(row);
+    }
+  } else {
+    var box = document.createElement('div');
+    box.className = 'wrap-any';
+    box.textContent = hex;
+    out.appendChild(box);
+  }
+}
+
+function setVerdict(kind, badge, html) {
+  verdict.className = 'verdict ' + kind;
+  verdict.innerHTML = '<span class="badge">' + badge + '</span><span class="msg">' + html + '</span>';
+}
+
+/* ------------------------------------------------------------------ *
+ * The update path
+ * ------------------------------------------------------------------ */
+var timer = null;
+
+function schedule() {
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(update, 110);
+}
+
+function update() {
+  timer = null;
+  var text = inp.value;
+
+  var prep;
+  try {
+    prep = prepare(text, state.mode, bitlen.value);
+  } catch (e) {
+    renderDigest(null);
+    inStats.innerHTML = 'rejected before hashing';
+    outStats.innerHTML = '';
+    setVerdict('err', 'input', escapeHtml(e.message)
+      + '<span class="why">This page will not hand the bytes to the core. Nothing was hashed.</span>');
+    return;
+  }
+
+  var bytes = prep.bytes;
+  var suppliedBits = prep.suppliedBits;
+
+  var msgBits;
+  try {
+    msgBits = parseBitLength(bitlen.value, suppliedBits);
+  } catch (e) {
+    renderDigest(null);
+    setVerdict('err', 'input', escapeHtml(e.message));
+    return;
+  }
+
+  inStats.innerHTML =
+    'bytes <b>' + fmtBytes(bytes.length) + '</b><span class="sep">·</span>'
+    + 'bits <b>' + fmtBits(Number(msgBits)) + '</b>'
+    + '<span class="sep">·</span>source <b>' + (state.mode === 'text' ? 'UTF-8 (LF newlines)' : state.mode) + '</b>';
+
+  if (bytes.length > HARD_CAP) {
+    renderDigest(null);
+    outStats.innerHTML = '';
+    setVerdict('warn', 'policy',
+      'This demo refuses messages above <b>' + fmtBytes(HARD_CAP) + '</b> (yours is '
+      + fmtBytes(bytes.length) + ').<span class="why">A policy limit of this page, not a limit of the specification. '
+      + 'The C code hashes far larger inputs.</span>');
+    return;
+  }
+
+  if (bytes.length > AUTO_CAP) {
+    renderDigest(null);
+    var est = bytes.length / 128 * 0.22;
+    outStats.innerHTML = '';
+    setVerdict('warn', 'policy',
+      '<span class="lead">' + fmtBytes(bytes.length) + ' — above the automatic threshold ('
+      + fmtBytes(AUTO_CAP) + ').</span><span class="why">A BigInt core at roughly 0.5 MB/s needs about '
+      + est.toFixed(0) + ' ms for this message, so it will not run on every keystroke. '
+      + '<button class="btn solid" id="btnGo" style="margin-top:7px">hash it now</button></span>');
+    var go = document.getElementById('btnGo');
+    if (go) go.addEventListener('click', function () { compute(bytes, msgBits, /*manual*/ true); });
+    return;
+  }
+
+  compute(bytes, msgBits, false);
+}
+
+function compute(bytes, msgBits, manual) {
+  var t;
+  try {
+    t = timedRun(bytes, msgBits, state.bits);
+  } catch (e) {
+    renderDigest(null);
+    outStats.innerHTML = '';
+    var spec = (e instanceof F.FeilianError);
+    setVerdict('err', spec ? 'spec' : 'input', escapeHtml(e.message || String(e))
+      + '<span class="why">' + (spec
+        ? 'The core itself rejected the call — this is the specification-level contract, and the message is the one the ported code emits.'
+        : 'The core did not recognise the call.') + '</span>');
+    return;
+  }
+
+  renderDigest(t.digest, true);
+  var blocks = paddedBlocks(Number(msgBits));
+  var mbps = t.avg > 0 ? (128 * blocks / 1048576) / (t.avg / 1000) : 0;
+  /* Coarse or clamped clocks can round a fast hash to 0 ms; report "n/a"
+     rather than an infinite rate. */
+  var mbpsTxt = t.avg > 0 ? mbps.toFixed(2) + ' MB/s' : 'n/a';
+  outStats.innerHTML =
+    '<b>' + WIDTHS[state.bits].name + '</b><span class="sep">·</span>'
+    + 'blocks <b>' + blocks + '</b> × 1024<span class="sep">·</span>'
+    + '<b>' + (t.avg * 1000 / blocks).toFixed(1) + ' µs</b>/block<span class="sep">·</span>'
+    + '<b>' + (t.avg * 1000).toFixed(1) + ' µs</b> wall<span class="sep">·</span>'
+    + '<b>' + mbpsTxt + '</b><span class="sep">·</span>'
+    + 'n=<b>' + t.samples + '</b>';
+
+  var note = bytes.length === 0
+    ? 'Empty input is a valid message: the core hashes the 0-bit string.'
+    : (msgBits === bytes.length * 8
+      ? 'OK'
+      : 'OK — only the first ' + msgBits + ' bits are hashed; bits past that are cleared, not read.');
+
+  setVerdict('ok', 'ok',
+    '<span class="lead">' + escapeHtml(note) + '</span><span class="why">'
+    + (manual ? 'Computed on request. ' : '')
+    + 'Digest, padding, counter and constants all come from the inlined BigInt port; this page only decides what bytes to hand it.</span>');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * Controls
+ * ------------------------------------------------------------------ */
+function bindSeg(el, key, after) {
+  el.addEventListener('click', function (ev) {
+    var t = ev.target;
+    var b = (t && t.closest) ? t.closest('button[data-v]') : null;
+    if (!b) return;
+    Array.prototype.forEach.call(el.querySelectorAll('button'), function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    state[key] = b.dataset.v === 'text' || b.dataset.v === 'hex' || b.dataset.v === 'bits'
+      ? b.dataset.v : parseInt(b.dataset.v, 10);
+    if (after) after();
+    schedule();
+  });
+}
+
+bindSeg($('segBits'), 'bits', function () {
+  $('outHint').textContent = WIDTHS[state.bits].name;
+});
+bindSeg($('segMode'), 'mode', function () {
+  bitlen.disabled = state.mode !== 'bits';
+  if (bitlen.disabled) bitlen.value = '';
+  updateHints();
+});
+
+function updateHints() {
+  var hints = {
+    text: 'UTF-8 text, byte-aligned',
+    hex: 'hex bytes; whitespace and ":" ignored',
+    bits: 'raw bit string; set a length to truncate'
+  };
+  $('inHint').textContent = hints[state.mode];
+  inp.placeholder = state.mode === 'text'
+    ? 'Type anything — the digest updates as you type.'
+    : (state.mode === 'hex'
+      ? '616263  (or 61:62:63) — "abc"'
+      : '011000010110001001100011  — "abc"');
+}
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise(function (resolve, reject) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    ok ? resolve() : reject(new Error('copy is not available from this context'));
+  });
+}
+
+$('btnCopy').addEventListener('click', function () {
+  var text = Array.prototype.map.call(out.querySelectorAll('.w'), function (w) { return w.textContent; }).join('')
+    || (out.querySelector('.wrap-any') ? out.querySelector('.wrap-any').textContent : '');
+  if (!text) return;
+  copyText(text).then(function () {
+    $('btnCopy').textContent = 'copied';
+  }, function () {
+    $('btnCopy').textContent = 'select & copy manually';
+  }).then(function () {
+    setTimeout(function () { $('btnCopy').textContent = 'copy digest'; }, 1400);
+  });
+});
+
+$('btnSample').addEventListener('click', function () {
+  if (state.mode === 'text') { inp.value = 'abc'; }
+  else if (state.mode === 'hex') { inp.value = '616263'; }
+  else { inp.value = '011000010110001001100011'; bitlen.value = '24'; }
+  schedule();
+});
+
+inp.addEventListener('input', schedule);
+bitlen.addEventListener('input', schedule);
+
+/* ------------------------------------------------------------------ *
+ * Self-test
+ * ------------------------------------------------------------------ */
+function selfTest() {
+  var rows = [], pass = 0;
+  for (var i = 0; i < KAT.length; i++) {
+    var v = KAT[i], got = null, ok = false, err = null;
+    try {
+      if (v.kind === 'bits') {
+        var pb = parseBits(v.val);
+        got = runCore(pb.bytes, v.nbits, v.bits);
+      } else {
+        var s = v.rep != null ? new Array(v.n + 1).join(v.rep) : v.val;
+        var eb = new TextEncoder().encode(s);
+        got = runCore(eb, eb.length * 8, v.bits);
+      }
+      ok = got === v.hex;
+    } catch (e) { err = e; }
+    if (ok) pass++;
+    rows.push('<tr><td>' + escapeHtml(v.label) + '</td><td class="'
+      + (ok ? 'pass' : 'fail') + '">' + (ok ? 'pass' : (err ? 'throw' : 'FAIL')) + '</td></tr>');
+  }
+  $('katTable').innerHTML = '<tbody>' + rows.join('') + '</tbody>';
+  var pill = $('stampTest');
+  if (pass === KAT.length) {
+    pill.innerHTML = '<span class="pill ok">' + pass + '/' + KAT.length + ' pass</span>';
+    setVerdict('info', 'ready',
+      '<span class="lead">Core self-test passed ' + pass + '/' + KAT.length
+      + ' against the canonical vectors.</span><span class="why">Includes two bit-level cases, so the non-byte-aligned path is covered too. '
+      + 'Hashing starts now; type in the box on the left.</span>');
+  } else {
+    pill.innerHTML = '<span class="pill bad">' + pass + '/' + KAT.length + ' pass</span>';
+    setVerdict('err', 'broken',
+      '<span class="lead">Core self-test failed (' + pass + '/' + KAT.length
+      + ').</span><span class="why">The inlined port does not agree with the canonical vectors. Digests shown on this page cannot be trusted — rebuild the demo.</span>');
+  }
+}
+
+$('uaStamp').textContent = navigator.userAgent;
+try {
+  selfTest();
+} catch (e) {
+  setVerdict('err', 'broken', 'Self-test could not run: ' + escapeHtml(e.message || String(e)));
+}
+updateHints();
+inp.value = 'abc';
+schedule();
+
+})();
 })();
 </script>
 </body>
